@@ -266,34 +266,27 @@ public class UserviewThemeProcesser {
             String menuId = userview.getParamString("menuId");
             //check current redirect url is exist, else redirect to home
             boolean isExist = false;
-            
-            if (userview.getCurrent() != null && (menuId.equals(userview.getCurrent().getPropertyString("id")) || menuId.equals(userview.getCurrent().getPropertyString("customId")))) {
-                isExist = true;
-            }
-            
-            if (!isExist) {
-                if (menuId != null && !menuId.isEmpty()) {
-                    for (UserviewCategory c : userview.getCategories()) {
-                        for (UserviewMenu m : c.getMenus()) {
-                            if (menuId.equals(m.getPropertyString("id")) || menuId.equals(m.getPropertyString("customId"))) {
-                                isExist = true;
-                                break;
-                            }
-                        }
-                        if (isExist) {
+            if (menuId != null && !menuId.isEmpty()) {
+                for (UserviewCategory c : userview.getCategories()) {
+                    for (UserviewMenu m : c.getMenus()) {
+                        if (menuId.equals(m.getPropertyString("id")) || menuId.equals(m.getPropertyString("customId"))) {
+                            isExist = true;
                             break;
                         }
                     }
-                    if (!isExist) {
-                        UserviewTheme temp = userview.getSetting().getTheme();
-                        if (temp != null && temp instanceof UserviewV5Theme) {
-                            String[] themeDefinedMenus = ((UserviewV5Theme) temp).themeDefinedMenusId();
-                            if (themeDefinedMenus != null) {
-                                for (String dm : themeDefinedMenus) {
-                                    if (dm.equals(menuId)) {
-                                        isExist = true;
-                                        break;
-                                    }
+                    if (isExist) {
+                        break;
+                    }
+                }
+                if (!isExist) {
+                    UserviewTheme temp = userview.getSetting().getTheme();
+                    if (temp != null && temp instanceof UserviewV5Theme) {
+                        String[] themeDefinedMenus = ((UserviewV5Theme) temp).themeDefinedMenusId();
+                        if (themeDefinedMenus != null) {
+                            for (String dm : themeDefinedMenus) {
+                                if (dm.equals(menuId)) {
+                                    isExist = true;
+                                    break;
                                 }
                             }
                         }
@@ -302,26 +295,20 @@ public class UserviewThemeProcesser {
             }
             if (isExist) {
                 if (!userview.getParamString("menuId").isEmpty()) {
-                    url += menuId;
+                    url += menuId; 
                 }
                 if (request.getQueryString() != null) {
                     url += "?" + StringUtil.decodeURL(request.getQueryString());
-                } else if (request.getQueryString() == null && request.getHeader("referer") != null) {
-                    String referer = request.getHeader("referer");
-                    if (referer != null && referer.contains("?")) {
-                        String queryString = referer.substring(referer.indexOf("?"));
-                        url += queryString;
-                    }
                 }
             } else {
-                url += userview.getProperty("homeMenuId");
+                url += userview.getProperty("homeMenuId"); 
             }
             
             return "redirect:" + url;
         }
         return null;
     }
-        
+
     protected String loginPageRedirection() {
         boolean isAnonymous = WorkflowUtil.isCurrentUserAnonymous();
         boolean hasCurrentPage = userview.getCurrent() != null;

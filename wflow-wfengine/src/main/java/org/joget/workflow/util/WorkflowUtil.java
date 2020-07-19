@@ -18,7 +18,6 @@ import org.joget.commons.util.DynamicDataSourceManager;
 import org.joget.commons.util.FileStore;
 import org.joget.commons.util.HostManager;
 import org.joget.commons.util.SecurityUtil;
-import org.joget.directory.model.service.DirectoryUtil;
 import org.joget.workflow.model.dao.WorkflowHelper;
 import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.model.service.WorkflowUserManager;
@@ -202,7 +201,7 @@ public class WorkflowUtil implements ApplicationContextAware {
         WorkflowUserManager workflowUserManager = (WorkflowUserManager) appContext.getBean("workflowUserManager");
         User user = workflowUserManager.getCurrentUser();
         if (user != null && user.getFirstName() != null && user.getFirstName().trim().length() > 0) {
-            return DirectoryUtil.getUserFullName(user);
+            return user.getFirstName() + " " + user.getLastName();
         } else {
             return workflowUserManager.getCurrentUsername();
         }

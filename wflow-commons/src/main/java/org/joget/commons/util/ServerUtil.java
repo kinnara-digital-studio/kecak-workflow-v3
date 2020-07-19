@@ -59,10 +59,6 @@ public class ServerUtil {
             LogUtil.debug(ServerUtil.class.getName(), "Error read servers file: " + e.getMessage());
         }
         
-        if (servers == null) {
-            servers = new HashSet<String>();
-        }
-        
         String lServerName = getServerName();
         
         if (!servers.contains(lServerName)) {

@@ -4677,9 +4677,6 @@ PropertyEditor.Type.CodeEditor.prototype = {
         if (this.properties.mode !== undefined || this.properties.mode !== "") {
             this.codeeditor.getSession().setMode("ace/mode/" + this.properties.mode);
         }
-        if (this.properties.check_syntax !== undefined && this.properties.check_syntax.toLowerCase() === "false") {
-            this.codeeditor.getSession().setUseWorker(false);
-        }
         this.codeeditor.setAutoScrollEditorIntoView(true);
         this.codeeditor.setOption("maxLines", 1000000); //unlimited, to fix the height issue
         this.codeeditor.setOption("minLines", 10);
@@ -4911,20 +4908,6 @@ PropertyEditor.Type.ElementSelect.prototype = {
                         } else {
                             elementdata += ' parentelementid="' + currentPage.attr("elementid") + '"';
                         }
-                    }
-                    
-                    //handle keep_value_on_change equal to true with new added property default value
-                    if (thisObj.pageOptions.propertyValues !== null && (typeof thisObj.pageOptions.propertyValues) !== "undefined" && !((typeof thisObj.properties.keep_value_on_change) === "undefined") && thisObj.properties.keep_value_on_change.toLowerCase() === "true") {
-                        $.each(thisObj.pageOptions.propertiesDefinition, function(i, page) {
-                            if (page.properties !== undefined) {
-                                $.each(page.properties, function(i, property) {
-                                    //if there is default value and the property name is not exist in existing values
-                                    if (property.value !== undefined && thisObj.pageOptions.propertyValues[property.name] === undefined) {
-                                        thisObj.pageOptions.propertyValues[property.name] = property.value;
-                                    }
-                                });
-                            }
-                        });
                     }
 
                     var html = "";
@@ -5324,20 +5307,6 @@ PropertyEditor.Type.ElementMultiSelect.prototype = {
                         } else {
                             elementdata += ' parentelementid="' + currentPage.attr("elementid") + '"';
                         }
-                    }
-                    
-                    //handle keep_value_on_change equal to true with new added property default value
-                    if (propertyValues !== null && (typeof propertyValues) !== "undefined" && !((typeof thisObj.properties.keep_value_on_change) === "undefined") && thisObj.properties.keep_value_on_change.toLowerCase() === "true") {
-                        $.each($(row).data("propertiesDefinition"), function(i, page) {
-                            if (page.properties !== undefined) {
-                                $.each(page.properties, function(i, property) {
-                                    //if there is default value and the property name is not exist in existing values
-                                    if (property.value !== undefined && propertyValues[property.name] === undefined) {
-                                        propertyValues[property.name] = property.value;
-                                    }
-                                });
-                            }
-                        });
                     }
                     
                     var newOptions = {

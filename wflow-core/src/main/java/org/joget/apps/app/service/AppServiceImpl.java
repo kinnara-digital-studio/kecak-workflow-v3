@@ -95,7 +95,6 @@ import org.joget.commons.util.SetupManager;
 import org.joget.commons.util.StringUtil;
 import org.joget.commons.util.UuidGenerator;
 import org.joget.directory.model.User;
-import org.joget.directory.model.service.DirectoryUtil;
 import org.joget.plugin.base.Plugin;
 import org.joget.plugin.base.PluginManager;
 import org.joget.plugin.property.model.PropertyEditable;
@@ -1786,7 +1785,7 @@ public class AppServiceImpl implements AppService {
                 User user = workflowUserManager.getCurrentUser();
                 String name = null;
                 if (user != null) {
-                    name = DirectoryUtil.getUserFullName(user);
+                    name = user.getFirstName() + ((user.getLastName() != null)?(" "+ user.getLastName()):"");
                 }
                 row.setModifiedByName(name);
                 Date dateCreated = null;
@@ -2375,7 +2374,7 @@ public class AppServiceImpl implements AppService {
         
         AppDevUtil.setImportApp(true);
         try {
-            LogUtil.info(getClass().getName(), "Importing app " + appDef.getId() + " ...");
+            LogUtil.info(getClass().getName(), "Importing app " + appDef.getId() + " ...");        
             AppDefinition newAppDef = new AppDefinition();
             newAppDef.setAppId(appId);
             newAppDef.setVersion(appVersion);
@@ -2397,7 +2396,6 @@ public class AppServiceImpl implements AppService {
                     formDefinitionDao.add(o);
                     tables.add(o.getTableName());
                     importedForms.add(o.getId());
-                    formDataDao.clearFormTableCache(o.getTableName());
                 }
 
                 String currentTable = "";
@@ -2435,12 +2433,6 @@ public class AppServiceImpl implements AppService {
 
             if (appDef.getUserviewDefinitionList() != null) {
                 for (UserviewDefinition o : appDef.getUserviewDefinitionList()) {
-                    String name = StringUtil.stripAllHtmlTag(o.getName());
-                    if (name.length() > 255) {
-                        name = name.substring(0, 255);
-                    }
-                    name = StringUtil.unescapeString(name,StringUtil.TYPE_HTML,null);
-                    o.setName(name);
                     o.setAppDefinition(newAppDef);
 
                     //remove tempDisablePermissionChecking setting
@@ -2472,9 +2464,8 @@ public class AppServiceImpl implements AppService {
                 }
                 LogUtil.info(getClass().getName(), "Imported addon builder definitions : " + appDef.getBuilderDefinitionList().size());
             }
-            
+
             if (!overrideEnvVariable && orgAppDef != null && orgAppDef.getEnvironmentVariableList() != null) {
-                Set<String> existId = new HashSet<String>();
                 for (EnvironmentVariable o : orgAppDef.getEnvironmentVariableList()) {
                     EnvironmentVariable temp = new EnvironmentVariable();
                     temp.setAppDefinition(newAppDef);
@@ -2482,19 +2473,6 @@ public class AppServiceImpl implements AppService {
                     temp.setValue(o.getValue());
                     temp.setRemarks(o.getRemarks());
                     environmentVariableDao.add(temp);
-                    existId.add(o.getId());
-                }
-
-                if (appDef.getEnvironmentVariableList() != null) {
-                    for (EnvironmentVariable o : appDef.getEnvironmentVariableList()) {
-                        if (!existId.contains(o.getId())) {
-                            if (o.getValue() == null) {
-                                o.setValue("");
-                            }
-                            o.setAppDefinition(newAppDef);
-                            environmentVariableDao.add(o);
-                        }
-                    }
                 }
             } else {
                 if (appDef.getEnvironmentVariableList() != null) {
@@ -2644,34 +2622,25 @@ public class AppServiceImpl implements AppService {
     @Override
     public void importPlugins(byte[] zip) throws Exception {
         ZipInputStream in = new ZipInputStream(new ByteArrayInputStream(zip));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        ZipEntry entry = null;
         int size = 0;
-
-        try {
-            ByteArrayOutputStream out = null;
-
-            ZipEntry entry = null;
-            while ((entry = in.getNextEntry()) != null) {
-                if (entry.getName().endsWith(".jar") && !entry.getName().contains("/")) {
-                    out = new ByteArrayOutputStream();
-
-                    try {
-                        int length;
-                        byte[] temp = new byte[1024];
-                        while ((length = in.read(temp, 0, 1024)) != -1) {
-                            out.write(temp, 0, length);
-                        }
-
-                        pluginManager.upload(entry.getName(), new ByteArrayInputStream(out.toByteArray()));
-                        size++;
-                    } finally {
-                        out.flush();
-                        out.close();
-                    }
+        while ((entry = in.getNextEntry()) != null) {
+            if (entry.getName().endsWith(".jar")) {
+                int length;
+                byte[] temp = new byte[1024];
+                while ((length = in.read(temp, 0, 1024)) != -1) {
+                    out.write(temp, 0, length);
                 }
+
+                pluginManager.upload(entry.getName(), new ByteArrayInputStream(out.toByteArray()));
+                size++;
             }
-        } finally {
-            in.close();
+            out.flush();
+            out.close();
         }
+        in.close();
         LogUtil.info(AppServiceImpl.class.getName(), "Imported plugins : " + size);
     }
     

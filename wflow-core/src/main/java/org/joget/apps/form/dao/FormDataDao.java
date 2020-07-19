@@ -21,12 +21,6 @@ public interface FormDataDao {
     public void clearFormCache(Form form);
     
     /**
-     * clear cache for a form
-     * @param tableName
-     */
-    public void clearFormTableCache(String tableName);
-    
-    /**
      * Loads a data row for a form based on the primary key
      * @param form
      * @param primaryKey

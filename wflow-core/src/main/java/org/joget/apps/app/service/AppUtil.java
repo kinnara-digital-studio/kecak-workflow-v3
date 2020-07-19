@@ -28,13 +28,10 @@ import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.property.Attendee;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.DtEnd;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.FixedUidGenerator;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
@@ -635,32 +632,6 @@ public class AppUtil implements ApplicationContextAware {
             AppUtil.setCurrentAppDefinition(originalAppDef);
         }
         return content;
-    }
-    
-    public static boolean hasUnparsedNestedHashVariable(String content) {
-        if (content != null && !content.isEmpty()) {
-            if (content.contains("{") && content.contains("}")) {
-                Pattern nestedPattern = Pattern.compile("\\{[^\\}]+\\.[^\\}]+\\}");
-                Matcher nestedMatcher = nestedPattern.matcher(content);
-                Set<String> foundPrefixes = new HashSet<String>();
-                while (nestedMatcher.find()) {
-                    String var = nestedMatcher.group();
-                    String prefix = var.substring(1, var.indexOf("."));
-                    foundPrefixes.add(prefix);
-                }
-                if (!foundPrefixes.isEmpty()) {
-                    PluginManager pluginManager = (PluginManager) appContext.getBean("pluginManager");
-                    Collection<Plugin> pluginList = pluginManager.list(HashVariablePlugin.class);
-                    for (Plugin p : pluginList) {
-                        HashVariablePlugin hashVariablePlugin = (HashVariablePlugin) p;
-                        if (foundPrefixes.contains(hashVariablePlugin.getPrefix())) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
     }
     
     protected static boolean isHashEscapeFormat(String hashFormat) {
@@ -1380,10 +1351,7 @@ public class AppUtil implements ApplicationContextAware {
                     endDate.setTime(sdFormat.parse(endDateTime));
                     DateTime end = new DateTime(endDate.getTime());
                     
-                    event = new VEvent();
-                    event.getProperties().add(new DtStart(start.toString(),timezone));
-                    event.getProperties().add(new DtEnd(end.toString(),timezone));
-                    event.getProperties().add(new Summary(eventName));
+                    event = new VEvent(start, end, eventName);
                 }
                 
                 UidGenerator ug = new FixedUidGenerator("joget-workflow");

@@ -14,7 +14,7 @@
         label : '@@form.idgeneratorfield.label@@',
         type : 'textfield',
         required : 'True',
-        value : '@@org.joget.apps.form.lib.IdGeneratorField.pluginLabel@@'
+        value : 'IdGeneratorField'
     },
     {
         name : 'envVariable',

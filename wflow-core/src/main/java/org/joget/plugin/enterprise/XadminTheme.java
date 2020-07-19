@@ -24,7 +24,6 @@ import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.commons.util.StringUtil;
 import org.joget.directory.model.User;
-import org.joget.directory.model.service.DirectoryUtil;
 import static org.joget.plugin.enterprise.UniversalTheme.INBOX;
 import org.joget.workflow.util.WorkflowUtil;
 
@@ -267,14 +266,12 @@ public class XadminTheme extends UniversalTheme {
 
             String profileImageTag = "";
             if (getPropertyString("userImage").isEmpty()) {
-                String url = (email != null && !email.isEmpty()) ? 
-                    new Gravatar()
-                        .setSize(20)
-                        .setHttps(true)
-                        .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
-                        .setStandardDefaultImage(DefaultImage.IDENTICON)
-                        .getUrl(email)
-                    : "//www.gravatar.com/avatar/default?d=identicon";
+                String url = new Gravatar()
+                    .setSize(30)
+                    .setHttps(true)
+                    .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
+                    .setStandardDefaultImage(DefaultImage.IDENTICON)
+                    .getUrl(email);
                 profileImageTag = "<img class=\"profile-img gravatar\" alt=\"gravatar\" width=\"30\" height=\"30\" src=\""+url+"\" /> ";
             } else if ("hashVariable".equals(getPropertyString("userImage"))) {
                 String url = AppUtil.processHashVariable(getPropertyString("userImageUrlHash"), null, StringUtil.TYPE_HTML, null, AppUtil.getCurrentAppDefinition());
@@ -291,7 +288,7 @@ public class XadminTheme extends UniversalTheme {
             html += getInbox(data);
             
             html += "<li class=\"layui-nav-item\">\n";
-            html += "<a href=\"javascript:;\">"+profileImageTag+StringUtil.stripHtmlTag(DirectoryUtil.getUserFullName(user), new String[]{}) + "</a>\n";
+            html += "<a href=\"javascript:;\">"+profileImageTag+StringUtil.stripHtmlTag(user.getFirstName(), new String[]{}) + " " + StringUtil.stripHtmlTag(user.getLastName(), new String[]{}) + "</a>\n";
             html += "<dl class=\"layui-nav-child\">\n";
             
             if (!"true".equals(getPropertyString("profile")) && !user.getReadonly()) {
@@ -543,20 +540,6 @@ public class XadminTheme extends UniversalTheme {
             data.put("loginBackground", "<style>#login{background-image:url('"+getPropertyString("loginBackground")+"');}</style>");
         }
         data.put("login_title", StringUtil.stripHtmlRelaxed(userview.getPropertyString("name")));
-        if (!data.containsKey("login_form_before")) {
-            if (getProperties().containsKey("loginPageTop")) {
-                data.put("login_form_before", getPropertyString("loginPageTop"));
-            } else {
-                data.put("login_form_before", this.userview.getSetting().getPropertyString("loginPageTop"));
-            }
-        }
-        if (!data.containsKey("login_form_after")) {
-            if (getProperties().containsKey("loginPageBottom")) {
-                data.put("login_form_after", getPropertyString("loginPageBottom"));
-            } else {
-                data.put("login_form_after", this.userview.getSetting().getPropertyString("loginPageBottom"));
-            }
-        }
         return UserviewUtil.getTemplate(this, data, "/templates/xadmin/login.ftl");
     }
     
@@ -629,7 +612,7 @@ public class XadminTheme extends UniversalTheme {
         if (decoratedMenu.contains("badge")) {
             String label = StringUtil.stripAllHtmlTag(menu.getPropertyString("label"));
             String badge = StringUtil.stripAllHtmlTag(decoratedMenu);
-            badge = badge.replaceFirst(StringUtil.escapeRegex(label), "");
+            badge = badge.replaceFirst(label, "");
             return getMenuHtml(category, menu, "<span class='pull-right badge rowCount'>"+badge+"</span>", null);
         } else {
             

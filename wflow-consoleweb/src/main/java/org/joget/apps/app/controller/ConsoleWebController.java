@@ -146,6 +146,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.util.HtmlUtils;
+
 @Controller
 public class ConsoleWebController {
 
@@ -2841,14 +2842,8 @@ public class ConsoleWebController {
             sort = "name";
             desc = false;
         }
-        AppDefinition appDef = null;
-        if (version == null || version.isEmpty()) {
-            Long appVersion = appService.getPublishedVersion(appId);
-            if (appVersion != null) {
-                version = appVersion.toString();
-            }
-        }    
-        appDef = appService.getAppDefinition(appId, version);
+
+        AppDefinition appDef = appService.getAppDefinition(appId, version);
         if (appDef != null) {
             datalistDefinitionList = datalistDefinitionDao.getDatalistDefinitionList(null, appDef, sort, desc, start, rows);
         } else {
@@ -3003,14 +2998,8 @@ public class ConsoleWebController {
             sort = "name";
             desc = false;
         }
-        AppDefinition appDef = null;
-        if (version == null || version.isEmpty()) {
-            Long appVersion = appService.getPublishedVersion(appId);
-            if (appVersion != null) {
-                version = appVersion.toString();
-            }
-        }
-        appDef = appService.getAppDefinition(appId, version);
+
+        AppDefinition appDef = appService.getAppDefinition(appId, version);
         if (appDef != null) {
             userviewDefinitionList = userviewDefinitionDao.getUserviewDefinitionList(null, appDef, sort, desc, start, rows);
         } else {
@@ -3802,14 +3791,8 @@ public class ConsoleWebController {
             sort = "name";
             desc = false;
         }
-        AppDefinition appDef = null;
-        if (version == null || version.isEmpty()) {
-            Long appVersion = appService.getPublishedVersion(appId);
-            if (appVersion != null) {
-                version = appVersion.toString();
-            }
-        }
-        appDef = appService.getAppDefinition(appId, version);
+
+        AppDefinition appDef = appService.getAppDefinition(appId, version);
         if (appDef != null) {
             formDefinitionList = formDefinitionDao.getFormDefinitionList(null, appDef, sort, desc, start, rows);
         } else {

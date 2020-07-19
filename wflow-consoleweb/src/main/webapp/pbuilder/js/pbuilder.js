@@ -4470,7 +4470,7 @@ ProcessBuilder.Mapper = {
                     }
                     url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList";
                 } else if ((typeof ProcessBuilder.Mapper.mappingData["modifierPlugin"]) !== "undefined") {
-                    url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList&pluginname=" + encodeURIComponent(ProcessBuilder.Mapper.mappingData["modifierPlugin"]);
+                    url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList&&pluginname=" + encodeURIComponent(ProcessBuilder.Mapper.mappingData["modifierPlugin"]);
                 } else {
                     url += "?activityName=" + encodeURIComponent(title);
                 }
@@ -4489,7 +4489,7 @@ ProcessBuilder.Mapper = {
                     }
                     url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList";
                 } else if ((typeof ProcessBuilder.Mapper.mappingData["spModifierPlugin"]) !== "undefined") {
-                    url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList&pluginname=" + encodeURIComponent(ProcessBuilder.Mapper.mappingData["spModifierPlugin"]);
+                    url += "/configure?title=" + encodeURIComponent(' - ' + title + " ("+id+")") + "&param_tab=activityList&&pluginname=" + encodeURIComponent(ProcessBuilder.Mapper.mappingData["spModifierPlugin"]);
                 } else {
                     url += "?activityName=" + encodeURIComponent(title);
                 }
@@ -4572,10 +4572,7 @@ ProcessBuilder.Mapper = {
                 $(node).find(".edit_mapping").removeClass("hasmapping");
                 
                 if (type === "start" || type === "activity") {
-                    $(node).tooltipster("close");
                     $("#"+id+"_detail").find(".remove, dl, .removesave").remove();
-                    $(".tooltipster-content").find("#"+id+"_detail").find(".remove, dl, .removesave").remove();
-                    
                     delete ProcessBuilder.Mapper.mappingData["activityForms"][processDefId+"::"+id]['formId'];
                     delete ProcessBuilder.Mapper.mappingData["activityForms"][processDefId+"::"+id]['formLabel'];
                     delete ProcessBuilder.Mapper.mappingData["activityForms"][processDefId+"::"+id]['formUrl'];

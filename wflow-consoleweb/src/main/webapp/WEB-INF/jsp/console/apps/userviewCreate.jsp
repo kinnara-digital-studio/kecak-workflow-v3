@@ -77,12 +77,8 @@
                         });
                     }
                 };
-                if ($("#copyAppId").val()==='${appId}') {
-                    version ='/${appVersion}';
-                } else {
-                    version='';
-                }
-                ConnectionManager.get('<c:out value="${pageContext.request.contextPath}"/>/web/json/console/app/'+$(this).val()+version+'/userview/options', populate);
+                
+                ConnectionManager.get('<c:out value="${pageContext.request.contextPath}"/>/web/json/console/app/'+$(this).val()+'/userview/options', populate);
             });
             $("#copyAppId").trigger("change");
         });    

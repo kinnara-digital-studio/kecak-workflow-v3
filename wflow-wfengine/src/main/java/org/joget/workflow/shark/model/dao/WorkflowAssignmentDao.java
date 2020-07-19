@@ -866,9 +866,6 @@ public class WorkflowAssignmentDao extends AbstractSpringDao {
                                     saveOrUpdate("MigrateAssignment", a);
                                 }
                             }
-                            
-                            wm.internalUpdateMigratedProcess(process, acts);
-                            
                             return true;
                         }
                     }

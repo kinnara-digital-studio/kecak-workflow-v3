@@ -13,7 +13,7 @@
         name : 'label',
         label : '@@form.radio.label@@',
         type : 'textfield',
-        value : '@@org.joget.apps.form.lib.Radio.pluginLabel@@'
+        value : 'Radio'
     },
     {
         name : 'options',
@@ -65,7 +65,7 @@
     {
         name : 'controlField',
         label : '@@form.radio.controlField@@',
-        type : 'autocomplete',
+        type : 'selectbox',
         options_callback : 'FormBuilder.getFieldOptions'
     },
     {

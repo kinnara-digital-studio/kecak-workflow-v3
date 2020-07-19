@@ -2275,10 +2275,6 @@ DatalistBuilder = {
                 var latest = JSON.decode($('#list-json').val());
                 merged = DiffMerge.merge(original, current, latest, output);
             },
-            error: function() {
-                currentSaved = $('#list-json-current').val();
-                merged = $('#list-json').val();
-            },
             complete: function() {
                 if (callback) {
                     callback.call(thisObject, currentSaved, merged);

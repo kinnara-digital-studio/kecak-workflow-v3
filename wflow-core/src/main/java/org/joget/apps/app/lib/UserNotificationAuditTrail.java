@@ -219,10 +219,6 @@ public class UserNotificationAuditTrail extends DefaultAuditTrailPlugin implemen
                                                 tempEmailMessage = emailMessage + "<br/><br/><br/>" + tempLink;
                                             }
                                             formattedMessage = AppUtil.processHashVariable(tempEmailMessage, wfAssignment, null, replace);
-                                            
-                                            //TODO: consider replace the next line to platform-wise support parsing of hash variables in the value returned by another hash variable
-                                            formattedMessage = AppUtil.processHashVariable(formattedMessage, wfAssignment, null, replace);
-                                            
                                             email.setHtmlMsg(formattedMessage);
                                         } else {
                                             String tempEmailMessage = emailMessage;
@@ -232,10 +228,6 @@ public class UserNotificationAuditTrail extends DefaultAuditTrailPlugin implemen
                                                 tempEmailMessage = emailMessage + "\n\n\n" + tempLink;
                                             }
                                             formattedMessage = AppUtil.processHashVariable(tempEmailMessage, wfAssignment, null, replace);
-                                            
-                                            //TODO: consider replace the next line to platform-wise support parsing of hash variables in the value returned by another hash variable
-                                            formattedMessage = AppUtil.processHashVariable(formattedMessage, wfAssignment, null, replace);
-                                            
                                             email.setMsg(formattedMessage);
                                         }
                                     }

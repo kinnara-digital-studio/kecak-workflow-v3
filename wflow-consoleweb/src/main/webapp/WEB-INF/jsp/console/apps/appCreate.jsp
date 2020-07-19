@@ -73,7 +73,7 @@
             if(!idMatch){
                 var alertString = '';
                 if(!idMatch){
-                    alertString = '<ui:msgEscJS key="console.app.error.label.idInvalid"/>';
+                    alertString = '<fmt:message key="console.app.error.label.idInvalid"/>';
                     $("#id").focus();
                 }
                 alert(alertString);

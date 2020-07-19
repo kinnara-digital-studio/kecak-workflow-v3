@@ -1403,10 +1403,6 @@ FormBuilder = {
                 var latest = JSON.decode($('#form-json').val());
                 merged = DiffMerge.merge(original, current, latest, output);
             },
-            error: function() {
-                currentSaved = $('#form-json-current').val();
-                merged = $('#form-json').val();
-            },
             complete: function() {
                 if (callback) {
                     callback.call(thisObject, currentSaved, merged);

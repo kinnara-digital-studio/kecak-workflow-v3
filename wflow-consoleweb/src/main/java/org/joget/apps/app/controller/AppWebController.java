@@ -358,7 +358,7 @@ public class AppWebController {
             Map<String, String> errors = formResult.getFormErrors();
             if (!formResult.getStay() && (errors == null || errors.isEmpty()) && activityForm.isAutoContinue()) {
                 // redirect to next activity if available
-                WorkflowAssignment nextActivity = workflowManager.getNextAssignmentByCurrentAssignment(assignment);
+                WorkflowAssignment nextActivity = workflowManager.getAssignmentByProcess(processId);
                 if (nextActivity != null) {
                     String assignmentUrl = "/web/client/app/" + appDef.getId() + "/" + appVersion + "/assignment/" + nextActivity.getActivityId();
                     if (request.getParameterValues(ORIGIN_FROM_PARAM) != null) {

@@ -15,8 +15,6 @@ import org.joget.commons.util.PagedList;
 import org.joget.workflow.model.WorkflowPackage;
 import org.joget.workflow.model.WorkflowProcessLink;
 import org.joget.workflow.model.WorkflowProcessResult;
-import org.joget.workflow.shark.migrate.model.MigrateActivity;
-import org.joget.workflow.shark.migrate.model.MigrateProcess;
 
 /**
  * Service methods to interact with workflow engine
@@ -922,13 +920,6 @@ public interface WorkflowManager {
      * Internal method used to updates deadline checker time interval
      */
     void internalUpdateDeadlineChecker();
-    
-    /**
-     * Internal method used to updates workflow variable and deadline of migrated process instance
-     * @param process
-     * @param acts
-     */
-    void internalUpdateMigratedProcess(MigrateProcess process, Collection<MigrateActivity> acts);
 
     /**
      * Gets the parent process instance id of a process instance
@@ -1039,11 +1030,4 @@ public interface WorkflowManager {
      */
     public WorkflowAssignment getAssignmentByRecordId(String id, String processDefId, String activityDefId, String username);
     
-    /**
-     * Gets next assignment by current completed assignment
-     * 
-     * @param assignment
-     * @return 
-     */
-    public WorkflowAssignment getNextAssignmentByCurrentAssignment(WorkflowAssignment assignment);
 }

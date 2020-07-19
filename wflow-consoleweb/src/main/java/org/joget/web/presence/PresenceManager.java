@@ -97,7 +97,7 @@ public class PresenceManager {
                 String output = "";
                 for (String sessionId: userMap.keySet()) {
                     UserEntry userEntry = userMap.get(sessionId);
-                    String url = (userEntry.getEmail() != null && !userEntry.getEmail().isEmpty()) ? 
+                    String url = (userEntry.getEmail() != null) ? 
                         new Gravatar()
                             .setSize(20)
                             .setHttps(true)

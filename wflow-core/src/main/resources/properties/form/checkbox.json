@@ -13,7 +13,7 @@
         name : 'label',
         label : '@@form.checkbox.label@@',
         type : 'textfield',
-        value : '@@org.joget.apps.form.lib.CheckBox.pluginLabel@@'
+        value : 'Checkbox'
     },
     {
         name : 'options',
@@ -66,7 +66,7 @@
     {
         name : 'controlField',
         label : '@@form.checkbox.controlField@@',
-        type : 'autocomplete',
+        type : 'selectbox',
         options_callback : 'FormBuilder.getFieldOptions'
     },
     {

@@ -243,7 +243,7 @@ public class FileUpload extends Element implements FormBuilderPaletteElement, Fi
 
     @Override
     public String getFormBuilderTemplate() {
-        return "<label class='label'>" + ResourceBundleUtil.getMessage("org.joget.apps.form.lib.FileUpload.pluginLabel") + "</label><input type='file' />";
+        return "<label class='label'>FileUpload</label><input type='file' />";
     }
 
     @Override
@@ -409,7 +409,6 @@ public class FileUpload extends Element implements FormBuilderPaletteElement, Fi
                                 String path = FileManager.storeFile(file);
                                 obj.put("path", path);
                                 obj.put("filename", file.getOriginalFilename());
-                                obj.put("newFilename", path.substring(path.lastIndexOf(File.separator) + 1));
                             } else {
                                 obj.put("error", ResourceBundleUtil.getMessage("form.fileupload.fileType.msg.invalidFileType"));
                             }

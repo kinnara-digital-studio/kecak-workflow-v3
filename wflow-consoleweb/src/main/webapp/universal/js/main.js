@@ -20,12 +20,6 @@ if ((typeof _customFooTableArgs) === "undefined") {
     })
 
     $(document).ready(function() {
-        //Scroll to active menu
-        setTimeout(function () {
-            var yOffset = $("li.active").position().top;
-            $("#sidebar").mCustomScrollbar("scrollTo", yOffset);
-        }, 200);
-        
         //fix tinymce position
         if ($(".tinymce").length > 0) {
             function overrideTinymce() {
@@ -155,19 +149,7 @@ if ((typeof _customFooTableArgs) === "undefined") {
             });
         };
         if ($("#sidebar").length > 0) {
-            var sidebar = function(){
-                if ($("#sidebar").css("display") === "inline-block" || $("#sidebar").css("width") === $("body").css("width")) {
-                    if ($("#sidebar").hasClass("mCustomScrollbar")) {
-                        $("#sidebar").mCustomScrollbar("destroy");
-                    }
-                } else {
-                    scrollBar("#sidebar", "minimal-dark", "y");
-                }
-            };
-            sidebar();
-            $(window).resize(function() {
-                sidebar();
-            });
+            scrollBar("#sidebar", "minimal-dark", "y");
         }
         if ($(".c-overflow").length > 0) {
             scrollBar(".c-overflow", "minimal-dark", "y");

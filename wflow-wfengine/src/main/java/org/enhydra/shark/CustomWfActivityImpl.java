@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.enhydra.shark.api.client.wfmc.wapi.WMSessionHandle;
 import org.enhydra.shark.api.client.wfmodel.CannotAcceptSuspended;
 import org.enhydra.shark.api.client.wfmodel.CannotComplete;
@@ -22,17 +21,13 @@ import org.enhydra.shark.api.internal.instancepersistence.DeadlinePersistenceObj
 import org.enhydra.shark.api.internal.instancepersistence.PersistentManagerInterface;
 import org.enhydra.shark.api.internal.toolagent.ToolAgentGeneralException;
 import org.enhydra.shark.api.internal.working.WfActivityInternal;
-import org.enhydra.shark.api.internal.working.WfAssignmentInternal;
 import org.enhydra.shark.api.internal.working.WfProcessInternal;
-import org.enhydra.shark.api.internal.working.WfResourceInternal;
 import org.enhydra.shark.xpdl.XMLCollectionElement;
 import org.enhydra.shark.xpdl.elements.Activity;
 import org.enhydra.shark.xpdl.elements.Deadline;
 import org.enhydra.shark.xpdl.elements.WorkflowProcess;
-import org.joget.commons.util.LogUtil;
 import org.joget.workflow.shark.migrate.model.MigrateActivity;
 import org.joget.workflow.shark.model.CustomDeadlinePersistenceObject;
-import org.joget.workflow.shark.model.dao.DeadlineDao;
 import org.joget.workflow.shark.model.dao.WorkflowAssignmentDao;
 import org.joget.workflow.util.WorkflowUtil;
 
@@ -343,86 +338,6 @@ public class CustomWfActivityImpl extends WfActivityImpl {
                 }
             }
             i++;
-        }
-    }
-    
-    public void migration(WMSessionHandle shandle, Set<String> missingVariables) {
-        try {
-            //workflow variable
-            if (missingVariables != null && !missingVariables.isEmpty()) {
-                PersistentManagerInterface pmgr = SharkEngineManager.getInstance().getInstancePersistenceManager();
-                for (String id : missingVariables) {
-                    ActivityVariablePersistenceObject var = new ActivityVariablePersistenceObject();
-                    var.setProcessId(this.processId);
-                    var.setActivityId(this.key);
-                    var.setDefinitionId(id);
-                    var.setValue("");
-                    var.setResultVariable(false);
-                    pmgr.persist(shandle, var, true);
-                }
-            }
-            
-            //deadlines
-            DeadlineDao dao = (DeadlineDao) WorkflowUtil.getApplicationContext().getBean("deadlineDao");
-            dao.deleteForActivity(this.key);
-            this.justCreatedDeadlines = true;
-            reevaluateDeadlines(shandle);
-            persistDeadlines(shandle);
-        } catch (Exception e) {
-            LogUtil.error(CustomWfActivityImpl.class.getName(), e, "");
-        }
-    }
-    
-    @Override
-    protected void createAssignments(WMSessionHandle shandle, List users) throws Exception {
-        if ((users == null) || (users.size() == 0)) {
-            return;
-        }
-
-        int lrLimit = 5;
-        try {
-            lrLimit = Integer.parseInt(SharkEngineManager.getInstance()
-                    .getCallbackUtilities()
-                    .getProperty("SharkKernel.LimitForRetrievingAllResourcesWhenCreatingAssignments",
-                            "5"));
-        } catch (Exception localException) {
-        }
-        if (users.size() > lrLimit) {
-            SharkEngineManager.getInstance()
-                    .getInstancePersistenceManager()
-                    .getAllResources(shandle);
-        }
-
-        Iterator resourcesIt = users.iterator();
-        while (resourcesIt.hasNext()) {
-            String username = (String) resourcesIt.next();
-            WfResourceInternal wr = SharkUtilities.getResource(shandle, username);
-            if (wr == null) {
-                wr = SharkEngineManager.getInstance()
-                        .getObjectFactory()
-                        .createResource(shandle, username);
-            }
-            WfAssignmentInternal ass = SharkEngineManager.getInstance()
-                    .getObjectFactory()
-                    .createAssignment(shandle, this, wr);
-            
-            //add logic to retry once in case it not created
-            if (ass == null) {
-                //retry
-                ass = SharkEngineManager.getInstance()
-                    .getObjectFactory()
-                    .createAssignment(shandle, this, wr);
-            }
-            
-            if (LogUtil.isDebugEnabled(CustomWfActivityImpl.class.getName())) {
-                if (ass != null) {
-                    LogUtil.debug(CustomWfActivityImpl.class.getName(), "Assingment of " + ass.activityId(shandle) + " created for " + username);
-                } else {
-                    LogUtil.debug(CustomWfActivityImpl.class.getName(), "Assingment of " + this.key + " failed to create for " + username);
-                }
-            }
-            wr.addAssignment(shandle, ass);
-            getAssignmentResourceIds(shandle).add(username);
         }
     }
 }

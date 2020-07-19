@@ -11,7 +11,6 @@ import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
-import org.joget.commons.util.ResourceBundleUtil;
 
 public class CheckBox extends SelectBox implements FormBuilderPaletteElement {
 
@@ -85,7 +84,7 @@ public class CheckBox extends SelectBox implements FormBuilderPaletteElement {
 
     @Override
     public String getFormBuilderTemplate() {
-        return "<label class='label'>" + ResourceBundleUtil.getMessage("org.joget.apps.form.lib.CheckBox.pluginLabel") + "</label><label><input type='checkbox' value='Option' style='color:silver' />" + ResourceBundleUtil.getMessage("form.checkbox.template.options") + "</label>";
+        return "<label class='label'>Check Box</label><label><input type='checkbox' value='Option' style='color:silver' />Option</label>";
     }
 
     @Override

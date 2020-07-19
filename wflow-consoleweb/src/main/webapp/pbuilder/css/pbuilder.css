@@ -937,8 +937,3 @@ body#pviewer {
 .showallcontrol:hover ul {
     display: block;
 }
-
-.more_setting{
-    cursor: pointer;
-    text-decoration: underline;
-}

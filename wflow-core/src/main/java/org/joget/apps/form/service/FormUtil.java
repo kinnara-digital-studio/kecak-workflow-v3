@@ -812,15 +812,11 @@ public class FormUtil implements ApplicationContextAware {
         //build prefix based on subform
         String prefix = "";
         Form form = FormUtil.findRootForm(rootElement);
-        while (form != null && form.getParent() != null && form.getParent() instanceof AbstractSubForm) {
+        while (form != null && form.getParent() != null) {
             if (form.getParent() instanceof AbstractSubForm) {
                 prefix = form.getParent().getPropertyString(FormUtil.PROPERTY_ID) + "." + prefix;
+                form = FormUtil.findRootForm(form.getParent());
             }
-            form = FormUtil.findRootForm(form.getParent());
-        }
-        if (form == null && rootElement instanceof Form) {
-            form = (Form) rootElement;
-            prefix = "";
         }
         
         List<Element> list = null;
@@ -855,10 +851,6 @@ public class FormUtil implements ApplicationContextAware {
             } else if (list.size() > 1) {
                 //try finding visible element and return it
                 List<Element> parentContinuedValidation = new ArrayList<Element>();
-                
-                //prevent concurrent modification
-                list = new ArrayList<Element>(list);
-                
                 for (Element el : list) {
                     if (el.isHidden(formData)) {
                         continue;
@@ -2098,9 +2090,9 @@ public class FormUtil implements ApplicationContextAware {
         }
 
         if (json.isEmpty()) {
-            formName = StringUtil.escapeString(formName, StringUtil.TYPE_JSON, null);
-            description = StringUtil.escapeString(description, StringUtil.TYPE_JSON, null);
-            json = "{\"className\": \"org.joget.apps.form.model.Form\",  \"properties\":{ \"id\":\"" + formId + "\", \"name\":\"" + formName + "\", \"tableName\":\"" + tableName + "\", \"loadBinder\":{ \"className\":\"org.joget.apps.form.lib.WorkflowFormBinder\" }, \"storeBinder\":{ \"className\":\"org.joget.apps.form.lib.WorkflowFormBinder\" }, \"description\":\"" + description + "\" },\"elements\":[{\"elements\":[{\"elements\":[],\"className\":\"org.joget.apps.form.model.Column\",\"properties\":{\"width\":\"100%\"}}],\"className\":\"org.joget.apps.form.model.Section\",\"properties\":{\"label\":\"" + ResourceBundleUtil.getMessage("fbuilder.section") + "\",\"id\":\"section1\"}}]}";
+            formName = StringEscapeUtils.escapeJavaScript(formName);
+            description = StringEscapeUtils.escapeJavaScript(description);
+             json = "{\"className\": \"org.joget.apps.form.model.Form\",  \"properties\":{ \"id\":\"" + formId + "\", \"name\":\"" + formName + "\", \"tableName\":\"" + tableName + "\", \"loadBinder\":{ \"className\":\"org.joget.apps.form.lib.WorkflowFormBinder\" }, \"storeBinder\":{ \"className\":\"org.joget.apps.form.lib.WorkflowFormBinder\" }, \"description\":\"" + description + "\" },\"elements\":[{\"elements\":[{\"elements\":[],\"className\":\"org.joget.apps.form.model.Column\",\"properties\":{\"width\":\"100%\"}}],\"className\":\"org.joget.apps.form.model.Section\",\"properties\":{\"label\":\"" + ResourceBundleUtil.getMessage("fbuilder.section") + "\",\"id\":\"section1\"}}]}";
         }
 
         return json;

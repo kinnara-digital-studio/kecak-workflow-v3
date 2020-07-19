@@ -58,29 +58,6 @@ public class ProgressiveTheme extends UniversalTheme {
             this.light = light;
         }
     }
-     
-    @Override
-    protected String getDefaultColor(String defaultColor) {
-        if (defaultColor.equals("primary")) {
-            defaultColor = "INDIGO";
-        }
-        else if (defaultColor.equals("accent")) {
-            defaultColor = "#1976D2";
-        }
-        else if (defaultColor.equals("button")) {
-            defaultColor = "#FF9800";
-        }
-        else if (defaultColor.equals("buttonText")) {
-            defaultColor = "#FFFFFF";
-        }
-        else if (defaultColor.equals("menuFont")) {
-            defaultColor = "#000000";
-        }
-        else if (defaultColor.equals("font")) {
-            defaultColor = "#FFFFFF";
-        }
-        return defaultColor;
-    }
     
     @Override
     public String getName() {

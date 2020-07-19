@@ -951,7 +951,7 @@ public class WorkflowJsonController {
         String packageVersion = WorkflowUtil.getProcessDefVersion(processDefId);
         boolean continueNextAssignment = appService.isActivityAutoContinue(packageId, packageVersion, processDefId, activityDefId);
         if (continueNextAssignment) {
-            WorkflowAssignment nextAssignment = workflowManager.getNextAssignmentByCurrentAssignment(assignment);
+            WorkflowAssignment nextAssignment = workflowManager.getAssignmentByProcess(processId);
             if (nextAssignment != null) {
                 jsonObject.accumulate("nextActivityId", nextAssignment.getActivityId());
             }
@@ -989,7 +989,7 @@ public class WorkflowJsonController {
         String packageVersion = WorkflowUtil.getProcessDefVersion(processDefId);
         boolean continueNextAssignment = appService.isActivityAutoContinue(packageId, packageVersion, processDefId, activityDefId);
         if (continueNextAssignment) {
-            WorkflowAssignment nextAssignment = workflowManager.getNextAssignmentByCurrentAssignment(assignment);
+            WorkflowAssignment nextAssignment = workflowManager.getAssignmentByProcess(processId);
             if (nextAssignment != null) {
                 jsonObject.accumulate("nextActivityId", nextAssignment.getActivityId());
             }

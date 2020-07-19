@@ -118,10 +118,8 @@
             this.width = temWidth - 20;
             this.height = temHeight - 20;
         }
-        var height = this.height;
         xadmin.openPopup(this.title, newSrc, this.width, this.height, function(index){
             PopupDialogCache.popupDialog.windowName = index;
-            $("#layui-layer-iframe" + index).closest(".layui-layer-iframe").css("height", (parseInt(height) + 51) + "px");
         });
     };
     PopupDialog.prototype.close = function() {
@@ -156,17 +154,14 @@
             
             xadmin.openPopup(title, url, width, height, function(index){
                 JPopup.dialogboxes[id] = index;
-                $("#layui-layer-iframe" + index).closest(".layui-layer-iframe").css("height", (parseInt(height) + 51) + "px");
             });
         } else {
             url += "&" + JPopup.tokenName + "="+ JPopup.tokenValue;
             
             xadmin.openPopup(title, UI.base+"/images/v3/cj.gif", width, height, function(index){
                 JPopup.dialogboxes[id] = index;
-                $("#layui-layer-iframe" + index).closest(".layui-layer-iframe").css("height", (parseInt(height) + 51) + "px");
-                $("#layui-layer-iframe"+ index).replaceWith('<iframe scrolling="auto" allowtransparency="true" id="'+id+'" name="'+id+'" ></iframe>');
                 
-                var form = $('<form method="post" data-ajax="false" style="display:none;" target="' + id + '" action="' + url + '"></form>');
+                var form = $('<form method="post" data-ajax="false" style="display:none;" target="layui-layer-iframe'+index+'" action="'+url+'"></form>'); 
                 $(document.body).append(form); 
                 $.each(params, function (key, data) {
                     $(form).append("<input id=\""+key+"\" name=\""+key+"\">");

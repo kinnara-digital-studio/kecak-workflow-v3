@@ -24,7 +24,6 @@ import org.joget.apps.form.lib.PasswordField;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.Form;
 import org.joget.apps.form.model.FormContainer;
-import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormService;
 import org.joget.apps.form.service.FormUtil;
@@ -97,10 +96,9 @@ public class FormRowDataListBinder extends DataListBinderDefault {
         
         if (tableName != null) {
             Collection<String> columnNames = formDataDao.getFormDefinitionColumnNames(tableName);
-            FormData formData = new FormData();
             for (String columnName : columnNames) {
                 if (form != null) {
-                    Element element = FormUtil.findElement(columnName, form, formData, true);
+                    Element element = FormUtil.findElement(columnName, form, null, true);
                     if (element != null && !(element instanceof FormContainer)) {
                         if (!(element instanceof PasswordField)) {
                             String id = element.getPropertyString(FormUtil.PROPERTY_ID);

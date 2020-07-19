@@ -7,7 +7,6 @@ import org.joget.apps.form.model.FormBuilderPaletteElement;
 import org.joget.apps.form.model.FormBuilderPalette;
 import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.service.FormUtil;
-import org.joget.commons.util.ResourceBundleUtil;
 
 public class HiddenField extends Element implements FormBuilderPaletteElement {
 
@@ -58,7 +57,7 @@ public class HiddenField extends Element implements FormBuilderPaletteElement {
 
     @Override
     public String getFormBuilderTemplate() {
-        return "<label class='label'>" + ResourceBundleUtil.getMessage("org.joget.apps.form.lib.HiddenField.pluginLabel") + "</label>";
+        return "<label class='label'>HiddenField</label>";
     }
 
     @Override

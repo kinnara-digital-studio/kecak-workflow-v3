@@ -47,6 +47,8 @@ import org.enhydra.shark.utilities.WMEntityUtilities;
 
 import org.joget.workflow.shark.JSPClientUtilities;
 import org.joget.workflow.util.WorkflowUtil;
+import com.lutris.dods.builder.generator.query.QueryBuilder;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -61,12 +63,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.enhydra.shark.CustomWfActivityImpl;
 
 import org.enhydra.shark.CustomWfActivityWrapper;
-import org.enhydra.shark.CustomWfProcessImpl;
 import org.enhydra.shark.CustomWfResourceImpl;
 import org.enhydra.shark.SharkUtil;
 import org.enhydra.shark.api.client.wfmodel.WfAssignmentIterator;
 import org.enhydra.shark.api.client.wfservice.PackageInvalid;
 import org.enhydra.shark.api.common.AssignmentFilterBuilder;
+import org.enhydra.shark.instancepersistence.data.ProcessQuery;
 import org.enhydra.shark.instancepersistence.data.ProcessStateDO;
 import org.enhydra.shark.instancepersistence.data.ProcessStateQuery;
 import org.enhydra.shark.xpdl.XMLUtil;
@@ -75,8 +77,6 @@ import org.joget.commons.util.PagedList;
 import org.joget.commons.util.UuidGenerator;
 import org.joget.workflow.model.dao.WorkflowHelper;
 import org.joget.workflow.model.dao.WorkflowProcessLinkDao;
-import org.joget.workflow.shark.migrate.model.MigrateActivity;
-import org.joget.workflow.shark.migrate.model.MigrateProcess;
 import org.joget.workflow.shark.model.dao.WorkflowAssignmentDao;
 import org.joget.workflow.util.DeadlineThreadManager;
 import org.springframework.context.ApplicationContext;
@@ -4460,48 +4460,27 @@ public class WorkflowManagerImpl implements WorkflowManager {
         SharkConnection sc = null;
 
         try {
-            sc = connect(username);
+            sc = connect();
             WMSessionHandle sessionHandle = sc.getSessionHandle();
+            WfAssignment wfa = getWfAssignmentByActivityId(sc, activityId);
             WfResource res = sc.getResource(username);
 
-            Shark shark = Shark.getInstance();
-            AssignmentFilterBuilder aieb = shark.getAssignmentFilterBuilder();
-
-            WMFilter filter = aieb.addActivityIdEquals(sessionHandle, activityId);
-
-            // execute
-            WfAssignmentIterator ai = sc.get_iterator_assignment();
-            ai.set_query_expression(aieb.toIteratorExpression(sessionHandle, filter));
-            WfAssignment[] wItems = ai.get_next_n_sequence(0);
-            WfAssignment wfa;
-            
-            if (wItems != null && wItems.length > 0) {
-                wfa = wItems[0];
-                for (int i = 0; i < wItems.length; i++) {
-                    if (wItems[i].assignee().resource_key().equals(res.resource_key())) {
-                        wfa = wItems[i];
-                    }
-                }
-            }else{
-                wfa = null;
-            }
-           
             if (res == null) {
                 CustomWfResourceImpl.createResource(sessionHandle, username);
                 res = sc.getResource(username);
             }
-            
-            if (wfa != null) {
-                if (wfa.assignee() == null || (wfa.assignee() != null && !res.resource_key().equals(wfa.assignee().resource_key()))) {
-                    wfa.set_assignee(res);
-                }
 
-                if (!wfa.get_accepted_status()) {
-                    wfa.set_accepted_status(true);
-                }
-
-                wfa.activity().complete();
+            if (wfa.assignee() == null || (wfa.assignee() != null && !res.resource_key().equals(wfa.assignee().resource_key()))) {
+                wfa.set_assignee(res);
             }
+
+            if (!wfa.get_accepted_status()) {
+                wfa.set_accepted_status(true);
+            }
+
+            wfa.activity().complete();
+
+
         } catch (Exception ex) {
             LogUtil.error(getClass().getName(), ex, "");
         } finally {
@@ -4980,43 +4959,6 @@ public class WorkflowManagerImpl implements WorkflowManager {
             Shark shark = Shark.getInstance();
             
             shark.getExecutionAdministration().checkDeadlinesWithFiltering(shandle, null);
-        } catch (Exception ex) {
-            LogUtil.error(getClass().getName(), ex, "");
-        } finally {
-            try {
-                disconnect(sc);
-            } catch (Exception e) {
-                LogUtil.error(getClass().getName(), e, "");
-            }
-        }
-    }
-    
-    /**
-     * Internal method used to updates workflow variable and deadline of migrated process instance
-     * @param process
-     * @param acts
-     */
-    @Override
-    public void internalUpdateMigratedProcess(MigrateProcess process, Collection<MigrateActivity> acts) {
-        SharkConnection sc = null;
-
-        try {
-            sc = connect();
-
-            WMSessionHandle shandle = sc.getSessionHandle();
-            Shark shark = Shark.getInstance();
-            
-            boolean updatedProcess = false;
-            Set<String> missingVariables = null;
-            for (MigrateActivity a : acts) {
-                CustomWfActivityWrapper wrapper = new CustomWfActivityWrapper(shandle, process.getName(), a.getProcessId(), a.getId());
-                if (!updatedProcess) {
-                    missingVariables = ((CustomWfProcessImpl) wrapper.getProcessImpl()).migration(shandle);
-                    updatedProcess = true;
-                }
-                ((CustomWfActivityImpl) wrapper.getActivityImpl()).migration(shandle, missingVariables);
-            }
-            
         } catch (Exception ex) {
             LogUtil.error(getClass().getName(), ex, "");
         } finally {
@@ -5586,27 +5528,5 @@ public class WorkflowManagerImpl implements WorkflowManager {
      */
     public WorkflowAssignment getAssignmentByRecordId(String id, String processDefId, String activityDefId, String username) {
         return workflowAssignmentDao.getAssignmentByRecordId(id, processDefId, activityDefId, username);
-    }
-    
-    /**
-     * Gets next assignment by current completed assignment
-     * 
-     * @param assignment
-     * @return 
-     */
-    public WorkflowAssignment getNextAssignmentByCurrentAssignment(WorkflowAssignment assignment) {
-        if (assignment == null) {
-            return null;
-        }
-        WorkflowAssignment nextAss = getAssignmentByProcess(assignment.getProcessId());
-        if (nextAss == null && assignment.isSubflow()) {
-            //get parent process id and try get assignment again
-            WorkflowProcessLink link = workflowProcessLinkDao.getWorkflowProcessLink(assignment.getProcessId());
-            if (link != null) {
-                String parentProcessId = link.getParentProcessId();
-                nextAss = getAssignmentByProcess(parentProcessId);
-            }
-        }
-        return nextAss;
     }
 }

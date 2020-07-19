@@ -35,7 +35,6 @@ import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.commons.util.StringUtil;
 import org.joget.commons.util.TimeZoneUtil;
 import org.joget.directory.model.User;
-import org.joget.directory.model.service.DirectoryUtil;
 import org.joget.plugin.base.PluginWebSupport;
 import org.joget.workflow.model.WorkflowAssignment;
 import org.joget.workflow.model.service.WorkflowManager;
@@ -141,11 +140,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
     public String getMetas(Map<String, Object> data) {
 
         String meta = super.getMetas(data) + "\n";
-        if ((Boolean) data.get("is_login_page")) {
-            meta += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\">\n";
-        } else {
-            meta += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
-        }
+        meta += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
         meta += "<meta name=\"msapplication-tap-highlight\" content=\"no\"/>\n";
         meta += getInternalMetas(data);
         return meta;
@@ -180,17 +175,16 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
         meta += "<link rel=\"manifest\" href=\"" + manifestUrl + "\">";
         return meta;
     }
-    
+
     protected String getPrimaryColor() {
-        Color p = Color.valueOf(getDefaultColor("primary"));
-        String primary = p.color;
+        String primary = "#FFFFFF";
         if ("custom".equals(getPropertyString("primaryColor"))) {
             primary = getPropertyString("customPrimary");
-        } else if (!getPropertyString("primaryColor").isEmpty()) {
-            p = Color.valueOf(getPropertyString("primaryColor"));
+        } else {
+            Color p = Color.valueOf(getPropertyString("primaryColor")); 
             if (p != null) {
                 primary = p.color;
-            }
+            } 
         }
         return primary;
     }
@@ -217,8 +211,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
             "    {\n" +
             "      \"src\": \"" + icon + "\",\n" +
             "      \"type\": \"image/png\",\n" +
-            "      \"sizes\": \"512x512\",\n" +
-            "      \"purpose\": \"any maskable\"\n" +    
+            "      \"sizes\": \"512x512\"\n" +
             "    }\n" +
             "  ],\n" +
             "  \"start_url\": \"" + startUrl + "\",\n" +
@@ -391,40 +384,18 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
         }
         return jsCssLink;
     }
-    
-    protected String getDefaultColor(String defaultColor) {
-        if (defaultColor.equals("primary")) {
-            defaultColor = "DARKROYALBLUE";
-        }
-        else if (defaultColor.equals("accent")) {
-            defaultColor = "#2196F3";
-        }
-        else if (defaultColor.equals("button")) {
-            defaultColor = "#9E9E9E";
-        }
-        else if (defaultColor.equals("buttonText")) {
-            defaultColor = "#FFFFFF";
-        }
-        else if (defaultColor.equals("menuFont")) {
-            defaultColor = "#000000";
-        }
-        else if (defaultColor.equals("font")) {
-            defaultColor = "#FFFFFF";
-        }
-        return defaultColor;
-    }
-    
+
     protected String generateLessCss() {
         String css = "";
         String lessVariables = "";
         String primary = "";
         String dark = "darken(@primary , 10%)";
         String light = "lighten(@primary , 5%)";
-        String accent = getDefaultColor("accent");
+        String accent = "";
         String lightAccent = "lighten(@accent , 10%)";
-        String button = getDefaultColor("button");
-        String buttonText = getDefaultColor("buttonText");
-        String font = getDefaultColor("font");
+        String button = "#D8DADA";
+        String buttonText = "#333";
+        String font = "";
         
         if ("custom".equals(getPropertyString("primaryColor"))) {
             primary = getPropertyString("customPrimary");
@@ -435,10 +406,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
                 light = getPropertyString("customPrimaryLight");
             }
         } else {
-            Color p = Color.valueOf(getDefaultColor("primary"));
-            if (!getPropertyString("primaryColor").isEmpty()){
-                p = Color.valueOf(getPropertyString("primaryColor")); 
-            }
+            Color p = Color.valueOf(getPropertyString("primaryColor")); 
             if (p != null) {
                 primary = p.color;
                 dark = (p.dark.isEmpty())?dark:p.dark;
@@ -455,8 +423,8 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
             if (!getPropertyString("customAccentLight").isEmpty()) {
                 lightAccent = getPropertyString("customAccentLight");
             }
-        }  else if (!getPropertyString("accentColor").isEmpty()) {
-            Color a = Color.valueOf(getPropertyString("accentColor"));
+        } else {
+            Color a = Color.valueOf(getPropertyString("accentColor")); 
             if (a != null) {
                 accent = a.color;
                 lightAccent = (a.light.isEmpty())?lightAccent:a.light;
@@ -466,7 +434,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
         if ("custom".equals(getPropertyString("buttonColor"))) {
             button = getPropertyString("customButton");
         } else if (!getPropertyString("buttonColor").isEmpty()) {
-            Color a = Color.valueOf(getPropertyString("buttonColor"));
+            Color a = Color.valueOf(getPropertyString("buttonColor")); 
             if (a != null) {
                 button = a.color;
             }
@@ -474,8 +442,8 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
         
         if ("custom".equals(getPropertyString("buttonTextColor"))) {
             buttonText = getPropertyString("customButtonText");
-        } else if (!getPropertyString("buttonTextColor").isEmpty()) {
-            Color a = Color.valueOf(getPropertyString("buttonTextColor"));
+        } else if (!getPropertyString("buttonColor").isEmpty()) {
+            Color a = Color.valueOf(getPropertyString("buttonTextColor")); 
             if (a != null) {
                 buttonText = a.color;
             }
@@ -483,19 +451,19 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
         
         if ("custom".equals(getPropertyString("fontColor"))) {
             font = getPropertyString("customFontColor");
-        } else if (!getPropertyString("fontColor").isEmpty()) {
-            Color a = Color.valueOf(getPropertyString("fontColor"));
+        } else {
+            Color a = Color.valueOf(getPropertyString("fontColor")); 
             if (a != null) {
                 font = a.color;
             }
         }
         
         if ("light".equals(getPropertyString("themeScheme"))) {
-            String menuFont = getDefaultColor("menuFont");
+            String menuFont = "#000000";
             if ("custom".equals(getPropertyString("menuFontColor"))) {
                 menuFont = getPropertyString("customMenuFontColor");
             } else if (!getPropertyString("menuFontColor").isEmpty()) {
-                Color a = Color.valueOf(getPropertyString("menuFontColor"));
+                Color a = Color.valueOf(getPropertyString("menuFontColor")); 
                 if (a != null) {
                     menuFont = a.color;
                 }
@@ -648,14 +616,12 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
 
                 String profileImageTag = "";
                 if (getPropertyString("userImage").isEmpty()) {
-                    String url = (email != null && !email.isEmpty()) ? 
-                        new Gravatar()
-                            .setSize(20)
-                            .setHttps(true)
-                            .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
-                            .setStandardDefaultImage(DefaultImage.IDENTICON)
-                            .getUrl(email)
-                        : "//www.gravatar.com/avatar/default?d=identicon";
+                    String url = new Gravatar()
+                        .setSize(30)
+                        .setHttps(true)
+                        .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
+                        .setStandardDefaultImage(DefaultImage.IDENTICON)
+                        .getUrl(email);
                     profileImageTag = "<img class=\"gravatar\" alt=\"gravatar\" width=\"30\" height=\"30\" src=\""+url+"\" /> ";
                 } else if ("hashVariable".equals(getPropertyString("userImage"))) {
                     String url = AppUtil.processHashVariable(getPropertyString("userImageUrlHash"), null, StringUtil.TYPE_HTML, null, AppUtil.getCurrentAppDefinition());
@@ -667,7 +633,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
                 
                 html += "<li class=\"user-link dropdown\">\n"
                       + "    <a data-toggle=\"dropdown\" class=\"btn dropdown-toggle\">\n"
-                      + "	     " + profileImageTag + StringUtil.stripHtmlTag(DirectoryUtil.getUserFullName(user), new String[]{}) + "\n"
+                      + "	     " + profileImageTag + StringUtil.stripHtmlTag(user.getFirstName(), new String[]{}) + " " + StringUtil.stripHtmlTag(user.getLastName(), new String[]{}) + "\n"
                       + "	     <span class=\"caret\"></span>\n"
                       + "    </a>\n";
 
@@ -730,14 +696,12 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
             
             String profileImageTag = "";
             if (getPropertyString("userImage").isEmpty()) {
-                String url = (email != null && !email.isEmpty()) ? 
-                    new Gravatar()
-                        .setSize(20)
-                        .setHttps(true)
-                        .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
-                        .setStandardDefaultImage(DefaultImage.IDENTICON)
-                        .getUrl(email)
-                    : "//www.gravatar.com/avatar/default?d=identicon";
+                String url = new Gravatar()
+                    .setSize(30)
+                    .setHttps(true)
+                    .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
+                    .setStandardDefaultImage(DefaultImage.IDENTICON)
+                    .getUrl(email);
                 profileImageTag = "<img class=\"gravatar\" alt=\"gravatar\" width=\"30\" height=\"30\" src=\""+url+"\" /> ";
             } else if ("hashVariable".equals(getPropertyString("userImage"))) {
                 String url = AppUtil.processHashVariable(getPropertyString("userImageUrlHash"), null, StringUtil.TYPE_HTML, null, AppUtil.getCurrentAppDefinition());
@@ -750,7 +714,7 @@ public class UniversalTheme extends UserviewV5Theme implements UserviewPwaTheme,
             html += "<li class=\"mm-profile user-link\">\n"
                   + "    <a class=\"dropdown\">\n"
                   + "        "+profileImageTag+"\n"  
-                  + "	     <span>" + StringUtil.stripHtmlTag(DirectoryUtil.getUserFullName(user), new String[]{}) + "</span>\n"
+                  + "	     <span>" + StringUtil.stripHtmlTag(user.getFirstName(), new String[]{}) + " " + StringUtil.stripHtmlTag(user.getLastName(), new String[]{}) + "</span>\n"
                   + "	     <small>" + email + "</small>\n"
                   + "    </a>\n";
             

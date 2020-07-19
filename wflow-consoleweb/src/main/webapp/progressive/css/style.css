@@ -892,7 +892,8 @@ body#login #page > footer {
         box-shadow:none;
     }
     body.horizontal_menu #sidebar .nav > li ul{
-        overflow: visible;
+        max-height: 75vh;
+        overflow: auto;
     }
     body.horizontal_menu.inline_menu .quickEditModeActive #sidebar{
         margin-top: -1px;
@@ -1018,23 +1019,8 @@ body#login #page > footer {
     }
 }
 
-.dataList .table-wrapper {
+.dataList {
     overflow-x: auto;
-}
-
-.dataList .table-wrapper::-webkit-scrollbar {
-    -webkit-appearance: none;
-}
-.dataList .table-wrapper::-webkit-scrollbar:vertical {
-    width: 8px;
-}
-.dataList .table-wrapper::-webkit-scrollbar:horizontal {
-    height: 8px;
-}
-.dataList .table-wrapper::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    border: 0; 
-    background-color: rgba(0, 0, 0, .3);
 }
 
 .dataList table a {

@@ -89,11 +89,10 @@
 
                 <#if element.properties.f_firstName! != 'hide'>
                     <div class="form-row">
+                        <label for="field1">@@console.directory.user.common.label.firstName@@</label>
                         <#if element.properties.f_firstName! == 'readonly'>
-                            <label for="field1">@@console.directory.user.common.label.firstName@@</label>
-                            <span class="form-input">${element.properties.user.firstName!?html}</span>
+                            <span class="form-input">${element.properties.user.firstName!?html} *</span>
                         <#else>
-                            <label for="field1">@@console.directory.user.common.label.firstName@@<span style="color:red"> *</span></label>
                             <span class="form-input"><input type="text" id="firstName" name="firstName" value="${element.properties.user.firstName!?html}"/></span>
                         </#if>
                     </div>
