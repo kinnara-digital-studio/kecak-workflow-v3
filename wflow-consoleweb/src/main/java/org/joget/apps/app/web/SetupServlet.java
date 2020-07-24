@@ -100,7 +100,8 @@ public class SetupServlet extends HttpServlet {
             Connection con = null;
             Statement stmt = null;
             ResultSet rs = null;
-            InputStream in = null;
+            InputStream schemaFileInputStream = null;
+            InputStream quartzFileInputStream = null;
             BasicDataSource ds = new BasicDataSource();
             ds.setDriverClassName(jdbcDriver);
             ds.setUrl(jdbcUrl);
@@ -139,12 +140,14 @@ public class SetupServlet extends HttpServlet {
                 if (!exists) {
                     // get schema file
                     String schemaFile = null;
+                    String quartzFile = null;
                     if ("oracle".equals(dbType) || jdbcUrl.contains("oracle")) {
                         schemaFile = "/setup/sql/jwdb-oracle.sql";
                     } else if ("sqlserver".equals(dbType) || jdbcUrl.contains("sqlserver")) {
                         schemaFile = "/setup/sql/jwdb-mssql.sql";
                     } else if ("mysql".equals(dbType) || jdbcUrl.contains("mysql")) {
                         schemaFile = "/setup/sql/jwdb-mysql.sql";
+                        quartzFile = "/setup/sql/quartz-tables_mysql_innodb.sql";
                     } else {
                         throw new SQLException("Unrecognized database type, please setup the datasource manually");
                     }
@@ -164,18 +167,29 @@ public class SetupServlet extends HttpServlet {
                     }
                     
                     // execute schema file
-                    LogUtil.info(getClass().getName(), "Execute schema " + schemaFile);
+
                     ScriptRunner runner = new ScriptRunner(con, false, true);
-                    in = getClass().getResourceAsStream(schemaFile);
-                    runner.runScript(new BufferedReader(new InputStreamReader(in)));
+
+                    schemaFileInputStream = getClass().getResourceAsStream(schemaFile);
+                    quartzFileInputStream = getClass().getResourceAsStream(quartzFile);
+
+                    try(BufferedReader schemaFileReader = new BufferedReader(new InputStreamReader(schemaFileInputStream));
+                        BufferedReader quartzFileReader = new BufferedReader(new InputStreamReader(quartzFileInputStream))) {
+
+                        LogUtil.info(getClass().getName(), "Execute schema " + schemaFile);
+                        runner.runScript(schemaFileReader);
+
+                        LogUtil.info(getClass().getName(), "Execute schema " + quartzFile);
+                        runner.runScript(quartzFileReader);
+                    }
                 }
                 if ("true".equals(sampleUsers)) {
                     // create users
                     String schemaFile = "/setup/sql/jwdb-users.sql";
                     LogUtil.info(getClass().getName(), "Create users using schema " + schemaFile);
                     ScriptRunner runner = new ScriptRunner(con, false, true);
-                    in = getClass().getResourceAsStream(schemaFile);
-                    runner.runScript(new BufferedReader(new InputStreamReader(in)));
+                    schemaFileInputStream = getClass().getResourceAsStream(schemaFile);
+                    runner.runScript(new BufferedReader(new InputStreamReader(schemaFileInputStream)));
                 }
                 
                 con.commit();
@@ -259,9 +273,9 @@ public class SetupServlet extends HttpServlet {
                 } catch (SQLException ex) {
                     // ignore
                 }
-                if (in != null) {
+                if (schemaFileInputStream != null) {
                     try {
-                        in.close();
+                        schemaFileInputStream.close();
                     } catch (IOException ex) {
                         // ignore
                     }

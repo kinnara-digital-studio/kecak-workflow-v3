@@ -130,6 +130,12 @@ import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.app.scheduler.SchedulerManager;
+import org.kecak.apps.app.scheduler.dao.SchedulerDetailsDao;
+import org.kecak.apps.app.scheduler.dao.SchedulerLogDao;
+import org.kecak.apps.app.scheduler.model.SchedulerDetails;
+import org.kecak.apps.app.scheduler.model.TriggerTypes;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -216,6 +222,15 @@ public class ConsoleWebController {
     UserMetaDataDao userMetaDataDao;
     @Autowired
     AuditTrailManager auditTrailManager;
+
+    // Start of scheduler
+    @Autowired
+    SchedulerManager schedulerManager;
+    @Autowired
+    SchedulerDetailsDao schedulerDetailsDao;
+    @Autowired
+    SchedulerLogDao schedulerLogDao;
+    // End of scheduler
 
     @RequestMapping({"/index", "/", "/home"})
     public String index() {
@@ -5778,4 +5793,180 @@ public class ConsoleWebController {
             return "console/monitor/systemLog";
         }
     }
+
+    // Start of Scheduler
+    /**
+     *
+     * @param map
+     * @return
+     */
+    @RequestMapping("/console/setting/scheduler")
+    public String consoleSettingSchedulerContent(ModelMap map) {
+        return "console/setting/scheduler/scheduler";
+    }
+
+    @RequestMapping("/console/setting/scheduler/create")
+    public String consoleSettingSchedulerCreate(ModelMap map) {
+        SchedulerDetails schedulerDetails = new SchedulerDetails();
+        map.addAttribute("schedulerDetails", schedulerDetails);
+        return "console/setting/scheduler/schedulerCreate";
+    }
+
+    @RequestMapping(value = "/console/setting/scheduler/submit/(*:action)", method = RequestMethod.POST)
+    public String consoleSettingSchedulerSubmit(ModelMap map, @RequestParam("action") String action, @ModelAttribute("schedulerDetails") SchedulerDetails schedulerDetails, BindingResult result) {
+        // validation
+        validator.validate(schedulerDetails, result);
+        Date now = new Date();
+        String currUsername = workflowUserManager.getCurrentUsername();
+
+        boolean invalid = result.hasErrors();
+        if (!invalid) {
+            // check error
+            Collection<String> errors = new ArrayList<String>();
+
+            if ("create".equals(action)) {
+                // check exist
+                SchedulerDetails currentByJob = schedulerDetailsDao.getSchedulerDetailsByJob(schedulerDetails.getJobName(), schedulerDetails.getGroupJobName());
+                SchedulerDetails currentByTrigger = schedulerDetailsDao.getSchedulerDetailsByTrigger(schedulerDetails.getTriggerName(), schedulerDetails.getGroupTriggerName());
+                if (currentByJob != null || currentByTrigger != null) {
+                    errors.add("console.app.message.error.label.exists");
+                } else {
+                    schedulerDetails.setDateCreated(now);
+                    schedulerDetails.setCreatedBy(currUsername);
+                    schedulerDetails.setDateModified(now);
+                    schedulerDetails.setModifiedBy(currUsername);
+                    schedulerDetails.setTriggerTypes(TriggerTypes.CRON);
+                    try {
+                        schedulerManager.saveOrUpdateJobDetails(schedulerDetails);
+                        invalid = false;
+                    } catch (Exception e) {
+                        invalid = true;
+                        errors.add("console.app.message.error.label.exception");
+                        e.printStackTrace();
+                        LogUtil.error(getClass().getName(), e, e.getMessage());
+                    }
+                }
+            } else {
+                SchedulerDetails details = schedulerDetailsDao.getSchedulerDetailsById(schedulerDetails.getId());
+                details.setCronExpression(schedulerDetails.getCronExpression());
+//                details.setJobClassName(schedulerDetails.getJobClassName());
+                details.setDateModified(now);
+                details.setModifiedBy(currUsername);
+
+                LogUtil.info(getClass().getName(), "getCronExpression [" + details.getCronExpression() + "] getJobClassName [" + details.getJobClassName() + "]");
+
+                try {
+                    schedulerManager.updateJobDetails(details);
+                    invalid = false;
+                } catch (Exception e) {
+                    invalid = true;
+                    errors.add("console.app.message.error.label.exception");
+                    e.printStackTrace();
+                    LogUtil.error(getClass().getName(), e, e.getMessage());
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                map.addAttribute("errors", errors);
+                invalid = true;
+            }
+        }
+
+        if (invalid) {
+            map.addAttribute("schedulerDetails", schedulerDetails);
+            if ("create".equals(action)) {
+                return "console/setting/scheduler/schedulerCreate";
+            } else {
+                return "console/setting/scheduler/schedulerEdit";
+            }
+        } else {
+            String contextPath = WorkflowUtil.getHttpServletRequest().getContextPath();
+            String url = contextPath + "/web/console/setting/scheduler";
+            map.addAttribute("url", url);
+            return "console/dialogClose";
+        }
+    }
+
+    @RequestMapping("/json/console/setting/scheduler/list")
+    public void consoleSettingSchedulerListJson(Writer writer, @RequestParam(value = "callback", required = false) String callback,
+                                                @RequestParam(value = "jobName", required = false) String jobName, @RequestParam(value = "sort", required = false) String sort,
+                                                @RequestParam(value = "desc", required = false) Boolean desc, @RequestParam(value = "start", required = false) Integer start,
+                                                @RequestParam(value = "rows", required = false) Integer rows) throws IOException, JSONException {
+
+        String condition = "";
+        List<String> param = new ArrayList<String>();
+
+        if (jobName != null && jobName.trim().length() != 0) {
+            if (!condition.isEmpty()) {
+                condition += " and";
+            }
+            condition += " (e.jobName like ? )";
+            param.add("%" + jobName + "%");
+        }
+
+        if (condition.length() > 0) {
+            condition = "WHERE " + condition;
+        }
+
+        List<SchedulerDetails> schedulerList = schedulerDetailsDao.getSchedulerDetails(condition, param.toArray(new String[param.size()]),
+                sort, desc, start, rows);
+
+        Long count = schedulerDetailsDao.count(condition, param.toArray(new String[param.size()]));
+
+        JSONObject jsonObject = new JSONObject();
+        if (schedulerList != null && schedulerList.size() > 0) {
+            for (SchedulerDetails details : schedulerList) {
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("id", details.getId());
+                data.put("jobName", details.getJobName());
+                data.put("groupJobName", details.getGroupJobName());
+                data.put("triggerName", details.getTriggerName());
+                data.put("groupTriggerName", details.getGroupTriggerName());
+                data.put("jobClassName", details.getJobClassName());
+                data.put("modifiedate", details.getDateModified() == null ? "" : details.getDateModified());
+                jsonObject.accumulate("data", data);
+            }
+        }
+
+        jsonObject.accumulate("total", count);
+        jsonObject.accumulate("start", start);
+        jsonObject.accumulate("sort", sort);
+        jsonObject.accumulate("desc", desc);
+
+        AppUtil.writeJson(writer, jsonObject, callback);
+    }
+
+    @RequestMapping(value = "/console/setting/scheduler/delete", method = RequestMethod.POST)
+    public String consoleSettingSchedulerDelete(@RequestParam(value = "ids") String ids) {
+        StringTokenizer strToken = new StringTokenizer(ids, ",");
+        while (strToken.hasMoreTokens()) {
+            String id = (String) strToken.nextElement();
+            SchedulerDetails details = schedulerDetailsDao.getSchedulerDetailsById(id);
+            schedulerManager.deleteJob(details);
+        }
+        return "console/dialogClose";
+    }
+
+    /**
+     * Manual trigger scheduler job
+     *
+     * @param ids
+     * @return
+     */
+    @RequestMapping(value = "/console/setting/scheduler/firenow", method = RequestMethod.POST)
+    public String consoleSettingSchedulerFireNow(@RequestParam(value = "ids") String ids) {
+        StringTokenizer strToken = new StringTokenizer(ids, ",");
+        while (strToken.hasMoreTokens()) {
+            String id = (String) strToken.nextElement();
+            SchedulerDetails details = schedulerDetailsDao.getSchedulerDetailsById(id);
+            try {
+                schedulerManager.fireNow(details);
+            } catch (SchedulerException e) {
+                LogUtil.error(getClass().getName(), e, "Unable to fire " + "[" + details.getJobName() + "] " + e.getMessage());
+                continue;
+            }
+        }
+        return "console/dialogClose";
+    }
+    // End of Scheduler
 }

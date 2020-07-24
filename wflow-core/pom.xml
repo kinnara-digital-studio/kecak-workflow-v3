@@ -241,15 +241,17 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.9.10.4</version>
         </dependency>
+        <!-- Start of Scheduler -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz-jobs</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <!-- End of Scheduler -->
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <url>dav:http://dev.joget.org/archiva/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>http://dev.joget.org/archiva/repository/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

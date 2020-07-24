@@ -169,6 +169,8 @@
                 <value>/org/joget/apps/app/model/EnvironmentVariable.hbm.xml</value>
                 <value>/org/joget/apps/app/model/AuditTrail.hbm.xml</value>
                 <value>/org/joget/apps/app/model/UserReplacement.hbm.xml</value>
+<!--                <value>/org/kecak/apps/app/scheduler/model/SchedulerLog.hbm.xml</value>-->
+<!--                <value>/org/kecak/apps/app/scheduler/model/SchedulerDetails.hbm.xml</value>-->
             </list>
         </property>
         <property name="hibernateProperties">
@@ -274,7 +276,58 @@
     <!-- Important: this is to let the XPath object created before Security Manageger initialized -->
     <bean id="dependenciesService" class="org.joget.apps.app.service.DependenciesUtil">
     </bean>
-   
+
+    <!-- Start of Scheduler -->
+<!--    <bean id="schedulerLogDao" class="org.kecak.apps.app.scheduler.dao.SchedulerLogDao">-->
+<!--        <property name="sessionFactory" ref="appSessionFactory"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="schedulerDetailsDao" class="org.kecak.apps.app.scheduler.dao.SchedulerDetailsDao">-->
+<!--        <property name="sessionFactory" ref="appSessionFactory"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="schedulerManager" class="org.kecak.apps.app.scheduler.SchedulerManager" init-method="initManager">-->
+<!--        <property name="schedulerFactory" ref="schedulerFactory"/>-->
+<!--        <property name="schedulerJobListener" ref="schedulerJobListener"/>-->
+<!--        <property name="schedulerDetailsDao" ref="schedulerDetailsDao"/>-->
+<!--        <property name="pluginManager" ref="pluginManager"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="schedulerJobListener" class="org.kecak.apps.app.scheduler.SchedulerJobListener">-->
+<!--        <property name="schedulerLogDao" ref="schedulerLogDao"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false">-->
+<!--        <property name="autoStartup" value="true" />-->
+<!--        <property name="waitForJobsToCompleteOnShutdown" value="true" />-->
+
+<!--        <property name="quartzProperties">-->
+<!--            <props>-->
+<!--                <prop key="org.quartz.scheduler.instanceName">kecakNonClusterScheduler</prop>-->
+<!--                <prop key="org.quartz.scheduler.skipUpdateCheck">true</prop>-->
+<!--                <prop key="org.quartz.scheduler.instanceId">AUTO</prop>-->
+<!--                <prop key="org.quartz.scheduler.interruptJobsOnShutdown">true</prop>-->
+<!--                <prop key="org.quartz.scheduler.interruptJobsOnShutdownWithWait">true</prop>-->
+
+<!--                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>-->
+<!--                <prop key="org.quartz.threadPool.threadCount">5</prop>-->
+
+<!--                &lt;!&ndash;Job Store &ndash;&gt;-->
+<!--                <prop key="org.quartz.jobStore.driverDelegateClass">${quartz.jobStore.driverDelegateClass}</prop>-->
+<!--                <prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>-->
+<!--                <prop key="org.quartz.jobStore.tablePrefix">QRTZ_</prop>-->
+<!--                <prop key="org.quartz.jobStore.isClustered">true</prop>-->
+<!--                <prop key="org.quartz.jobStore.clusterCheckinInterval">20000</prop>-->
+
+<!--                &lt;!&ndash; DataSource &ndash;&gt;-->
+<!--                <prop key="org.quartz.jobStore.dataSource">quartzDS</prop>-->
+
+<!--                <prop key="org.quartz.dataSource.quartzDS.jndiURL">${quartzDS.jndiURL}</prop>-->
+<!--            </props>-->
+<!--        </property>-->
+<!--    </bean>-->
+    <!-- End of Scheduler -->
+
     <aop:config>
         <aop:advisor advice-ref="txAdvice" pointcut="execution(* org.joget.apps.app.dao.*Dao.*(..)) and !(execution(* org.joget.apps.app.dao.AppDefinitionDao.updateDateModified(..)))" order="1" />
         <aop:advisor advice-ref="txAdvice" pointcut="execution(* org.joget.report.dao.*Dao.*(..))" order="1" />
