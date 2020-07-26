@@ -14,10 +14,10 @@
  
     <!-- START web relevant bean-->
     <context:annotation-config/>
-    <context:component-scan base-package="org.joget, org.kecak"/>
+    <context:component-scan base-package="org.joget,org.kecak"/>
 
     <!-- Start of scheduler -->
-<!--    <context:property-placeholder location="classpath:conf/quartz-setup.properties"/>-->
+    <context:property-placeholder location="classpath:conf/quartz-setup.properties"/>
     <!-- End of scheduler -->
     
     <bean id="configurationLoader"
