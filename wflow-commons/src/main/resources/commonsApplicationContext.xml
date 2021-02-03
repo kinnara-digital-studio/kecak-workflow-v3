@@ -30,14 +30,13 @@
     <bean id="hostManager" class="org.joget.commons.util.HostManager" depends-on="staticInitOfDynamicDataSourceManager">
     </bean>
 
-     <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices"> 
-         <property name="serverId" value="btm-joget" /> 
-         <property name="journal" value="null" /> 
-         <property name="DefaultTransactionTimeout" value="900" /> 
-     </bean> 
+     <bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager" init-method="init" destroy-method="close">
+        <property name="forceShutdown" value="true" />
+    </bean>
 
-     <bean id="bitronixTransactionManager" factory-method="getTransactionManager" 
-         class="bitronix.tm.TransactionManagerServices" depends-on="btmConfig" destroy-method="shutdown" /> 
+    <bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
+        <property name="transactionTimeout" value="300" />
+    </bean>
 
     <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
         <property name="transactionManager" ref="bitronixTransactionManager" />
@@ -100,6 +99,7 @@
             <list>
                 <value>/org/joget/commons/spring/model/Setting.hbm.xml</value>
                 <value>/org/joget/commons/spring/model/ResourceBundleMessage.hbm.xml</value>
+                <value>/org/joget/commons/spring/model/EmailApprovalContent.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -152,4 +152,14 @@
     <bean id="fileManager" class="org.joget.commons.util.FileManager" depends-on="setupManager">
     </bean>
     
+    <bean id="nonceGenerator" class="org.joget.commons.util.NonceGeneratorImpl">
+        <property name="cache">
+            <ref local="resourceBundleMessageCache" />
+        </property>
+    </bean>
+	
+    <bean id="securityUtil" class="org.joget.commons.util.SecurityUtil">
+        <property name="dataEncryption" ref="dataEncryption" />
+        <property name="nonceGenerator" ref="nonceGenerator" />
+    </bean>
 </beans>
