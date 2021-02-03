@@ -175,21 +175,21 @@
         <property name="sessionFactory" ref="appSessionFactory"/>
     </bean>
 
+    <!-- Start of Scheduler -->
+    <bean id="propertiesLoader" class="org.kecak.apps.property.DataSourcePropertiesLoader">
+        <property name="locations">
+            <list>
+                <value>classpath:conf/quartz-setup.properties</value>
+            </list>
+        </property>
+        <property name="propertyDao" ref="propertyDao" />
+    </bean>
+    <!-- End of Scheduler -->
+
     <bean id="applicationProperties" class="org.kecak.apps.property.PropertiesTemplate">
         <property name="propertiesLoader" ref="propertiesLoader" />
     </bean>
     <!-- End of Property -->
-
-    <!-- Start of Scheduler -->
-<!--    <bean id="propertiesLoader" class="org.kecak.apps.property.DataSourcePropertiesLoader">-->
-<!--        <property name="locations">-->
-<!--            <list>-->
-<!--                <value>classpath:conf/quartz-setup.properties</value>-->
-<!--            </list>-->
-<!--        </property>-->
-<!--        <property name="propertyDao" ref="propertyDao" />-->
-<!--    </bean>-->
-    <!-- End of Scheduler -->
 
     <import resource="classpath:webApplicationContext.xml" />
 </beans>

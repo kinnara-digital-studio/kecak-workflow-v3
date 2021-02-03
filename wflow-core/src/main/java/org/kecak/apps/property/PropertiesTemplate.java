@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class PropertiesTemplate extends Properties {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 5035504924418610552L;
 
@@ -19,7 +19,7 @@ public class PropertiesTemplate extends Properties {
 	
 	public void setPropertiesLoader(PropertiesLoader propertiesLoader) throws IOException {
 		this.propertiesLoader = propertiesLoader;
-		refresh();
+//		refresh();
 	}
 	
 	public void refresh() throws IOException {
@@ -31,6 +31,5 @@ public class PropertiesTemplate extends Properties {
 		SimplePropertiesLoader propertiesLoader = new SimplePropertiesLoader();
 		propertiesLoader.setLocations(this.locations);
 		CollectionUtils.mergePropertiesIntoMap(propertiesLoader.loadProperties(),this);
-		
 	}
 }
