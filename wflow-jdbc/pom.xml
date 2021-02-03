@@ -34,6 +34,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.17</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>12.1.0.2</version>
@@ -46,15 +52,5 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <url>dav:http://dev.joget.org/archiva/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>http://dev.joget.org/archiva/repository/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
 
