@@ -175,7 +175,7 @@ public class SetupManager {
      */
     public String getSettingValue(String property) {        
         Setting setting = getSettingByProperty(property);
-        String value = (setting != null) ? setting.getValue() : null;
+        String value = (setting != null) ? setting.getValue() : "";
         return value;
     }
 

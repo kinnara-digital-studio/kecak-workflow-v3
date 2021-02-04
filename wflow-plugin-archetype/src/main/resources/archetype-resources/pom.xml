@@ -6,7 +6,7 @@
     <packaging>bundle</packaging>
     <version>${dollar}{version}</version>
     <name>${dollar}{artifactId}</name>
-    <url>http://www.joget.org</url>
+    <url>http://www.kecak.org</url>
     <build>
         <plugins>
             <plugin>

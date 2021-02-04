@@ -6,7 +6,7 @@
     <packaging>pom</packaging>
     <version>7.0-SNAPSHOT</version>
     <name>wflow-install</name>
-    <url>http://www.joget.org</url>
+    <url>http://www.kecak.org</url>
     <properties>
         <nsis.setup.nsi>target/setup.nsi</nsis.setup.nsi>
         <nsis.output.file>../wflow-install/builds/joget-setup-${project.version}-${buildNumber}.exe</nsis.output.file>

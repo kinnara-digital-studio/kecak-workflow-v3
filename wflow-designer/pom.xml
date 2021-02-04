@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <version>7.0-SNAPSHOT</version>
     <name>wflow-designer</name>
-    <url>http://www.joget.org</url>
+    <url>http://www.kecak.org</url>
     <scm>
         <connection>scm:git:ssh://git@repo.joget.org:2224/joget/jw-community.git</connection>
         <developerConnection>scm:git:ssh://git@repo.joget.org:2224/joget/jw-community.git</developerConnection>

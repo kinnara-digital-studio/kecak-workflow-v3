@@ -1,22 +1,22 @@
 package org.joget.commons.util;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.tomcat.jdbc.pool.XADataSource;
+import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 
-public class DynamicDataSource extends XADataSource {
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.Properties;
+
+public class DynamicDataSource extends BasicManagedDataSource {
 
     public static final String URL = "Url";
     public static final String USER = "User";
     public static final String PASSWORD = "Password";
     public static final String DRIVER = "Driver";
     private String datasourceName;
-    
+
     @Override
-    public Connection getConnection() throws SQLException {
+    protected synchronized DataSource createDataSource() throws SQLException {
+
         Properties properties = DynamicDataSourceManager.getProperties();
         String tempDriver = properties.getProperty(getDatasourceName() + DRIVER);
         String tempUrl = properties.getProperty(getDatasourceName() + URL);
@@ -33,34 +33,19 @@ public class DynamicDataSource extends XADataSource {
             tempPassword = "";
         }
 
-        if (!getUrl().equals(tempUrl)) {
+        if (!this.url.equals(tempUrl)) {
             //close old datasource
             super.close();
+            super.closed = false;
 
             // set new settings
-            setDriverClassName(tempDriver);
-            setUrl(tempUrl);
-            setUsername(tempUser);
-            setPassword(tempPassword);
-            setProperties(properties);
-            LogUtil.info(getClass().getName(), "profileName=" + HostManager.getCurrentProfile() + ", url=" + getUrl() + ", user=" + getUsername());
+            this.driverClassName = tempDriver;
+            this.url = tempUrl;
+            this.username = tempUser;
+            this.password = tempPassword;
+            LogUtil.info(getClass().getName(), "datasourceName=" + getDatasourceName() + ", url=" + url + ", user=" + username);
         }
-        return super.getConnection();
-    }
-    
-    protected void setProperties(Properties properties) {
-        for (Map.Entry<Object, Object> e : properties.entrySet()) {
-            String key = (String) e.getKey();
-            String value = (String) e.getValue();
-            
-            if (key.endsWith(DRIVER) || key.endsWith(URL) || key.endsWith(USER) || key.endsWith(PASSWORD) || key.endsWith("profileName") || key.endsWith("encryption")) {
-                continue;
-            }
-            
-            try {
-                BeanUtils.setProperty(this, key, value);
-            } catch (Exception ex) {/*ignore*/}
-        }
+        return super.createDataSource();
     }
 
     public String getConfigDataSourceUrl() {

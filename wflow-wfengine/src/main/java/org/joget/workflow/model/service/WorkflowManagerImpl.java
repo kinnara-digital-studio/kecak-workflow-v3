@@ -1,11 +1,13 @@
 package org.joget.workflow.model.service;
 
-import org.joget.commons.util.LogUtil;
-import org.joget.commons.util.SetupManager;
+import org.joget.commons.util.*;
 import org.joget.workflow.model.*;
 import com.lutris.dods.builder.generator.query.DataObjectException;
 import com.lutris.dods.builder.generator.query.NonUniqueQueryException;
 import com.lutris.dods.builder.generator.query.QueryException;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -57,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import org.apache.commons.collections.SequencedHashMap;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -72,9 +75,6 @@ import org.enhydra.shark.instancepersistence.data.ProcessQuery;
 import org.enhydra.shark.instancepersistence.data.ProcessStateDO;
 import org.enhydra.shark.instancepersistence.data.ProcessStateQuery;
 import org.enhydra.shark.xpdl.XMLUtil;
-import org.joget.commons.util.DynamicDataSourceManager;
-import org.joget.commons.util.PagedList;
-import org.joget.commons.util.UuidGenerator;
 import org.joget.workflow.model.dao.WorkflowHelper;
 import org.joget.workflow.model.dao.WorkflowProcessLinkDao;
 import org.joget.workflow.shark.model.dao.WorkflowAssignmentDao;
@@ -172,31 +172,49 @@ public class WorkflowManagerImpl implements WorkflowManager {
                 }
 
                 if (this.dataSource != null) {
+                    LogUtil.info(getClass().getName(), "this.dataSource != null");
                     // set Spring datasource, hardcoded to Shark's JNDI binding
                     ic = new InitialContext();
                     String jndiName = "jwdb";
                     try {
                         ic.rebind(jndiName, this.dataSource);
                     } catch(Exception ne) {
+                        LogUtil.error(getClass().getName(), ne, ne.getMessage());
                         // workaround for Websphere as it does not allow non-serializable object binding, so bind to java:comp/
                         try {
                             jndiName = "java:comp/jwdb";
                             ic.rebind(jndiName, this.dataSource);
                         } catch(Exception nee) {
+                            LogUtil.error(getClass().getName(), nee, nee.getMessage());
                             jndiName = "jwdb";
                         }
                     }
                     // set shark datasource name
                     JSPClientUtilities.setProperty("DatabaseManager.DB.sharkdb.Connection.DataSourceName", jndiName);
                     LogUtil.info(getClass().getName(), "Datasource bound to " + jndiName);
+
+                    // test jndi connection
+                    DataSource ds = (DataSource)ic.lookup(jndiName);
+                    try(Connection conn = ds.getConnection()) {
+                        LogUtil.info(getClass().getName(), "JNDI Connection [" + jndiName + "] success, ["+ds.getClass().getName()+"] is XADataSource ["+ (ds instanceof XADataSource) +"] is DataSource ["+ (ds instanceof DataSource) +"]");
+                    } catch (SQLException e) {
+                        LogUtil.warn(getClass().getName(), "JNDI Connection [" + jndiName + "] failed, [" + ds.getClass().getName()+"]");
+                        if(ds instanceof DynamicDataSource) {
+                            LogUtil.info(getClass().getName(), "DynamicDataSource : getConfigDataSourceUrl ["+((DynamicDataSource) ds).getConfigDataSourceUrl()+"] getUrl ["+((DynamicDataSource) ds).getUrl()+"] getUsername ["+((DynamicDataSource) ds).getUsername()+"] getDatasourceName ["+((DynamicDataSource) ds).getDatasourceName()+"]");
+                        }
+                        LogUtil.error(getClass().getName(), e, e.getMessage());
+                    }
                 }
 
                 if (this.transactionManager != null) {
+                    LogUtil.info(getClass().getName(), "this.transactionManager != null");
                     // set Spring tx manager, hardcoded to Shark's JNDI binding
                     TransactionManager tm = this.transactionManager.getTransactionManager();
                     if (tm != null && ic != null) {
                         ic.rebind("jwTransactionManager", tm);
                     }
+                } else {
+                    LogUtil.warn(getClass().getName(), "this.transactionManager == null");
                 }
 
                 // configure shark

@@ -191,5 +191,6 @@
     </bean>
     <!-- End of Property -->
 
+    <import resource="classpath:camelApplicationContext.xml" />
     <import resource="classpath:webApplicationContext.xml" />
 </beans>

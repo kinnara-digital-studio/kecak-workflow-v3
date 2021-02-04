@@ -6,7 +6,7 @@
     <packaging>war</packaging>
     <version>7.0-SNAPSHOT</version>
     <name>wflow-consoleweb</name>
-    <url>http://www.joget.org</url>
+    <url>http://www.kecak.org</url>
     <scm>
         <connection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow.git</developerConnection>
@@ -108,7 +108,32 @@
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
             <version>1.1</version>
-        </dependency>  
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-stream</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jms</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-mail</artifactId>
+            <version>2.15.1</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>kecak</finalName>
@@ -274,6 +299,7 @@
                     <doUpdate>false</doUpdate>
                     <revisionOnScmFailure>0</revisionOnScmFailure>
                     <shortRevisionLength>7</shortRevisionLength>
+                    <timestampFormat>{0,date,yyyy}</timestampFormat>
                 </configuration>
             </plugin>
             <plugin>
@@ -309,7 +335,7 @@
                     </dependency>                         
                 </dependencies>                
                 <configuration>
-                    <complianceLevel>1.7</complianceLevel>
+                    <complianceLevel>1.8</complianceLevel>
                     <weaveDependencies>
                         <weaveDependency>
                             <groupId>org.joget</groupId>

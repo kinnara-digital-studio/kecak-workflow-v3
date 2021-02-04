@@ -6,7 +6,7 @@
     <packaging>war</packaging>
     <version>7.0-SNAPSHOT</version>
     <name>wflow-designerweb</name>
-    <url>http://www.joget.org</url>
+    <url>http://www.kecak.org</url>
     <dependencies>
         <dependency>
             <groupId>org.joget</groupId>
