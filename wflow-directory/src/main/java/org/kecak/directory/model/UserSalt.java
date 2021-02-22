@@ -1,80 +1,92 @@
-package org.joget.commons.spring.model;
+package org.kecak.directory.model;
+
+import org.joget.commons.spring.model.Auditable;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Deprecated
-public class EmailApprovalContent implements Serializable {
+public class UserSalt implements Serializable, Auditable{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6504636506447960305L;
-	
+	private static final long serialVersionUID = 964929068235904826L;
+
 	private String id;
-	private String processId;
-	private String activityId;
-	private String content;
+	private String userId;
+	private String randomSalt;
 	private Date dateCreated;
-   	private Date dateModified;
-   	private String createdBy;
-   	private String modifiedBy;
-   	private Boolean deleted;
-   	
+	private Date dateModified;
+	private String createdBy;
+	private String modifiedBy;
+	private Boolean deleted;
+	
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getProcessId() {
-		return processId;
+
+	public String getUserId() {
+		return userId;
 	}
-	public void setProcessId(String processId) {
-		this.processId = processId;
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public String getActivityId() {
-		return activityId;
+
+	public String getRandomSalt() {
+		return randomSalt;
 	}
-	public void setActivityId(String activityId) {
-		this.activityId = activityId;
+
+	public void setRandomSalt(String randomSalt) {
+		this.randomSalt = randomSalt;
 	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
+
 	public Date getDateCreated() {
 		return dateCreated;
 	}
+
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+
 	public Date getDateModified() {
 		return dateModified;
 	}
+
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
 	}
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
+
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
+
 	public String getModifiedBy() {
 		return modifiedBy;
 	}
+
 	public void setModifiedBy(String modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
+
 	public Boolean getDeleted() {
 		return deleted;
 	}
+
 	public void setDeleted(Boolean deleted) {
 		this.deleted = deleted;
 	}
-   	
-   	
+
+	public String getAuditTrailId() {
+		return id;
+	}
+
 }

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
     
     <import resource="classpath:commonsApplicationContext.xml" />
     <import resource="classpath:pluginBaseApplicationContext.xml" />
@@ -44,6 +41,16 @@
         <property name="roleDao" ref="roleDao" />
         <property name="departmentDao" ref="departmentDao" />
         <property name="sessionFactory" ref="directorySessionFactory" />
+    </bean>
+
+    <bean id="userSaltDao" class="org.kecak.directory.dao.UserSaltDaoImpl">
+        <property name="sessionFactory" ref="directorySessionFactory" />
+        <property name="workflowUserManager" ref="workflowUserManager"/>
+    </bean>
+
+    <bean id="userTokenDao" class="org.kecak.directory.dao.UserTokenDaoImpl">
+        <property name="sessionFactory" ref="directorySessionFactory" />
+        <property name="workflowUserManager" ref="workflowUserManager"/>
     </bean>
 
     <bean id="employmentDao" class="org.joget.directory.dao.EmploymentDaoImpl">
@@ -107,6 +114,8 @@
         <property name="organizationDao" ref="organizationDao" />
         <property name="gradeDao" ref="gradeDao" />
         <property name="roleDao" ref="roleDao" />
+        <property name="userSaltDao" ref="userSaltDao" />
+        <property name="userTokenDao" ref="userTokenDao" />
     </bean>
 
     <aop:config>

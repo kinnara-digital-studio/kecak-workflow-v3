@@ -1,24 +1,26 @@
-package org.joget.commons.spring.model;
+package org.kecak.directory.model;
+
+import org.joget.commons.spring.model.Auditable;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class Setting implements Serializable {
+public class UserToken implements Serializable, Auditable{
 
     /**
      *
      */
-    private static final long serialVersionUID = 4526125925128433194L;
-
     private String id;
-    private String property;
-    private String value;
-    private Integer ordering;
+    private String userId;
+    private String platformId;
+    private String token;
+    private String externalId;
     private Date dateCreated;
     private Date dateModified;
     private String createdBy;
     private String modifiedBy;
     private Boolean deleted;
+    private Date expirationDate;
 
     public String getId() {
         return id;
@@ -28,28 +30,36 @@ public class Setting implements Serializable {
         this.id = id;
     }
 
-    public Integer getOrdering() {
-        return ordering;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setOrdering(Integer ordering) {
-        this.ordering = ordering;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getProperty() {
-        return property;
+    public String getPlatformId() {
+        return platformId;
     }
 
-    public void setProperty(String property) {
-        this.property = property;
+    public void setPlatformId(String platformId) {
+        this.platformId = platformId;
     }
 
-    public String getValue() {
-        return value;
+    public String getToken() {
+        return token;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public Date getDateCreated() {
@@ -90,5 +100,18 @@ public class Setting implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    @Override
+    public String getAuditTrailId() {
+        return id;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

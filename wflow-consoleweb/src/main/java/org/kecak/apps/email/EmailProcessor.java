@@ -31,7 +31,6 @@ public class EmailProcessor {
     public static final String FROM = "from";
     public static final String SUBJECT = "subject";
 
-//    private EmailApprovalContentDao emailApprovalContentDao;
     private WorkflowManager workflowManager;
     private AppService appService;
     private WorkflowUserManager workflowUserManager;
