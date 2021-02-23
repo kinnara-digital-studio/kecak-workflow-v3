@@ -2707,28 +2707,8 @@ CREATE TABLE `dir_user` (
 --
 
 /*!40000 ALTER TABLE `dir_user` DISABLE KEYS */;
-INSERT INTO `dir_user` VALUES ('admin','admin','D475DD2BBF4138BB17263A3537B2F101','Admin','Admin',NULL,1,'0',NULL);
+INSERT INTO `dir_user` VALUES ('admin','admin','21232f297a57a5a743894a0e4a801fc3','Admin','Admin',NULL,1,'0',NULL);
 /*!40000 ALTER TABLE `dir_user` ENABLE KEYS */;
-
---
--- Table structure for table 'dir_user_salt'
---
-CREATE TABLE `dir_user_salt` (
-	`id` VARCHAR(255) NOT NULL,
-	`userId` VARCHAR(255) NULL DEFAULT NULL,
-	`randomSalt` VARCHAR(255) NULL DEFAULT NULL,
-	PRIMARY KEY (`id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `dir_user_salt`
---
-
-LOCK TABLES `dir_user_salt` WRITE;
-/*!40000 ALTER TABLE `dir_user_salt` DISABLE KEYS */;
-INSERT INTO `dir_user_salt` VALUES (UUID(),'admin','2DEFB4535E58F417C62E632D82402986');
-/*!40000 ALTER TABLE `dir_user_salt` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `dir_user_extra`

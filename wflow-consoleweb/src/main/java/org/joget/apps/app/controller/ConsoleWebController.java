@@ -15,8 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -84,7 +82,11 @@ import org.joget.commons.spring.model.ResourceBundleMessage;
 import org.joget.commons.spring.model.ResourceBundleMessageDao;
 import org.joget.commons.spring.model.Setting;
 import org.joget.commons.util.TimeZoneUtil;
-import org.joget.directory.model.*;
+import org.joget.directory.model.Department;
+import org.joget.directory.model.Employment;
+import org.joget.directory.model.Group;
+import org.joget.directory.model.Role;
+import org.joget.directory.model.User;
 import org.joget.directory.model.service.ExtDirectoryManager;
 import org.joget.plugin.base.Plugin;
 import org.joget.plugin.base.PluginManager;
@@ -112,6 +114,8 @@ import org.joget.directory.dao.OrganizationDao;
 import org.joget.directory.dao.RoleDao;
 import org.joget.directory.dao.UserDao;
 import org.joget.directory.dao.UserMetaDataDao;
+import org.joget.directory.model.Grade;
+import org.joget.directory.model.Organization;
 import org.joget.directory.model.service.DirectoryManagerPlugin;
 import org.joget.directory.model.service.DirectoryUtil;
 import org.joget.directory.model.service.UserSecurity;
@@ -131,11 +135,6 @@ import org.kecak.apps.app.scheduler.dao.SchedulerDetailsDao;
 import org.kecak.apps.app.scheduler.dao.SchedulerLogDao;
 import org.kecak.apps.app.scheduler.model.SchedulerDetails;
 import org.kecak.apps.app.scheduler.model.TriggerTypes;
-import org.kecak.commons.util.HashSalt;
-import org.kecak.commons.util.PasswordGeneratorService;
-import org.kecak.commons.util.PasswordValidator;
-import org.kecak.directory.dao.UserSaltDao;
-import org.kecak.directory.model.UserSalt;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -160,8 +159,6 @@ public class ConsoleWebController {
     public static final String APP_ZIP_PREFIX = "APP_";
     @Autowired
     UserDao userDao;
-    @Autowired
-    UserSaltDao userSaltDao;
     @Autowired
     OrganizationDao organizationDao;
     @Autowired
@@ -225,8 +222,6 @@ public class ConsoleWebController {
     UserMetaDataDao userMetaDataDao;
     @Autowired
     AuditTrailManager auditTrailManager;
-    @Autowired
-    PasswordGeneratorService passwordGeneratorService;
 
     // Start of scheduler
     @Autowired
@@ -927,45 +922,50 @@ public class ConsoleWebController {
 
     @RequestMapping(value = "/console/directory/user/submit/(*:action)", method = RequestMethod.POST)
     public String consoleUserSubmit(ModelMap model, @RequestParam("action") String action, @ModelAttribute("user") User user, BindingResult result,
-                                    @RequestParam(value = "employeeCode", required = false) String employeeCode, @RequestParam(value = "employeeRole", required = false) String employeeRole,
-                                    @RequestParam(value = "employeeOrganization", required = false) String employeeOrganization, @RequestParam(value = "employeeDepartment", required = false) String employeeDepartment,
-                                    @RequestParam(value = "employeeDepartmentHod", required = false) String employeeDepartmentHod, @RequestParam(value = "employeeGrade", required = false) String employeeGrade,
-                                    @RequestParam(value = "employeeStartDate", required = false) String employeeStartDate, @RequestParam(value = "employeeEndDate", required = false) String employeeEndDate) throws NoSuchAlgorithmException, InvalidKeySpecException {
+            @RequestParam(value = "employeeCode", required = false) String employeeCode, @RequestParam(value = "employeeRole", required = false) String employeeRole,
+            @RequestParam(value = "employeeDeptOrganization", required = false) String[] employeeDeptOrganization,
+            @RequestParam(value = "employeeDepartment", required = false) String[] employeeDepartment,
+            @RequestParam(value = "employeeDepartmentHod", required = false) String[] employeeDepartmentHod, 
+            @RequestParam(value = "employeeGradeOrganization", required = false) String[] employeeGradeOrganization,
+            @RequestParam(value = "employeeGrade", required = false) String[] employeeGrade,
+            @RequestParam(value = "employeeStartDate", required = false) String employeeStartDate, @RequestParam(value = "employeeEndDate", required = false) String employeeEndDate) {
         // validate ID
         validator.validate(user, result);
 
         UserSecurity us = DirectoryUtil.getUserSecurity();
-        UserSalt userSalt = new UserSalt();
+        User u = null;
 
         boolean invalid = result.hasErrors();
         if (!invalid) {
             // check error
             Collection<String> errors = new ArrayList<String>();
-
+            
             if ("create".equals(action)) {
                 // check username exist
                 if (directoryManager.getUserByUsername(user.getUsername()) != null || (us != null && us.isDataExist(user.getUsername()))) {
                     errors.add(ResourceBundleUtil.getMessage("console.directory.user.error.label.usernameExists"));
                 }
-
+                
                 if (us != null) {
                     Collection<String> validationErrors = us.validateUserOnInsert(user);
                     if (validationErrors != null && !validationErrors.isEmpty()) {
                         errors.addAll(validationErrors);
                     }
                 }
-
-                //Check Password Empty
-                if (PasswordValidator.isPasswordEmpty(user.getPassword())) {
-                    errors.add(ResourceBundleUtil.getMessage("console.directory.user.error.label.passwordNotEmpty"));
-                } else if (!PasswordValidator.validate(user.getPassword())) {
-                    errors.add(ResourceBundleUtil.getMessage("console.directory.user.error.label.passwordNotValid"));
-                }
-
+                
                 errors.addAll(validateEmploymentDate(employeeStartDate, employeeEndDate));
 
                 if (errors.isEmpty()) {
                     user.setId(user.getUsername());
+                    if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+                        user.setConfirmPassword(user.getPassword());
+                        if (us != null) {
+                            user.setPassword(us.encryptPassword(user.getUsername(), user.getPassword()));
+                        } else {
+                            //md5 password
+                            user.setPassword(StringUtil.md5Base16(user.getPassword()));
+                        }
+                    }
 
                     //set roles
                     if (user.getRoles() != null && user.getRoles().size() > 0) {
@@ -975,60 +975,43 @@ public class ConsoleWebController {
                         }
                         user.setRoles(roles);
                     }
-                    if(DirectoryUtil.isCustomDirectoryManager() && !directoryManager.isReadOnly()){
-                        invalid = !directoryManager.addUser(user);
-                    } else {
-                        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
-                            user.setConfirmPassword(user.getPassword());
-                            if (us != null) {
-                                user.setPassword(us.encryptPassword(user.getUsername(), user.getPassword()));
-                            } else {
-                                //md5 password
-                                //user.setPassword(StringUtil.md5Base16(user.getPassword()));
-                                HashSalt hashSalt = passwordGeneratorService.createNewHashWithSalt(user.getPassword());
-                                userSalt.setId(UUID.randomUUID().toString());
-                                userSalt.setRandomSalt(hashSalt.getSalt());
 
-                                user.setPassword(hashSalt.getHash());
-                            }
-                        }
-                        userSalt.setUserId(user.getUsername());
-                        userSaltDao.addUserSalt(userSalt);
-                        invalid = !userDao.addUser(user);
-                        if (us != null && !invalid) {
-                            us.insertUserPostProcessing(user);
-                        }
+                    invalid = !userDao.addUser(user);
+
+                    if (us != null && !invalid) {
+                        us.insertUserPostProcessing(user);
                     }
+                    u = user;
                 }
             } else {
                 user.setUsername(user.getId());
-                String currPassword = user.getPassword();
-
+                
                 if (us != null) {
                     Collection<String> validationErrors = us.validateUserOnUpdate(user);
                     if (validationErrors != null && !validationErrors.isEmpty()) {
                         errors.addAll(validationErrors);
                     }
                 }
-
-                if (!PasswordValidator.isPasswordEmpty(currPassword)) {
-                    if (!PasswordValidator.validate(currPassword)) {
-                        errors.add(ResourceBundleUtil.getMessage("console.directory.user.error.label.passwordNotValid"));
-                    }
-                }
-
+                
                 errors.addAll(validateEmploymentDate(employeeStartDate, employeeEndDate));
-
+                
                 if (errors.isEmpty()) {
                     boolean passwordReset = false;
-                    boolean passwordUpdated = false;
 
-                    User u = directoryManager.getUserById(user.getId());
+                    u = userDao.getUserById(user.getId());
                     u.setFirstName(user.getFirstName());
                     u.setLastName(user.getLastName());
                     u.setEmail(user.getEmail());
-                    u.setTelephoneNumber(user.getTelephoneNumber());
-
+                    if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+                        u.setConfirmPassword(user.getPassword());
+                        if (us != null) {
+                            passwordReset = true;
+                            u.setPassword(us.encryptPassword(user.getUsername(), user.getPassword()));
+                        } else {
+                            //md5 password
+                            u.setPassword(StringUtil.md5Base16(user.getPassword()));
+                        }
+                    }
                     //set roles
                     if (user.getRoles() != null && user.getRoles().size() > 0) {
                         Set roles = new HashSet();
@@ -1040,48 +1023,11 @@ public class ConsoleWebController {
                     u.setTimeZone(user.getTimeZone());
                     u.setActive(user.getActive());
 
-                    if(DirectoryUtil.isCustomDirectoryManager() && !directoryManager.isReadOnly()){
-                        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
-                            u.setPassword(user.getPassword());
-                        } else {
-                            u.setPassword(null);
-                        }
-                        invalid = !directoryManager.updateUser(u);
-                    } else {
-                        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
-                            u.setConfirmPassword(user.getPassword());
-                            if (us != null) {
-                                passwordReset = true;
-                                u.setPassword(us.encryptPassword(user.getUsername(), user.getPassword()));
-                            } else {
-                                //md5 password
-                                //u.setPassword(StringUtil.md5Base16(user.getPassword()));
-                                passwordUpdated = true;
-                                HashSalt hashSalt = passwordGeneratorService.createNewHashWithSalt(user.getPassword());
-                                u.setPassword(hashSalt.getHash());
-
-                                userSalt.setUserId(u.getUsername());
-                                userSalt.setRandomSalt(hashSalt.getSalt());
-
-                            }
-                        }
-                        invalid = !userDao.updateUser(u);
-                        if (passwordUpdated) {
-                            UserSalt currentUserSalt = userSaltDao.getUserSaltByUserId(u.getUsername());
-                            if (currentUserSalt == null) {
-                                userSalt.setId(UUID.randomUUID().toString());
-                                userSaltDao.addUserSalt(userSalt);
-                            } else {
-                                userSalt.setId(currentUserSalt.getId());
-                                userSaltDao.updateUserSalt(userSalt);
-                            }
-                        }
-
-                        if (us != null && !invalid) {
-                            us.updateUserPostProcessing(u);
-                            if (passwordReset) {
-                                us.passwordResetPostProcessing(u);
-                            }
+                    invalid = !userDao.updateUser(u);
+                    if (us != null && !invalid) {
+                        us.updateUserPostProcessing(u);
+                        if (passwordReset) {
+                            us.passwordResetPostProcessing(u);
                         }
                     }
                 }
@@ -1093,9 +1039,8 @@ public class ConsoleWebController {
             }
         }
 
-        if (invalid) {
-//            Collection<Organization> organizations = organizationDao.getOrganizationsByFilter(null, "name", false, null, null);
-            Collection<Organization> organizations = directoryManager.getOrganizationsByFilter(null, "name", false, null, null);
+        if (invalid || u == null) {
+            Collection<Organization> organizations = organizationDao.getOrganizationsByFilter(null, "name", false, null, null);
             model.addAttribute("organizations", organizations);
             model.addAttribute("roles", roleDao.getRoles(null, "name", false, null, null));
             model.addAttribute("timezones", TimeZoneUtil.getList());
@@ -1109,13 +1054,33 @@ public class ConsoleWebController {
 
             model.addAttribute("employeeCode", employeeCode);
             model.addAttribute("employeeRole", employeeRole);
-            model.addAttribute("employeeOrganization", employeeOrganization);
-            model.addAttribute("employeeDepartment", employeeDepartment);
-            model.addAttribute("employeeGrade", employeeGrade);
             model.addAttribute("employeeStartDate", employeeStartDate);
             model.addAttribute("employeeEndDate", employeeEndDate);
-            model.addAttribute("employeeDepartmentHod", employeeDepartmentHod);
-
+            
+            //convert department & grade to employments
+            Collection<Employment> employments = new ArrayList<Employment>();
+            if (employeeDepartment != null) {
+                for (int i = 0; i < employeeDepartment.length; i++) {
+                    Employment t = new Employment();
+                    t.setOrganizationId(employeeDeptOrganization[i]);
+                    t.setDepartmentId(employeeDepartment[i]);
+                    if ("true".equalsIgnoreCase(employeeDepartmentHod[i])) {
+                        Set<String> hod = new HashSet<String>();
+                        hod.add(employeeDepartment[i]);
+                        t.setHods(hod);
+                    }
+                    if (employeeGradeOrganization != null) {
+                        for (int j = 0; j < employeeGradeOrganization.length; j++) {
+                            if (employeeGradeOrganization[j].equals(employeeDeptOrganization[i])) {
+                                t.setGradeId(employeeGrade[j]);
+                            }
+                        }
+                    }
+                    employments.add(t);
+                }
+            }
+            model.addAttribute("employments", employments);
+            
             if (us != null) {
                 if ("create".equals(action)) {
                     model.addAttribute("userFormFooter", us.getUserCreationFormFooter());
@@ -1125,36 +1090,28 @@ public class ConsoleWebController {
             } else {
                 model.addAttribute("userFormFooter", "");
             }
-
+            
             if ("create".equals(action)) {
                 return "console/directory/userCreate";
             } else {
                 return "console/directory/userEdit";
             }
         } else {
-            String prevDepartmentId = null;
-
             //set employment detail
             Employment employment = null;
             if ("create".equals(action)) {
                 employment = new Employment();
             } else {
                 try {
-                    employment = (Employment) directoryManager.getUserById(user.getId()).getEmployments().iterator().next();
-                    employment = directoryManager.getEmployment(employment.getId());
+                    employment = (Employment) u.getEmployments().iterator().next();
                 } catch (Exception e) {
                     employment = new Employment();
                 }
             }
 
-            prevDepartmentId = employment.getDepartmentId();
-
             employment.setUserId(user.getId());
             employment.setEmployeeCode(employeeCode);
             employment.setRole(employeeRole);
-            employment.setOrganizationId((employeeOrganization != null && !employeeOrganization.isEmpty()) ? employeeOrganization : null);
-            employment.setDepartmentId((employeeDepartment != null && !employeeDepartment.isEmpty()) ? employeeDepartment : null);
-            employment.setGradeId((employeeGrade != null && !employeeGrade.isEmpty()) ? employeeGrade : null);
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 if (employeeStartDate != null && employeeStartDate.trim().length() > 0) {
@@ -1172,29 +1129,67 @@ public class ConsoleWebController {
             }
             if (employment.getId() == null) {
                 employment.setUser(user);
-                directoryManager.addEmployment(employment);
+                employmentDao.addEmployment(employment);
             } else {
-                directoryManager.updateEmployment(employment);
+                employmentDao.updateEmployment(employment);
             }
 
-            //Hod
-            if ("yes".equals(employeeDepartmentHod) && employeeDepartment != null && employeeDepartment.trim().length() > 0) {
-                if (prevDepartmentId != null) {
-                    User prevHod = directoryManager.getDepartmentHod(prevDepartmentId);
-                    if (prevHod != null) {
-                        directoryManager.unassignUserAsDepartmentHOD(prevHod.getId(), prevDepartmentId);
+            //handle departments & grade
+            Set<String> existingDepartments = new HashSet<String>();
+            Set<String> existingHods = new HashSet<String>();
+            Set<String> existingGrades = new HashSet<String>();
+            if (u.getEmployments() != null && !u.getEmployments().isEmpty()) {
+                for (Employment e : (Set<Employment>) u.getEmployments()) {
+                    if (e.getDepartmentId() != null) {
+                        existingDepartments.add(e.getDepartmentId());
+                    }
+                    if (e.getHods() != null && !e.getHods().isEmpty()) {
+                        existingHods.add(e.getDepartmentId());
+                    }
+                    if (e.getGradeId() != null) {
+                        existingGrades.add(e.getGradeId());
                     }
                 }
-                directoryManager.assignUserAsDepartmentHOD(user.getId(), employeeDepartment);
-            } else if (prevDepartmentId != null) {
-                User prevHod = directoryManager.getDepartmentHod(prevDepartmentId);
-                if (prevHod != null && prevHod.getId().equals(user.getId())) {
-                    directoryManager.unassignUserAsDepartmentHOD(prevHod.getId(), prevDepartmentId);
+            }
+            if (employeeDepartment != null) {
+                for (int i = 0; i < employeeDepartment.length; i++) {
+                    if (existingDepartments.contains(employeeDepartment[i])) {
+                        existingDepartments.remove(employeeDepartment[i]);
+                    } else {
+                        employmentDao.assignUserToDepartment(u.getId(), employeeDepartment[i]);
+                    }
+
+                    if ("true".equalsIgnoreCase(employeeDepartmentHod[i])) {
+                        if (existingHods.contains(employeeDepartment[i])) {
+                            existingHods.remove(employeeDepartment[i]);
+                        } else {
+                            employmentDao.assignUserAsDepartmentHOD(u.getId(), employeeDepartment[i]);
+                        }
+                    }
                 }
             }
+            if (employeeGrade != null) {
+                for (int i = 0; i < employeeGrade.length; i++) {
+                    if (existingGrades.contains(employeeGrade[i])) {
+                        existingGrades.remove(employeeGrade[i]);
+                    } else {
+                        employmentDao.assignUserToGrade(u.getId(), employeeGrade[i]);
+                    }
+                }
+            }
+            for (String d : existingHods) {
+                employmentDao.unassignUserAsDepartmentHOD(u.getId(), d);
+            }
+            for (String d : existingDepartments) {
+                employmentDao.unassignUserFromDepartment(u.getId(), d);
+            }
+            for (String d : existingGrades) {
+                employmentDao.unassignUserFromGrade(u.getId(), d);
+            }
+            
             String contextPath = WorkflowUtil.getHttpServletRequest().getContextPath();
             String url = contextPath;
-            url += "/web/console/directory/user/view/" + user.getId() + ".";
+            url += "/web/console/directory/user/view/" + StringEscapeUtils.escapeHtml(user.getId()) + ".";
             model.addAttribute("url", url);
             return "console/dialogClose";
         }

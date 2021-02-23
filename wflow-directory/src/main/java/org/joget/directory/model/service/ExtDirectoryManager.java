@@ -22,7 +22,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Group> getGroupsByOrganizationId(String filterString, String organizationId, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -30,7 +30,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * Method call to retrieve the number of Groups available within a specific Organization filtered by search parameters
      * @param filterString
      * @param organizationId
-     * @return
+     * @return 
      */
     Long getTotalGroupsByOrganizationId(String filterString, String organizationId);
 
@@ -47,7 +47,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<User> getUsers(String filterString, String organizationId, String departmentId, String gardeId, String groupId, String roleId, String active, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -60,7 +60,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param groupId
      * @param roleId
      * @param active
-     * @return
+     * @return 
      */
     Long getTotalUsers(String filterString, String organizationId, String departmentId, String gardeId, String groupId, String roleId, String active);
 
@@ -71,14 +71,14 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<User> getUsersSubordinate(String username, String sort, Boolean desc, Integer start, Integer rows);
 
     /**
      * Method called to retrieve the number of subordinates which reports to a specific User
      * @param username
-     * @return
+     * @return 
      */
     Long getTotalUsersSubordinate(String username);
 
@@ -92,7 +92,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Employment> getEmployments(String filterString, String organizationId, String departmentId, String gradeId, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -102,28 +102,28 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param organizationId
      * @param departmentId
      * @param gradeId
-     * @return
+     * @return 
      */
     Long getTotalEmployments(String filterString, String organizationId, String departmentId, String gradeId);
 
     /**
      * Method called to retrieve a specific Department by Department Name
      * @param name
-     * @return
+     * @return 
      */
     Department getDepartmentByName(String name);
 
     /**
      * Method called to retrieve a parent Department of a Department
      * @param id
-     * @return
+     * @return 
      */
     Department getParentDepartment(String id);
 
     /**
      * Method called to retrieve a parent Department of a Department by Department Name
      * @param name
-     * @return
+     * @return 
      */
     Department getParentDepartmentByName(String name);
 
@@ -135,7 +135,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Department> getDepartmentsByParentId(String filterString, String parentId, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -143,7 +143,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * Method called to retrieve the number of sub Departments within a specific Department 
      * @param filterString
      * @param parentId
-     * @return
+     * @return 
      */
     Long getTotalDepartmentsByParentId(String filterString, String parentId);
 
@@ -155,7 +155,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Department> getDepartmentsByOrganizationId(String filterString, String organizationId, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -163,14 +163,14 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * Method called to retrieve the number of Departments within a specific Organization filtered by search parameters
      * @param filterString
      * @param organizationId
-     * @return
+     * @return 
      */
     Long getTotalDepartmentnsByOrganizationId(String filterString, String organizationId);
 
     /**
      * Method called to retrieve a specific Grade by Grade Name
      * @param name
-     * @return
+     * @return 
      */
     Grade getGradeByName(String name);
 
@@ -182,30 +182,30 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Grade> getGradesByOrganizationId(String filterString, String organizationId, String sort, Boolean desc, Integer start, Integer rows);
 
     /**
      * Method called to retrieve the number of Grades within a specific Organization filtered by search parameters
-     *
+     * 
      * @param filterString
      * @param organizationId
-     * @return
+     * @return 
      */
     Long getTotalGradesByOrganizationId(String filterString, String organizationId);
 
     /**
      * Method called to retrieve a specific Organization by Id
      * @param id
-     * @return
+     * @return 
      */
     Organization getOrganization(String id);
 
     /**
      * Method called to retrieve a specific Organization by Name
      * @param name
-     * @return
+     * @return 
      */
     Organization getOrganizationByName(String name);
 
@@ -216,21 +216,21 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Organization> getOrganizationsByFilter(String filterString, String sort, Boolean desc, Integer start, Integer rows);
 
     /**
      * Method called to retrieve the number of Organizations
      * @param filterString
-     * @return
+     * @return 
      */
     Long getTotalOrganizationsByFilter(String filterString);
 
     /**
      * Method called to retrieve a specific Employment info 
      * @param id
-     * @return
+     * @return 
      */
     Employment getEmployment(String id);
 
@@ -244,7 +244,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param desc
      * @param start
      * @param rows
-     * @return
+     * @return 
      */
     Collection<Group> getGroupsByUserId(String filterString, String userId, String organizationId, Boolean inGroup, String sort, Boolean desc, Integer start, Integer rows);
 
@@ -254,71 +254,7 @@ public interface ExtDirectoryManager extends DirectoryManager {
      * @param userId
      * @param organizationId
      * @param inGroup
-     * @return
+     * @return 
      */
     Long getTotalGroupsByUserId(String filterString, String userId, String organizationId, Boolean inGroup);
-
-    Boolean addUser(User user);
-
-    Boolean updateUser(User user);
-
-    Boolean deleteUser(String username);
-
-    Boolean isReadOnly();
-
-    Boolean addGroup(Group group);
-
-    Boolean deleteGroup(String id);
-
-    Boolean updateGroup(Group group);
-
-    Collection<User> getUsersNotInGroup(String filterString, String groupId, String sort, Boolean desc, Integer start, Integer rows);
-
-    Long getTotalUsersNotInGroup(String filterString, String groupId);
-
-    Boolean assignUserToGroup(String userId, String groupId);
-
-    Boolean unassignUserFromGroup(String userId, String groupId);
-
-    Collection<Employment> getEmploymentsNotInDepartment(String filterString, String orgId, String deptId, String sort, Boolean desc, Integer start, Integer rows);
-
-    Long getTotalEmploymentsNotInDepartment(String filterString, String orgId, String deptId);
-
-    Collection<Employment> getEmploymentsNotInGrade(String filterString, String orgId, String gradeId, String sort, Boolean desc, Integer start, Integer rows);
-
-    Long getTotalEmploymentsNotInGrade(String filterString, String orgId, String gradeId);
-
-    Boolean addDepartment(Department department);
-
-    Boolean updateDepartment(Department department);
-
-    Boolean deleteDepartment(String id);
-
-    Boolean addGrade(Grade grade);
-
-    Boolean updateGrade(Grade grade);
-
-    Boolean deleteGrade(String id);
-
-    Boolean assignUserToDepartment(String userId, String departmentId);
-
-    Boolean unassignUserFromDepartment(String userId, String departmentId);
-
-    Boolean assignUserToGrade(String userId, String gradeId);
-
-    Boolean unassignUserFromGrade(String userId, String gradeId);
-
-    Boolean addEmployment(Employment employment);
-
-    Boolean updateEmployment(Employment employment);
-
-    Boolean deleteEmployment(String id);
-
-    Boolean assignUserAsDepartmentHOD(String userId, String departmentId);
-
-    Boolean unassignUserAsDepartmentHOD(String userId, String departmentId);
-
-    Boolean assignUserReportTo(String userId, String reportToUserId);
-
-    Boolean unassignUserReportTo(String userId);
 }

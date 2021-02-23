@@ -1,27 +1,12 @@
 package org.joget.apps.app.web;
 
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.joget.apps.app.model.AppDefinition;
-import org.joget.apps.app.service.AppService;
-import org.joget.apps.app.service.AppUtil;
-import org.joget.commons.spring.web.CustomContextLoaderListener;
-import org.joget.commons.spring.web.CustomDispatcherServlet;
-import org.joget.commons.util.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.FrameworkServlet;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -29,6 +14,30 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.joget.apps.app.model.AppDefinition;
+import org.joget.apps.app.service.AppService;
+import org.joget.apps.app.service.AppUtil;
+import org.joget.commons.spring.web.CustomContextLoaderListener;
+import org.joget.commons.spring.web.CustomDispatcherServlet;
+import org.joget.commons.util.DynamicDataSourceManager;
+import org.joget.commons.util.HostManager;
+import org.joget.commons.util.LogUtil;
+import org.joget.commons.util.ResourceBundleUtil;
+import org.joget.commons.util.SecurityUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.FrameworkServlet;
 
 /**
  * Servlet to handle first-time database setup and initialization.
@@ -39,10 +48,10 @@ public class SetupServlet extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -83,7 +92,7 @@ public class SetupServlet extends HttpServlet {
             if (dbName != null) {
                 dbName = SecurityUtil.validateStringInput(dbName);
             }
-
+            
             // create datasource
             LogUtil.info(getClass().getName(), "===== Starting Database Setup =====");
             boolean success = false;
@@ -127,25 +136,21 @@ public class SetupServlet extends HttpServlet {
                 } catch (SQLException ex) {
                     LogUtil.info(getClass().getName(), "Database not yet initialized " + jdbcUrl);
                 }
-
+                
                 if (!exists) {
                     // get schema file
-                    String schemaFile;
-                    String quartzFile;
+                    String schemaFile = null;
+                    String quartzFile = null;
                     if ("oracle".equals(dbType) || jdbcUrl.contains("oracle")) {
                         schemaFile = "/setup/sql/jwdb-oracle.sql";
-                        quartzFile = "/setup/sql/quartz-tables_oracle.sql";
                     } else if ("sqlserver".equals(dbType) || jdbcUrl.contains("sqlserver")) {
                         schemaFile = "/setup/sql/jwdb-mssql.sql";
-                        quartzFile = "/setup/sql/quartz-tables_sqlServer.sql";
                     } else if ("mysql".equals(dbType) || jdbcUrl.contains("mysql")) {
                         schemaFile = "/setup/sql/jwdb-mysql.sql";
                         quartzFile = "/setup/sql/quartz-tables_mysql_innodb.sql";
                     } else {
                         throw new SQLException("Unrecognized database type, please setup the datasource manually");
                     }
-
-                    LogUtil.info(getClass().getName(), "Using schema file [" + schemaFile + "] quartz file [" + quartzFile + "]");
 
                     if (dbName != null && stmt != null) {
                         // create database
@@ -160,7 +165,7 @@ public class SetupServlet extends HttpServlet {
                         LogUtil.info(getClass().getName(), "Use database " + dbName);
                         con.setCatalog(dbName);
                     }
-
+                    
                     // execute schema file
 
                     ScriptRunner runner = new ScriptRunner(con, false, true);
@@ -168,8 +173,8 @@ public class SetupServlet extends HttpServlet {
                     schemaFileInputStream = getClass().getResourceAsStream(schemaFile);
                     quartzFileInputStream = getClass().getResourceAsStream(quartzFile);
 
-                    try (BufferedReader schemaFileReader = new BufferedReader(new InputStreamReader(schemaFileInputStream));
-                         BufferedReader quartzFileReader = new BufferedReader(new InputStreamReader(quartzFileInputStream))) {
+                    try(BufferedReader schemaFileReader = new BufferedReader(new InputStreamReader(schemaFileInputStream));
+                        BufferedReader quartzFileReader = new BufferedReader(new InputStreamReader(quartzFileInputStream))) {
 
                         LogUtil.info(getClass().getName(), "Execute schema " + schemaFile);
                         runner.runScript(schemaFileReader);
@@ -186,10 +191,10 @@ public class SetupServlet extends HttpServlet {
                     schemaFileInputStream = getClass().getResourceAsStream(schemaFile);
                     runner.runScript(new BufferedReader(new InputStreamReader(schemaFileInputStream)));
                 }
-
+                
                 con.commit();
                 LogUtil.info(getClass().getName(), "Datasource init complete: " + success);
-
+                
                 // save profile
                 String profileName = (dbName != null && !dbName.trim().isEmpty()) ? dbName : "custom";
                 String jdbcUrlToSave = (jdbcFullUrl != null && !jdbcFullUrl.trim().isEmpty()) ? jdbcFullUrl : jdbcUrl;
@@ -200,7 +205,7 @@ public class SetupServlet extends HttpServlet {
                 DynamicDataSourceManager.writeProperty("workflowUrl", jdbcUrlToSave);
                 DynamicDataSourceManager.writeProperty("workflowUser", jdbcUser);
                 DynamicDataSourceManager.writeProperty("workflowPassword", jdbcPassword);
-
+                
                 // initialize spring application context
                 ServletContext sc = request.getServletContext();
                 ServletContextEvent sce = new ServletContextEvent(sc);
@@ -213,7 +218,7 @@ public class SetupServlet extends HttpServlet {
                 wacField.set(servlet, null);
                 // reinitialize DispatcherServlet
                 servlet.init();
-
+                
                 if (sampleApps != null) {
                     // import sample apps
                     ApplicationContext context = AppUtil.getApplicationContext();
@@ -232,11 +237,11 @@ public class SetupServlet extends HttpServlet {
                             setupInput.close();
                         }
                     }
-                }
-
+                }                
+                
                 LogUtil.info(getClass().getName(), "Profile init complete: " + profileName);
                 LogUtil.info(getClass().getName(), "===== Database Setup Complete =====");
-
+                
             } catch (Exception ex) {
                 LogUtil.error(getClass().getName(), null, ex.toString());
                 success = false;
@@ -292,7 +297,6 @@ public class SetupServlet extends HttpServlet {
 
     /**
      * Import an app from a specified path.
-     *
      * @param context
      * @param path
      */
@@ -300,7 +304,7 @@ public class SetupServlet extends HttpServlet {
         LogUtil.info(getClass().getName(), "Import app " + path);
         InputStream in = null;
         try {
-            final AppService appService = (AppService) context.getBean("appService");
+            final AppService appService = (AppService)context.getBean("appService");
             in = getClass().getResourceAsStream(path);
             byte[] fileContent = readInputStream(in);
             final AppDefinition appDef = appService.importApp(fileContent);
@@ -313,24 +317,23 @@ public class SetupServlet extends HttpServlet {
                     }
                 });
             }
-        } catch (Exception ex) {
+        } catch(Exception ex) {
             LogUtil.error(getClass().getName(), ex, "Failed to import app " + path);
         } finally {
             try {
                 if (in != null) {
                     in.close();
                 }
-            } catch (IOException e) {
+            } catch(IOException e) {                
             }
         }
-    }
+    }    
 
     /**
      * Reads a specified InputStream, returning its contents in a byte array
-     *
      * @param in
      * @return
-     * @throws IOException
+     * @throws IOException 
      */
     protected byte[] readInputStream(InputStream in) throws IOException {
         byte[] fileContent;
@@ -359,14 +362,14 @@ public class SetupServlet extends HttpServlet {
             }
         }
     }
-
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -377,10 +380,10 @@ public class SetupServlet extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

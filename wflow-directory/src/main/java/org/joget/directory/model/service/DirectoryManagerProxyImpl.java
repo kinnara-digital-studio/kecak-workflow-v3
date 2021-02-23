@@ -1,7 +1,6 @@
 package org.joget.directory.model.service;
 
-import java.util.*;
-
+import java.util.ArrayList;
 import org.joget.directory.ext.DirectoryManagerAuthenticatorImpl;
 import org.joget.commons.spring.model.Setting;
 import org.joget.commons.util.CsvUtil;
@@ -15,6 +14,9 @@ import org.joget.directory.model.Organization;
 import org.joget.directory.model.Role;
 import org.joget.directory.model.User;
 import org.joget.plugin.base.PluginManager;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.joget.commons.util.StringUtil;
 import org.joget.plugin.property.model.PropertyEditable;
 import org.joget.plugin.property.service.PropertyUtil;
@@ -77,23 +79,22 @@ public class DirectoryManagerProxyImpl implements ExtDirectoryManager {
         return authenticator;
     }
 
-    @SuppressWarnings({ "rawtypes", "deprecation" })
     private DirectoryManager getCustomDirectoryManagerImpl() {
         try {
-            String propertiesName = DirectoryUtil.IMPL_PROPERTIES;
+            String propertiesName = DirectoryUtil.IMPL_PROPERTIES; 
             String className = "";
-
+            
             Setting setting = getSetupManager().getSettingByProperty("directoryManagerImpl");
             if (setting != null && setting.getValue() != null && !setting.getValue().isEmpty()) {
                 className = setting.getValue();
             } else {
                 className = getCustomDirectoryManagerClassName();
             }
-
+            
             if (className != null && className.equals(getCustomDirectoryManagerClassName())) {
                 propertiesName = DirectoryUtil.CUSTOM_IMPL_PROPERTIES;
             }
-
+            
             if (className != null && !className.isEmpty()) {
 
                 DirectoryManagerPlugin directoryManagerPlugin = (DirectoryManagerPlugin) getPluginManager().getPlugin(className);
@@ -103,22 +104,22 @@ public class DirectoryManagerProxyImpl implements ExtDirectoryManager {
                     //get plugin properties (if any)
                     Map propertyMap = new HashMap();
                     Setting propertySetting = getSetupManager().getSettingByProperty(propertiesName);
-
+                    
                     if (propertySetting == null && getCustomDirectoryManagerClassName() != null) {
                         String properties = "";
-
+                        
                         try {
                             properties = PropertyUtil.getDefaultPropertyValues(((PropertyEditable) directoryManagerPlugin).getPropertyOptions());
                             properties = properties.replaceAll("\\\\n", "\\n");
                         } catch (Exception e){}
-
+                        
                         propertySetting = new Setting();
                         propertySetting.setProperty(propertiesName);
                         propertySetting.setValue(properties);
-                        setting.setDateModified(new Date());
+                        
                         getSetupManager().saveSetting(propertySetting);
                     }
-
+                    
                     if (propertySetting != null && propertySetting.getValue() != null && propertySetting.getValue().trim().length() > 0) {
                         String properties = propertySetting.getValue();
                         properties = StringUtil.decryptContent(properties);
@@ -193,14 +194,14 @@ public class DirectoryManagerProxyImpl implements ExtDirectoryManager {
     }
 
     public Collection<User> getUsersSubordinate(String username, String sort, Boolean desc, Integer start, Integer rows) {
-        if (username != null && !username.isEmpty() && !DirectoryUtil.ROLE_ANONYMOUS.equals(username)) {
+        if (username != null && !username.isEmpty() && !DirectoryUtil.ROLE_ANONYMOUS.equals(username)) {        
             return getExtDirectoryManagerImpl().getUsersSubordinate(username, sort, desc, start, rows);
         }
         return new ArrayList<User>();
     }
 
     public Long getTotalUsersSubordinate(String username) {
-        if (username != null && !username.isEmpty() && !DirectoryUtil.ROLE_ANONYMOUS.equals(username)) {
+        if (username != null && !username.isEmpty() && !DirectoryUtil.ROLE_ANONYMOUS.equals(username)) { 
             return getExtDirectoryManagerImpl().getTotalUsersSubordinate(username);
         }
         return 0L;
@@ -498,127 +499,5 @@ public class DirectoryManagerProxyImpl implements ExtDirectoryManager {
 
     public Collection<Grade> getGradeList() {
         return getDirectoryManagerImpl().getGradeList();
-    }
-
-    public Boolean addUser(User user) {
-        return getDirectoryManagerImpl().addUser(user);
-    }
-
-    public Boolean updateUser(User user){
-        return getDirectoryManagerImpl().updateUser(user);
-    }
-
-    public Boolean deleteUser(String username){
-        return getDirectoryManagerImpl().deleteUser(username);
-    }
-
-    public Boolean isReadOnly() {
-        return getDirectoryManagerImpl().isReadOnly();
-    }
-
-    public Boolean addGroup(Group group){
-        return getDirectoryManagerImpl().addGroup(group);
-    }
-
-    public Boolean deleteGroup(String id){
-        return getDirectoryManagerImpl().deleteGroup(id);
-    }
-    public Boolean updateGroup(Group group){
-        return getDirectoryManagerImpl().updateGroup(group);
-    }
-    public Collection<User> getUsersNotInGroup(String filterString, String groupId, String sort, Boolean desc, Integer start, Integer rows){
-        return getDirectoryManagerImpl().getUsersNotInGroup(filterString, groupId, sort, desc, start, rows);
-    }
-    public Long getTotalUsersNotInGroup(String filterString, String groupId) {
-        return getDirectoryManagerImpl().getTotalUsersNotInGroup(filterString,groupId);
-    }
-
-    public Boolean assignUserToGroup(String userId, String groupId) {
-        return getDirectoryManagerImpl().assignUserToGroup(userId,groupId);
-    }
-
-    public Boolean unassignUserFromGroup(String userId, String groupId) {
-        return getDirectoryManagerImpl().unassignUserFromGroup(userId, groupId);
-    }
-
-    public Collection<Employment> getEmploymentsNotInDepartment(String filterString, String orgId, String deptId, String sort, Boolean desc, Integer start, Integer rows){
-        return this.getDirectoryManagerImpl().getEmploymentsNotInDepartment(filterString,orgId,deptId,sort,desc,start,rows);
-    }
-    public Long getTotalEmploymentsNotInDepartment(String filterString, String organizationId, String departmentId){
-        return this.getDirectoryManagerImpl().getTotalEmploymentsNotInDepartment(filterString,organizationId,departmentId);
-    }
-
-    public Collection<Employment> getEmploymentsNotInGrade(String filterString, String orgId, String gradeId, String sort, Boolean desc, Integer start, Integer rows){
-        return this.getDirectoryManagerImpl().getEmploymentsNotInGrade(filterString,orgId,gradeId,sort,desc,start,rows);
-    }
-    public Long getTotalEmploymentsNotInGrade(String filterString, String organizationId, String gradeId){
-        return this.getDirectoryManagerImpl().getTotalEmploymentsNotInGrade(filterString,organizationId,gradeId);
-    }
-
-    public Boolean addDepartment(Department department) {
-        return this.getDirectoryManagerImpl().addDepartment(department);
-    }
-
-    public Boolean updateDepartment(Department department) {
-        return this.getDirectoryManagerImpl().updateDepartment(department);
-    }
-
-    public Boolean deleteDepartment(String id) {
-        return this.getDirectoryManagerImpl().deleteDepartment(id);
-    }
-
-    public Boolean addGrade(Grade grade) {
-        return this.getDirectoryManagerImpl().addGrade(grade);
-    }
-
-    public Boolean updateGrade(Grade grade) {
-        return this.getDirectoryManagerImpl().updateGrade(grade);
-    }
-
-    public Boolean deleteGrade(String id) {
-        return this.getDirectoryManagerImpl().deleteGrade(id);
-    }
-
-    public Boolean assignUserToDepartment(String userId, String departmentId) {
-        return this.getDirectoryManagerImpl().assignUserToDepartment(userId,departmentId);
-    }
-
-    public Boolean unassignUserFromDepartment(String userId, String departmentId) {
-        return this.getDirectoryManagerImpl().unassignUserFromDepartment(userId,departmentId);
-    }
-
-    public Boolean assignUserToGrade(String userId, String gradeId) {
-        return this.getDirectoryManagerImpl().assignUserToGrade(userId,gradeId);
-    }
-
-    public Boolean unassignUserFromGrade(String userId, String gradeId) {
-        return this.getDirectoryManagerImpl().unassignUserFromGrade(userId,gradeId);
-    }
-
-    public Boolean addEmployment(Employment employment) {
-        return this.getDirectoryManagerImpl().addEmployment(employment);
-    }
-
-    public Boolean updateEmployment(Employment employment) {
-        return this.getDirectoryManagerImpl().updateEmployment(employment);
-    }
-
-    public Boolean deleteEmployment(String id) {
-        return this.getDirectoryManagerImpl().deleteEmployment(id);
-    }
-    public Boolean assignUserAsDepartmentHOD(String userId, String departmentId) {
-        return this.getDirectoryManagerImpl().assignUserAsDepartmentHOD(userId,departmentId);
-    }
-
-    public Boolean unassignUserAsDepartmentHOD(String userId, String departmentId) {
-        return this.getDirectoryManagerImpl().unassignUserAsDepartmentHOD(userId,departmentId);
-    }
-
-    public Boolean assignUserReportTo(String userId, String reportToUserId) {
-        return this.getDirectoryManagerImpl().assignUserReportTo(userId,reportToUserId);
-    }
-
-    public Boolean unassignUserReportTo(String userId) {
-        return this.getDirectoryManagerImpl().unassignUserReportTo(userId);
     }
 }

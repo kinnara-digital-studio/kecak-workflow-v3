@@ -2,7 +2,6 @@ package org.joget.directory.model;
 
 import org.joget.commons.spring.model.Auditable;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.util.Set;
 import org.joget.commons.util.StringUtil;
 import org.joget.commons.util.TimeZoneUtil;
@@ -25,10 +24,6 @@ public class User implements Serializable, Auditable {
     private Integer active;
     private String timeZone;
     private String locale;
-
-    private Blob profilePicture;
-    private String telephoneNumber;
-
     //join
     private Set roles;
     private Set groups;
@@ -172,21 +167,5 @@ public class User implements Serializable, Auditable {
 
     public String getLoginHash() {
         return StringUtil.md5(username + LOGIN_HASH_DELIMINATOR + password);
-    }
-
-    public String getTelephoneNumber() {
-        return telephoneNumber;
-    }
-
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
-    }
-
-    public Blob getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(Blob profilePicture) {
-        this.profilePicture = profilePicture;
     }
 }

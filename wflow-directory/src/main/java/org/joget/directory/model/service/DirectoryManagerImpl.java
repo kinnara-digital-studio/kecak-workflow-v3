@@ -1,22 +1,24 @@
 package org.joget.directory.model.service;
 
-import org.apache.commons.lang.StringUtils;
-import org.joget.commons.util.LogUtil;
-import org.joget.directory.dao.*;
-import org.joget.directory.model.*;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import org.joget.directory.model.Department;
+import org.joget.directory.model.Employment;
+import org.joget.directory.model.EmploymentReportTo;
+import org.joget.directory.model.Grade;
+import org.joget.directory.model.Group;
+import org.joget.directory.model.Organization;
+import org.joget.directory.model.Role;
+import org.joget.directory.model.User;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.kecak.commons.util.PasswordGeneratorService;
-import org.kecak.commons.util.PasswordSalt;
-import org.kecak.directory.dao.UserSaltDao;
-import org.kecak.directory.dao.UserTokenDao;
-import org.kecak.directory.model.UserSalt;
-
-import javax.annotation.Nullable;
+import java.util.HashSet;
+import org.joget.commons.util.StringUtil;
+import org.joget.directory.dao.DepartmentDao;
+import org.joget.directory.dao.EmploymentDao;
+import org.joget.directory.dao.GradeDao;
+import org.joget.directory.dao.GroupDao;
+import org.joget.directory.dao.OrganizationDao;
+import org.joget.directory.dao.RoleDao;
+import org.joget.directory.dao.UserDao;
 
 public class DirectoryManagerImpl implements ExtDirectoryManager {
 
@@ -27,9 +29,6 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
     private EmploymentDao employmentDao;
     private GradeDao gradeDao;
     private RoleDao roleDao;
-    private UserSaltDao userSaltDao;
-    private UserTokenDao userTokenDao;
-    private PasswordGeneratorService passwordGeneratorService;
 
     public DepartmentDao getDepartmentDao() {
         return departmentDao;
@@ -85,22 +84,6 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
-    }
-
-    public UserSaltDao getUserSaltDao() {
-        return userSaltDao;
-    }
-
-    public void setUserSaltDao(UserSaltDao userSaltDao) {
-        this.userSaltDao = userSaltDao;
-    }
-
-    public UserTokenDao getUserTokenDao() {
-        return userTokenDao;
-    }
-
-    public void setUserTokenDao(UserTokenDao userTokenDao) {
-        this.userTokenDao = userTokenDao;
     }
 
     public Collection<Group> getGroupsByOrganizationId(String filterString, String organizationId, String sort, Boolean desc, Integer start, Integer rows) {
@@ -184,48 +167,30 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
     }
 
     public boolean authenticate(String username, String password) {
-        @Nullable User user = getUserByUsername(username);
+        User user = getUserByUsername(username);
 
-        // user not found, set as invalid
-        if(user == null) {
-            LogUtil.warn(getClass().getName(), "User [" + username + "] is not listed in the directory");
-            return false;
+        String userPassword = (user != null) ? user.getPassword() : null;
+
+        // temporary code to check for unencrypted password and encrypt it for comparison
+        if (userPassword != null && userPassword.length() != 32) {
+            userPassword = StringUtil.md5Base16(userPassword);
         }
 
-        @Nullable UserSalt userSalt = userSaltDao.getUserSaltByUserId(username);
+        // compare passwords
+        boolean validLogin = (user != null && userPassword != null && password != null && userPassword.equals(StringUtil.md5Base16(password)));
 
-        String hash = StringUtils.EMPTY;
-        try {
-            hash  = passwordGeneratorService.hashPassword(new PasswordSalt(userSalt == null ? "" : userSalt.getRandomSalt(), password));
-        } catch (NoSuchAlgorithmException e) {
-            LogUtil.error(getClass().getName(), e, e.getMessage());
-        } catch (InvalidKeySpecException e) {
-            LogUtil.error(getClass().getName(), e, e.getMessage());
+        if (!validLogin) {
+            validLogin = (user != null && userPassword != null && user.getLoginHash().equalsIgnoreCase(password));
         }
-
-        boolean validLogin = StringUtils.equals(hash, user.getPassword()) || user.getLoginHash().equalsIgnoreCase(password);
-
-//        // temporary code to check for unencrypted password and encrypt it for comparison
-//        if (userPassword != null && userPassword.length() != 32) {
-//            userPassword = StringUtil.md5Base16(userPassword);
-//        }
-//
-//        // compare passwords
-//        boolean validLogin = (user != null && userPassword != null && password != null && userPassword.equals(StringUtil.md5Base16(password)));
-//
-//        if (!validLogin) {
-//            validLogin = (user != null && userPassword != null && user.getLoginHash().equalsIgnoreCase(password));
-//        }
 
         // check for active flag
-        boolean active = user.getActive() == User.ACTIVE;
+        boolean active = (user != null && user.getActive() == User.ACTIVE);
 
-        if (!active) {
-            LogUtil.warn(getClass().getName(), "User [" + user.getUsername() + "] is not active");
+        if (!validLogin || !active) {
             return false;
+        } else {
+            return true;
         }
-
-        return validLogin;
     }
 
     public Group getGroupById(String groupId) {
@@ -261,7 +226,7 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
     }
 
     public Collection<User> getUserByGradeId(String gradeId) {
-        return getUserDao().getUsers(null, null, null, null, null, gradeId, null, "username", false, null, null);
+        return getUserDao().getUsers(null, null, null, gradeId, null, null, null, "username", false, null, null);
     }
 
     public Collection<User> getUserByGroupId(String groupId) {
@@ -333,7 +298,7 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
         }
         return null;
     }
-
+    
     protected User getDepartmentHod(Department department) {
         if (department != null && department.getHod() != null) {
             return employmentDao.getEmployment(department.getHod().getId()).getUser();
@@ -341,7 +306,6 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
         return null;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Collection<User> getUserHod(String username) {
         Collection<User> userList = new ArrayList();
 
@@ -349,19 +313,22 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
         if (user != null && user.getEmployments() != null) {
             Collection<Employment> employments = user.getEmployments();
 
-            //get only 1st employment record, currently only support 1 employment per user
             if (employments != null && !employments.isEmpty()) {
-                Employment employment = employments.iterator().next();
+                //find reportTo
+                for (Employment e : employments) {
+                    if (e.getEmploymentReportTo() != null) {
+                        userList.add(e.getEmploymentReportTo().getReportTo().getUser());
+                    }
+                }
 
-                if (employment.getEmploymentReportTo() != null) {
-                    EmploymentReportTo employmentReportTo = employment.getEmploymentReportTo();
-                    userList.add(employmentReportTo.getReportTo().getUser());
-                } else {
-                    Department dept = employment.getDepartment();
-                    if (dept != null) {
-                        User hod = getDepartmentHod(dept.getId());
-                        if (hod != null) {
-                            userList.add(hod);
+                if (userList.isEmpty()) {
+                    for (Employment e : employments) {
+                        Department dept = e.getDepartment();
+                        if (dept != null) {
+                            User hod = getDepartmentHod(dept.getId());
+                            if (hod != null) {
+                                userList.add(hod);
+                            }
                         }
                     }
                 }
@@ -375,15 +342,15 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
         return getUserDao().getUsersSubordinate(username, null, null, null, null);
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<User> getUserDepartmentUser(String username) {
         User user = getUserDao().getUser(username);
-        if (user != null && user.getEmployments() != null) {
+        if (user != null && user.getEmployments() != null && !user.getEmployments().isEmpty()) {
             Collection<Employment> employments = user.getEmployments();
-            //get only 1st employment record, currently only support 1 employment per user
-            Employment employment = employments.iterator().next();
-            if (employment.getDepartment() != null) {
-                return getUserDao().getUsers(null, null, employment.getDepartment().getId(), null, null, null, null, "username", false, null, null);
+            Collection<User> users = new HashSet<User>();
+            for (Employment e : employments) {
+                if (e.getDepartment() != null) {
+                    users.addAll(getUserDao().getUsers(null, null, e.getDepartment().getId(), null, null, null, null, "username", false, null, null));
+                }
             }
         }
         return null;
@@ -447,124 +414,5 @@ public class DirectoryManagerImpl implements ExtDirectoryManager {
 
     public Long getTotalGroupsByUserId(String filterString, String userId, String organizationId, Boolean inGroup) {
         return getGroupDao().getTotalGroupsByUserId(filterString, userId, organizationId, inGroup);
-    }
-
-    public Boolean addUser(User user){
-        return false;
-    }
-
-    public Boolean deleteUser(String username){
-        return getUserDao().deleteUser(username);
-    }
-
-    public Boolean updateUser(User user){
-        return getUserDao().updateUser(user);
-    }
-
-    public Boolean isReadOnly() { return true; }
-
-    public Boolean addGroup(Group group){
-        return getGroupDao().addGroup(group);
-    }
-
-    public Boolean deleteGroup(String id){
-        return getGroupDao().deleteGroup(id);
-    }
-
-    public Boolean updateGroup(Group group){
-        return getGroupDao().updateGroup(group);
-    }
-
-    public Collection<User> getUsersNotInGroup(String filterString, String groupId, String sort, Boolean desc, Integer start, Integer rows){
-        return getUserDao().getUsersNotInGroup(filterString, groupId, sort, desc, start, rows);
-    }
-    public Long getTotalUsersNotInGroup(String filterString, String groupId) {
-        return getUserDao().getTotalUsersNotInGroup(filterString,groupId);
-    }
-    public Boolean assignUserToGroup(String userId, String groupId) {
-        return getUserDao().assignUserToGroup(userId,groupId);
-    }
-    public Boolean unassignUserFromGroup(String userId, String groupId) {
-        return getUserDao().unassignUserFromGroup(userId, groupId);
-    }
-    public Collection<Employment> getEmploymentsNotInDepartment(String filterString, String orgId, String deptId, String sort, Boolean desc, Integer start, Integer rows){
-        return this.getEmploymentDao().getEmploymentsNotInDepartment(filterString,orgId,deptId,sort,desc,start,rows);
-    }
-    public Long getTotalEmploymentsNotInDepartment(String filterString, String organizationId, String departmentId){
-        return this.getEmploymentDao().getTotalEmploymentsNotInDepartment(filterString,organizationId,departmentId);
-    }
-
-    public Collection<Employment> getEmploymentsNotInGrade(String filterString, String orgId, String gradeId, String sort, Boolean desc, Integer start, Integer rows){
-        return this.getEmploymentDao().getEmploymentsNotInGrade(filterString,orgId,gradeId,sort,desc,start,rows);
-    }
-    public Long getTotalEmploymentsNotInGrade(String filterString, String organizationId, String gradeId){
-        return this.getEmploymentDao().getTotalEmploymentsNotInGrade(filterString,organizationId,gradeId);
-    }
-
-    public Boolean addDepartment(Department department) {
-        return this.getDepartmentDao().addDepartment(department);
-    }
-
-    public Boolean updateDepartment(Department department) {
-        return this.getDepartmentDao().updateDepartment(department);
-    }
-
-    public Boolean deleteDepartment(String id) {
-        return this.getDepartmentDao().deleteDepartment(id);
-    }
-
-    public Boolean addGrade(Grade grade) {
-        return this.getGradeDao().addGrade(grade);
-    }
-
-    public Boolean updateGrade(Grade grade) {
-        return this.getGradeDao().updateGrade(grade);
-    }
-
-    public Boolean deleteGrade(String id) {
-        return this.getGradeDao().deleteGrade(id);
-    }
-
-    public Boolean assignUserToDepartment(String userId, String departmentId) {
-        return this.getEmploymentDao().assignUserToDepartment(userId,departmentId);
-    }
-
-    public Boolean unassignUserFromDepartment(String userId, String departmentId) {
-        return this.getEmploymentDao().unassignUserFromDepartment(userId,departmentId);
-    }
-
-    public Boolean assignUserToGrade(String userId, String gradeId) {
-        return this.getEmploymentDao().assignUserToGrade(userId,gradeId);
-    }
-
-    public Boolean unassignUserFromGrade(String userId, String gradeId) {
-        return this.getEmploymentDao().unassignUserFromGrade(userId,gradeId);
-    }
-
-    public Boolean addEmployment(Employment employment) {
-        return this.getEmploymentDao().addEmployment(employment);
-    }
-
-    public Boolean updateEmployment(Employment employment) {
-        return this.getEmploymentDao().updateEmployment(employment);
-    }
-
-    public Boolean deleteEmployment(String id) {
-        return this.getEmploymentDao().deleteEmployment(id);
-    }
-    public Boolean assignUserAsDepartmentHOD(String userId, String departmentId) {
-        return this.getEmploymentDao().assignUserAsDepartmentHOD(userId,departmentId);
-    }
-
-    public Boolean unassignUserAsDepartmentHOD(String userId, String departmentId) {
-        return this.getEmploymentDao().unassignUserAsDepartmentHOD(userId,departmentId);
-    }
-
-    public Boolean assignUserReportTo(String userId, String reportToUserId) {
-        return this.getEmploymentDao().assignUserReportTo(userId,reportToUserId);
-    }
-
-    public Boolean unassignUserReportTo(String userId) {
-        return this.getEmploymentDao().unassignUserReportTo(userId);
     }
 }
