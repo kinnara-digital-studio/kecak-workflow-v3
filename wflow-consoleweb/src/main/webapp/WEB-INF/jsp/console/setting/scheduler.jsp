@@ -45,7 +45,7 @@
 			checkbox="true"
 			checkboxButton2="general.method.label.delete"
 			checkboxCallback2="schedulerDetailsDelete"
-			checkboxButton3="general.method.label.fireNow"
+			checkboxButton3="console.setting.scheduler.common.label.fireNow"
 			checkboxCallback3="schedulerDetailsFireNow" 
 			searchItems="jobName|Job Name"
 			fields="['id','jobName','groupJobName','triggerName','groupTriggerName','jobClassName','modifiedate']"
@@ -101,7 +101,7 @@
 </script>
 
 <script>
-	Template.init("", "#nav-setting-schedulerContent");
+	Template.init("", "#nav-setting-scheduler");
 </script>
 
 <commons:footer />

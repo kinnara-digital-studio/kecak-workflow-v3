@@ -169,8 +169,8 @@
                 <value>/org/joget/apps/app/model/EnvironmentVariable.hbm.xml</value>
                 <value>/org/joget/apps/app/model/AuditTrail.hbm.xml</value>
                 <value>/org/joget/apps/app/model/UserReplacement.hbm.xml</value>
-<!--                <value>/org/kecak/apps/app/scheduler/model/SchedulerLog.hbm.xml</value>-->
-<!--                <value>/org/kecak/apps/app/scheduler/model/SchedulerDetails.hbm.xml</value>-->
+                <value>/org/kecak/apps/app/scheduler/model/SchedulerLog.hbm.xml</value>
+                <value>/org/kecak/apps/app/scheduler/model/SchedulerDetails.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

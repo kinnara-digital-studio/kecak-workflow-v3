@@ -52,13 +52,15 @@
 
     <script type="text/javascript">
         function validateField(){
-        	var jobName = /^[0-9a-zA-Z_-]+$/.test($("#jobName").attr("value"));
-        	var groupJobName = /^[0-9a-zA-Z_-]+$/.test($("#groupJobName").attr("value"));
-        	var triggerName = /^[0-9a-zA-Z_-]+$/.test($("#triggerName").attr("value"));
-        	var groupTriggerName = /^[0-9a-zA-Z_-]+$/.test($("#groupTriggerName").attr("value"));
-        	var jobClassName = /^[0-9a-zA-Z_-]+$/.test($("#jobClassName").attr("value"));
-        	var cronExpression = /^[0-9a-zA-Z_-]+$/.test($("#cronExpression").attr("value"));
-        	
+        	var jobName = /^[0-9a-zA-Z_-]+$/.test($("#jobName").val());
+        	var groupJobName = /^[0-9a-zA-Z_-]+$/.test($("#groupJobName").val());
+        	var triggerName = /^[0-9a-zA-Z_-]+$/.test($("#triggerName").val());
+        	var groupTriggerName = /^[0-9a-zA-Z_-]+$/.test($("#groupTriggerName").val());
+        	var jobClassName = /^[0-9a-zA-Z_-]+$/.test($("#jobClassName").val());
+        	var cronExpression = /^[0-9a-zA-Z_-]+$/.test($("#cronExpression").val());
+
+        	debugger;
+
             if(!jobName){
                 var alertString = '<fmt:message key="console.setting.scheduler.error.label.jobNameInvalid"/>';
                 $("#jobName").focus();

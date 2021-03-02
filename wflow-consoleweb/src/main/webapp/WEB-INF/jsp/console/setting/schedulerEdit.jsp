@@ -19,23 +19,23 @@
             <fieldset>
                 <legend><fmt:message key="console.setting.scheduler.common.label.details"/></legend>
                 <div class="form-row">
-                    <label for="field1"><fmt:message key="console.setting.eaContent.common.label.id"/></label>
+                    <label for="id"><fmt:message key="console.setting.scheduler.common.label.id"/></label>
                     <span class="form-input"><c:out value="${schedulerDetails.id}"/><input id="id" type="hidden" value="${schedulerDetails.id}" name="id"/></span>
                 </div>
                 <div class="form-row">
-                    <label for="field1"><fmt:message key="console.setting.scheduler.common.label.jobName"/></label>
+                    <label for="jobName"><fmt:message key="console.setting.scheduler.common.label.jobName"/></label>
                     <span class="form-input"><form:input path="jobName" cssErrorClass="form-input-error" size="30" readonly="true" disabled="true"/> *</span>
                 </div>
                 <div class="form-row">
-                    <label for="field1"><fmt:message key="console.setting.scheduler.common.label.groupJobName"/></label>
+                    <label for="groupJobName"><fmt:message key="console.setting.scheduler.common.label.groupJobName"/></label>
                     <span class="form-input"><form:input path="groupJobName" cssErrorClass="form-input-error"  size="30" readonly="true" disabled="true"/> *</span>
                 </div>
                 <div class="form-row">
-                    <label for="field1"><fmt:message key="console.setting.scheduler.common.label.triggerName"/></label>
+                    <label for="triggerName"><fmt:message key="console.setting.scheduler.common.label.triggerName"/></label>
                     <span class="form-input"><form:input path="triggerName" cssErrorClass="form-input-error" size="30" readonly="true" disabled="true"/> *</span>
                 </div>
                 <div class="form-row">
-                    <label for="field1"><fmt:message key="console.setting.scheduler.common.label.groupTriggerName"/></label>
+                    <label for="groupTriggerName"><fmt:message key="console.setting.scheduler.common.label.groupTriggerName"/></label>
                     <span class="form-input"><form:input path="groupTriggerName" cssErrorClass="form-input-error" size="30" readonly="true" disabled="true"/> *</span>
                 </div>
                 <div class="form-row">

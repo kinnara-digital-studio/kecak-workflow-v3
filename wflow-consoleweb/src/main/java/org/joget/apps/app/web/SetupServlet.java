@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
@@ -32,6 +33,10 @@ import org.joget.commons.util.HostManager;
 import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.commons.util.SecurityUtil;
+import org.kecak.apps.app.scheduler.SchedulerManager;
+import org.kecak.apps.app.scheduler.SchedulerPluginJob;
+import org.kecak.apps.app.scheduler.model.SchedulerDetails;
+import org.kecak.apps.app.scheduler.model.TriggerTypes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -241,7 +246,25 @@ public class SetupServlet extends HttpServlet {
                 
                 LogUtil.info(getClass().getName(), "Profile init complete: " + profileName);
                 LogUtil.info(getClass().getName(), "===== Database Setup Complete =====");
-                
+
+                //Initialize Scheduler Job
+                SchedulerDetails schedulerDetails = new SchedulerDetails();
+                schedulerDetails.setJobName("SchedulerPluginJob");
+                schedulerDetails.setJobClassName(SchedulerPluginJob.class.getName());
+//                    schedulerDetails.setCronExpression("0 0/1 * * * ? *"); // run every 1 minute
+                schedulerDetails.setCronExpression("0 0/5 * * * ? *"); // run every 5 minutes
+                schedulerDetails.setGroupJobName("SchedulerPluginJob");
+                schedulerDetails.setGroupTriggerName("SchedulerPluginJob");
+                Date now = new Date();
+                schedulerDetails.setDateCreated(now);
+                schedulerDetails.setCreatedBy("admin");
+                schedulerDetails.setDateModified(now);
+                schedulerDetails.setModifiedBy("admin");
+                schedulerDetails.setTriggerTypes(TriggerTypes.CRON);
+                schedulerDetails.setTriggerName("SchedulerPluginJob");
+                SchedulerManager schedulerManager = (SchedulerManager) AppUtil.getApplicationContext().getBean("schedulerManager");
+                schedulerManager.saveOrUpdateJobDetails(schedulerDetails);
+
             } catch (Exception ex) {
                 LogUtil.error(getClass().getName(), null, ex.toString());
                 success = false;

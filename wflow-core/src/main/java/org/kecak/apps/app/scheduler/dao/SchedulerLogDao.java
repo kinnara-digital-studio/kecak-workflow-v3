@@ -3,12 +3,14 @@ package org.kecak.apps.app.scheduler.dao;
 
 import org.joget.commons.spring.model.AbstractSpringDao;
 import org.kecak.apps.app.scheduler.model.SchedulerLog;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Kecak Exclusive
  */
+@Transactional
 public class SchedulerLogDao extends AbstractSpringDao<SchedulerLog> {
 
 	public static final String ENTITY_NAME = "SchedulerLog";

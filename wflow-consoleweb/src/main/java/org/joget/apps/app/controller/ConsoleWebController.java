@@ -130,6 +130,7 @@ import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.app.model.SchedulerPlugin;
 import org.kecak.apps.app.scheduler.SchedulerManager;
 import org.kecak.apps.app.scheduler.dao.SchedulerDetailsDao;
 import org.kecak.apps.app.scheduler.dao.SchedulerLogDao;
@@ -5360,6 +5361,7 @@ public class ConsoleWebController {
         pluginTypeMap.put("org.joget.workflow.model.ParticipantPlugin", ResourceBundleUtil.getMessage("setting.plugin.processParticipant"));
         pluginTypeMap.put("org.joget.plugin.base.ApplicationPlugin", ResourceBundleUtil.getMessage("setting.plugin.processTool"));
         pluginTypeMap.put("org.joget.apps.app.model.ProcessFormModifier", ResourceBundleUtil.getMessage("setting.plugin.processFormModifier"));
+        pluginTypeMap.put(SchedulerPlugin.class.getName(), ResourceBundleUtil.getMessage("setting.plugin.scheduler"));
 
         return PagingUtils.sortMapByValue(pluginTypeMap, false);
     }
@@ -5802,14 +5804,14 @@ public class ConsoleWebController {
      */
     @RequestMapping("/console/setting/scheduler")
     public String consoleSettingSchedulerContent(ModelMap map) {
-        return "console/setting/scheduler/scheduler";
+        return "console/setting/scheduler";
     }
 
     @RequestMapping("/console/setting/scheduler/create")
     public String consoleSettingSchedulerCreate(ModelMap map) {
         SchedulerDetails schedulerDetails = new SchedulerDetails();
         map.addAttribute("schedulerDetails", schedulerDetails);
-        return "console/setting/scheduler/schedulerCreate";
+        return "console/setting/schedulerCreate";
     }
 
     @RequestMapping(value = "/console/setting/scheduler/submit/(*:action)", method = RequestMethod.POST)
@@ -5967,6 +5969,13 @@ public class ConsoleWebController {
             }
         }
         return "console/dialogClose";
+    }
+
+    @RequestMapping("/console/setting/scheduler/edit/(*:id)")
+    public String consoleSettingSchedulerEdit(ModelMap map, @RequestParam("id") String id) {
+        SchedulerDetails schedulerDetails = schedulerDetailsDao.getSchedulerDetailsById(id);
+        map.addAttribute("schedulerDetails", schedulerDetails);
+        return "console/setting/schedulerEdit";
     }
     // End of Scheduler
 }

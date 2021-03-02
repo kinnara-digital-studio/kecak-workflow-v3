@@ -2,6 +2,7 @@ package org.kecak.apps.app.scheduler.dao;
 
 import org.joget.commons.spring.model.AbstractSpringDao;
 import org.kecak.apps.app.scheduler.model.SchedulerDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * Kecak Exclusive
  */
+@Transactional
 public class SchedulerDetailsDao extends AbstractSpringDao<SchedulerDetails> {
 
 	public static final String ENTITY_NAME = "SchedulerDetails";
