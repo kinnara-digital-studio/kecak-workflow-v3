@@ -109,32 +109,36 @@ public class DataListMenu extends UserviewMenu implements PwaOfflineValidation {
             DataList dataList = getDataList();
 
             if (dataList != null) {
-                //overide datalist result to use userview result
-                DataListActionResult ac = dataList.getActionResult();
-                if (ac != null) {
-                    if (ac.getMessage() != null && !ac.getMessage().isEmpty()) {
-                        setAlertMessage(ac.getMessage());
-                    }
-                    if (ac.getType() != null && DataListActionResult.TYPE_REDIRECT.equals(ac.getType()) &&
-                            ac.getUrl() != null && !ac.getUrl().isEmpty()) {
-                        if ("REFERER".equals(ac.getUrl())) {
-                            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
-                            if (request != null && request.getHeader("Referer") != null) {
-                                setRedirectUrl(request.getHeader("Referer"));
+                if(!dataList.isIsAuthorized()) {
+                    setProperty("error", "Unauthorized access");
+                } else {
+                    //overide datalist result to use userview result
+                    DataListActionResult ac = dataList.getActionResult();
+                    if (ac != null) {
+                        if (ac.getMessage() != null && !ac.getMessage().isEmpty()) {
+                            setAlertMessage(ac.getMessage());
+                        }
+                        if (ac.getType() != null && DataListActionResult.TYPE_REDIRECT.equals(ac.getType()) &&
+                                ac.getUrl() != null && !ac.getUrl().isEmpty()) {
+                            if ("REFERER".equals(ac.getUrl())) {
+                                HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+                                if (request != null && request.getHeader("Referer") != null) {
+                                    setRedirectUrl(request.getHeader("Referer"));
+                                } else {
+                                    setRedirectUrl("REFERER");
+                                }
                             } else {
-                                setRedirectUrl("REFERER");
+                                if (ac.getUrl().startsWith("?")) {
+                                    ac.setUrl(getUrl() + ac.getUrl());
+                                }
+                                setRedirectUrl(ac.getUrl());
                             }
-                        } else {
-                            if (ac.getUrl().startsWith("?")) {
-                                ac.setUrl(getUrl() + ac.getUrl());
-                            }
-                            setRedirectUrl(ac.getUrl());
                         }
                     }
-                }
 
-                // set data list
-                setProperty("dataList", dataList);
+                    // set data list
+                    setProperty("dataList", dataList);
+                }
             } else {
                 setProperty("error", "Data List \"" + getPropertyString("datalistId") + "\" not exist.");
             }

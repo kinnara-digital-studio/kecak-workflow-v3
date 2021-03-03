@@ -296,6 +296,11 @@
             <artifactId>jasypt</artifactId>
             <version>1.9.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.kinnarastudio</groupId>
+            <artifactId>kinnara-commons</artifactId>
+            <version>1.2.3</version>
+        </dependency>
     </dependencies>
 </project>
 

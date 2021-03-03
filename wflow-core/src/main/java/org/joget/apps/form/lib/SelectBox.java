@@ -1,13 +1,11 @@
 package org.joget.apps.form.lib;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.kinnarastudio.commons.jsonstream.JSONCollectors;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.Form;
@@ -25,6 +23,8 @@ import org.joget.apps.userview.model.PwaOfflineValidation;
 import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.plugin.base.PluginManager;
 import org.joget.plugin.property.model.PropertyEditable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SelectBox extends Element implements FormBuilderPaletteElement, FormAjaxOptionsElement, PwaOfflineValidation {
     private Element controlElement;
@@ -226,6 +226,46 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
             }
         }
         return null;
+    }
+
+    @Override
+    public Object handleElementValueResponse(Element element, FormData formData) {
+        final boolean retrieveOptionsData = formData.getRequestParameter(PARAMETER_AS_OPTIONS) != null;
+        final FormRowSet rowSet = formData.getLoadBinderData(element);
+
+        if (retrieveOptionsData ) {
+            final String elementId = element.getPropertyString(FormUtil.PROPERTY_ID);
+
+
+
+            FormRow row = rowSet.stream().findFirst().orElseGet(FormRow::new);
+
+            final FormRowSet options = FormUtil.getElementPropertyOptionsMap(element, formData).stream()
+                    .map(m -> (Map<String, Object>)m)
+                    .map(m -> m.entrySet()
+                            .stream()
+                            .collect(Collector.of(FormRow::new, (r, e) -> r.setProperty(e.getKey(), String.valueOf(e.getValue())), (r1, r2) -> {
+                                r1.putAll(r2);
+                                return r1;
+                            })))
+                    .collect(Collectors.toCollection(FormRowSet::new));
+
+            JSONArray values = Optional.of(elementId)
+                    .map(row::getProperty)
+                    .map(s -> s.split(";"))
+                    .map(Arrays::stream)
+                    .orElseGet(Stream::empty)
+                    .map(s -> options.stream()
+                            .filter(r -> s.equals(r.getProperty(FormUtil.PROPERTY_VALUE)))
+                            .findFirst()
+                            .orElseGet(FormRow::new))
+                    .map(JSONObject::new)
+                    .collect(JSONCollectors.toJSONArray());
+
+            return values;
+        } else {
+            return super.handleElementValueResponse(element, formData);
+        }
     }
 }
 

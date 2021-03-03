@@ -11,13 +11,14 @@ import org.joget.apps.userview.model.Permission;
 import org.joget.plugin.base.ExtDefaultPlugin;
 import org.joget.plugin.property.model.PropertyEditable;
 import org.joget.plugin.property.service.PropertyUtil;
+import org.kecak.apps.form.model.DataJsonControllerHandler;
 
 /**
  * A base abstract class to develop a Form Field Element plugin. 
  * All forms, containers and form fields must extend this class.
  * 
  */
-public abstract class Element extends ExtDefaultPlugin implements PropertyEditable{
+public abstract class Element extends ExtDefaultPlugin implements PropertyEditable, DataJsonControllerHandler {
 
     private Collection<Element> children = new ArrayList<Element>();
     private Element parent;

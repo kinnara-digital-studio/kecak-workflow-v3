@@ -139,7 +139,9 @@ public class DataList {
     }
 
     public DataListAction[] getActions() {
-        return actions;
+        return Arrays.stream(actions)
+                .filter(DataListAction::isPermitted)
+                .toArray(DataListAction[]::new);
     }
 
     public void setActions(DataListAction[] actions) {
@@ -307,8 +309,10 @@ public class DataList {
                 rowActions[i] = r;
             }
         }
-        
-        return rowActions;
+
+        return Arrays.stream(rowActions)
+                .filter(DataListAction::isPermitted)
+                .toArray(DataListAction[]::new);
     }
     
     public DataListAction getColumnAction(DataListColumn column) {
