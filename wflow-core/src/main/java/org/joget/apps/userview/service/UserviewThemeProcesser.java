@@ -24,6 +24,7 @@ import org.joget.directory.model.service.DirectoryUtil;
 import org.joget.directory.model.service.UserSecurity;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 
 public class UserviewThemeProcesser {
 
@@ -51,7 +52,11 @@ public class UserviewThemeProcesser {
 
     public String getPreviewView() {
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            return "ubuilder/preview";
+            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getPreviewJsp();
+            } else {
+                return "ubuilder/preview";
+            }
         }
 
         init();
@@ -61,7 +66,11 @@ public class UserviewThemeProcesser {
 
     public String getLoginView() {
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            return "ubuilder/login";
+            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getLoginJsp();
+            } else {
+                return "ubuilder/login";
+            }
         }
         
         String loginRedirection = loginRedirection();
@@ -78,7 +87,11 @@ public class UserviewThemeProcesser {
     public String getView() {
         
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            return "ubuilder/view";
+            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getUserviewJsp();
+            } else {
+                return "ubuilder/view";
+            }
         }
 
         String mobileViewRedirection = mobileViewRedirection();

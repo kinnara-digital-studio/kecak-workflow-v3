@@ -9,9 +9,14 @@ import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.service.FormService;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.apps.userview.model.Permission;
+import org.joget.apps.userview.model.UserviewTheme;
+import org.joget.apps.userview.service.UserviewService;
 import org.json.JSONObject;
 
+import javax.annotation.Nullable;
+
 public class Form extends Element implements FormBuilderEditable, FormContainer {
+    private UserviewTheme theme = null;
 
     private Map<String, String[]> formMetas = new HashMap<String, String[]>();
     private Collection<FormAction> actions = new ArrayList<FormAction>();
@@ -223,5 +228,16 @@ public class Form extends Element implements FormBuilderEditable, FormContainer 
             }
         }
         return permissionKeys.get(formData);
+    }
+
+    @Override
+    @Nullable
+    public UserviewTheme getTheme(FormData formData) {
+        if(theme == null) {
+            AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
+            UserviewService userviewService = (UserviewService) AppUtil.getApplicationContext().getBean("userviewService");
+            theme = formData == null ? null : userviewService.getUserviewTheme(appDefinition.getAppId(), formData.getRequestParameter("userviewId"));
+        }
+        return theme;
     }
 }

@@ -1,17 +1,22 @@
 package org.joget.apps.form.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.service.FormService;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.apps.userview.model.Permission;
+import org.joget.apps.userview.model.UserviewTheme;
 import org.joget.plugin.base.ExtDefaultPlugin;
 import org.joget.plugin.property.model.PropertyEditable;
 import org.joget.plugin.property.service.PropertyUtil;
+import org.kecak.apps.form.model.BootstrapFormElement;
 import org.kecak.apps.form.model.DataJsonControllerHandler;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A base abstract class to develop a Form Field Element plugin. 
@@ -268,7 +273,12 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
             this.setProperty(FormUtil.PROPERTY_READONLY, "");
         }
 
-        return renderTemplate(formData, dataModel);
+        UserviewTheme userviewTheme = getTheme(formData);
+        if (userviewTheme instanceof BootstrapUserviewTheme && this instanceof BootstrapFormElement) {
+            return ((BootstrapUserviewTheme)userviewTheme).renderBootstrapFormElementTemplate(this, formData, dataModel);
+        } else {
+            return renderTemplate(formData, dataModel);
+        }
     }
 
     /**
@@ -295,8 +305,13 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
         } else {
             this.setProperty(FormUtil.PROPERTY_READONLY, "");
         }
-        
-        return renderTemplate(formData, dataModel);
+
+        UserviewTheme userviewTheme = getTheme(formData);
+        if (userviewTheme instanceof BootstrapUserviewTheme && this instanceof BootstrapFormElement) {
+            return ((BootstrapUserviewTheme)userviewTheme).renderBootstrapFormElementTemplate(this, formData, dataModel);
+        } else {
+            return renderTemplate(formData, dataModel);
+        }
     }
 
     /**
@@ -319,7 +334,12 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
         // set readonly flag
         dataModel.put(FormUtil.PROPERTY_READONLY, Boolean.TRUE);
 
-        return renderTemplate(formData, dataModel);
+        UserviewTheme userviewTheme = getTheme(formData);
+        if (userviewTheme instanceof BootstrapUserviewTheme && this instanceof BootstrapFormElement) {
+            return ((BootstrapUserviewTheme)userviewTheme).renderBootstrapFormElementTemplate(this, formData, dataModel);
+        } else {
+            return renderTemplate(formData, dataModel);
+        }
     }
 
     /**
@@ -539,5 +559,18 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
             }
         }
         return permissionKeys.get(formData);
+    }
+
+    @Nullable
+    public UserviewTheme getTheme(FormData formData) {
+        // theme object is kept in Form
+        Form form;
+        if(this instanceof Form) {
+            form = (Form) this;
+        } else {
+            form = FormUtil.findRootForm(this);
+        }
+
+        return form == null ? null : form.getTheme(formData);
     }
 }
