@@ -17,7 +17,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getCss() {
+    @Deprecated
+    public final String getCss() {
         //is not using anymore
         return null;
     } 
@@ -27,7 +28,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getJavascript() {
+    @Deprecated
+    public final String getJavascript() {
         //is not using anymore
         return null;
     } 
@@ -37,7 +39,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getHeader() {
+    @Deprecated
+    public final String getHeader() {
         //is not using anymore
         return null;
     } 
@@ -47,7 +50,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getFooter() {
+    @Deprecated
+    public final String getFooter() {
         //is not using anymore
         return null;
     } 
@@ -57,7 +61,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getPageTop() {
+    @Deprecated
+    public final String getPageTop() {
         //is not using anymore
         return null;
     } 
@@ -67,7 +72,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getPageBottom() {
+    @Deprecated
+    public final String getPageBottom() {
         //is not using anymore
         return null;
     } 
@@ -77,7 +83,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
      * 
      * @return 
      */
-    public String getBeforeContent() {
+    @Deprecated
+    public final String getBeforeContent() {
         //is not using anymore
         return null;
     } 
