@@ -164,7 +164,7 @@ public abstract class UserviewV5Theme extends UserviewTheme {
     }
 
     /**
-     * HTML template for putting javascript and css link for getHead() template
+     * HTML template for putting javascript and css link for {@link #getHead(Map)} template
      * 
      * @param data
      * @return 
@@ -174,7 +174,7 @@ public abstract class UserviewV5Theme extends UserviewTheme {
     }
 
     /**
-     * Gets dynamic generated CSS for getHead() template
+     * Gets dynamic generated CSS for {@link #getHead(Map)} template
      * 
      * @param data
      * @return 
@@ -184,7 +184,7 @@ public abstract class UserviewV5Theme extends UserviewTheme {
     }
 
     /**
-     * Gets dynamic generated javascript for getHead() template 
+     * Gets dynamic generated javascript for {@link #getHead(Map)} template 
      * 
      * @param data
      * @return 
@@ -194,7 +194,7 @@ public abstract class UserviewV5Theme extends UserviewTheme {
     }
 
     /**
-     * Gets dynamic generated meta data for getHead() template 
+     * Gets dynamic generated meta data for {@link #getHead(Map)} template 
      * 
      * @param data
      * @return 
@@ -215,7 +215,7 @@ public abstract class UserviewV5Theme extends UserviewTheme {
     }
 
     /**
-     * Gets the fav icon relative path for getHead() template 
+     * Gets the fav icon relative path for {@link #getHead(Map)} template 
      * 
      * @param data
      * @return 

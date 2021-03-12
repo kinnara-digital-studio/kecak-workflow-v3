@@ -51,12 +51,12 @@ public class UserviewThemeProcesser {
     }
 
     public String getPreviewView() {
+        if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+            return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getPreviewJsp();
+        }
+
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
-                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getPreviewJsp();
-            } else {
-                return "ubuilder/preview";
-            }
+            return "ubuilder/preview";
         }
 
         init();
@@ -65,12 +65,12 @@ public class UserviewThemeProcesser {
     }
 
     public String getLoginView() {
+        if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+            return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getLoginJsp();
+        }
+
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
-                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getLoginJsp();
-            } else {
-                return "ubuilder/login";
-            }
+            return "ubuilder/login";
         }
         
         String loginRedirection = loginRedirection();
@@ -85,13 +85,12 @@ public class UserviewThemeProcesser {
     }
 
     public String getView() {
-        
+        if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+            return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getUserviewJsp();
+        }
+
         if (userview.getSetting().getTheme() != null && !(userview.getSetting().getTheme() instanceof UserviewV5Theme)) {
-            if(userview.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
-                return ((BootstrapUserviewTheme)userview.getSetting().getTheme()).getUserviewJsp();
-            } else {
-                return "ubuilder/view";
-            }
+            return "ubuilder/view";
         }
 
         String mobileViewRedirection = mobileViewRedirection();

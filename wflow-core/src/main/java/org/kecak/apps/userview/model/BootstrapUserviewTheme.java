@@ -30,6 +30,8 @@ public interface BootstrapUserviewTheme {
 
     String getLoginJsp();
 
+    void setJspVariables(final Map<String, Object> map);
+
     default String getUnauthorizedJsp() {
         return "userview/plugin/unauthorized.jsp";
     }

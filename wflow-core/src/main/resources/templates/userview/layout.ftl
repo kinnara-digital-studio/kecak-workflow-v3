@@ -3,7 +3,7 @@
     ${html_inner_before!}
     <head>
         ${head_inner_before!}
-        ${head!}
+        ${head!}                            <#-- see head.ftl -->
         ${head_inner_after!}
     </head>
 
@@ -12,11 +12,11 @@
         ${page_before!}
         <div id="page">
             ${page_inner_before!}
-            ${header!}
+            ${header!}                      <#-- see header.ftl -->
 
-            ${content_container!}
+            ${content_container!}           <#-- see contentContainer.ftl -->
 
-            ${footer!}
+            ${footer!}                      <#-- see footer.ftl -->
             ${page_inner_after!}
         </div>
         ${page_after!}

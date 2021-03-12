@@ -22,10 +22,12 @@ import org.joget.apps.userview.service.UserviewUtil;
 import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.commons.util.StringUtil;
 import org.joget.workflow.util.WorkflowUtil;
+import org.kecak.apps.userview.model.AceUserviewMenu;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-public class DataListMenu extends UserviewMenu implements PwaOfflineValidation {
+public class DataListMenu extends UserviewMenu implements PwaOfflineValidation, AceUserviewMenu {
     private DataList cacheDataList = null;
 
     @Override
@@ -217,5 +219,69 @@ public class DataListMenu extends UserviewMenu implements PwaOfflineValidation {
             return warning;
         }
         return null;
+    }
+
+    @Override
+    public String getAceJspPage(BootstrapUserviewTheme bootstrapTheme) {
+        return getJspPage(bootstrapTheme.getDataListJsp());
+    }
+
+    @Override
+    public String getAceRenderPage() {
+        return getRenderPage();
+    }
+
+    @Override
+    public String getAceDecoratedMenu() {
+        return getDecoratedMenu();
+    }
+
+    protected String getJspPage(String jspFile) {
+        DataListService dataListSService = (DataListService) AppUtil.getApplicationContext().getBean("dataListService");
+        try {
+            // get data list
+            DataList dataList = getDataList();
+
+            if (dataList != null) {
+                if(!dataList.isIsAuthorized()) {
+                    setProperty("error", "Unauthorized access");
+                } else {
+
+                    //overide datalist result to use userview result
+                    DataListActionResult ac = dataList.getActionResult();
+                    if (ac != null) {
+                        if (ac.getMessage() != null && !ac.getMessage().isEmpty()) {
+                            setAlertMessage(ac.getMessage());
+                        }
+                        if (ac.getType() != null && DataListActionResult.TYPE_REDIRECT.equals(ac.getType()) &&
+                                ac.getUrl() != null && !ac.getUrl().isEmpty()) {
+                            if ("REFERER".equals(ac.getUrl())) {
+                                HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+                                if (request != null && request.getHeader("Referer") != null) {
+                                    setRedirectUrl(request.getHeader("Referer"));
+                                } else {
+                                    setRedirectUrl("REFERER");
+                                }
+                            } else {
+                                setRedirectUrl(ac.getUrl());
+                            }
+                        }
+                    }
+
+                    // set data list
+                    setProperty("dataList", dataList);
+                }
+            } else {
+                setProperty("error", "Data List \"" + getPropertyString("datalistId") + "\" not exist.");
+            }
+        } catch (Exception ex) {
+            StringWriter out = new StringWriter();
+            ex.printStackTrace(new PrintWriter(out));
+            String message = ex.toString();
+            message += "\r\n<pre class=\"stacktrace\">" + out.getBuffer() + "</pre>";
+            setProperty("error", message);
+        }
+
+        return jspFile;
     }
 }

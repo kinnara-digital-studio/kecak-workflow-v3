@@ -24,12 +24,14 @@ import org.joget.commons.util.StringUtil;
 import org.joget.workflow.model.WorkflowAssignment;
 import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.util.WorkflowUtil;
+import org.kecak.apps.userview.model.AceUserviewMenu;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 import org.springframework.context.ApplicationContext;
 
 /**
  * Represents a menu item that displays a data form and handles form submission.
  */
-public class FormMenu extends UserviewMenu implements PwaOfflineValidation {
+public class FormMenu extends UserviewMenu implements PwaOfflineValidation, AceUserviewMenu {
 
     @Override
     public String getIcon() {
@@ -111,20 +113,7 @@ public class FormMenu extends UserviewMenu implements PwaOfflineValidation {
 
     @Override
     public String getJspPage() {
-        if ("submit".equals(getRequestParameterString("_action"))) {
-            // only allow POST
-            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
-            if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
-                return "userview/plugin/unauthorized.jsp";
-            }
-            
-            // submit form
-            submitForm();
-        } else {
-            displayForm();
-
-        }
-        return "userview/plugin/form.jsp";
+        return getJspPage("userview/plugin/form.jsp", "userview/plugin/unauthorized.jsp");
     }
 
     @Override
@@ -521,5 +510,35 @@ public class FormMenu extends UserviewMenu implements PwaOfflineValidation {
             return warning;
         }
         return null;
+    }
+
+    @Override
+    public String getAceJspPage(BootstrapUserviewTheme theme) {
+        return getJspPage(theme.getFormJsp(), theme.getUnauthorizedJsp());
+    }
+
+    @Override
+    public String getAceRenderPage() {
+        return null;
+    }
+
+    @Override
+    public String getAceDecoratedMenu() {
+        return getDecoratedMenu();
+    }
+
+    protected String getJspPage(String jspFile, String unauthorizedJspFile) {
+        if ("submit".equals(getRequestParameterString("_action"))) {
+            // only allow POST
+            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+            if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
+                return unauthorizedJspFile;
+            }
+            // submit form
+            submitForm();
+        } else {
+            displayForm();
+        }
+        return jspFile;
     }
 }

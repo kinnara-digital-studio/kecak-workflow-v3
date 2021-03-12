@@ -8,9 +8,9 @@
     <name>wflow-consoleweb</name>
     <url>http://www.kecak.org</url>
     <scm>
-        <connection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow.git</developerConnection>
-        <url>ssh://git@github.com:kinnara-digital-studio/kecak-workflow.git</url>
+        <connection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</developerConnection>
+        <url>ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</url>
     </scm>
     <dependencies>
         <dependency>
@@ -380,26 +380,25 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!-- TODO : enable later after bower has been implemented -->
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>exec-maven-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>exec</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <executable>bower</executable>-->
-<!--                    <arguments>-->
-<!--                        <argument>install</argument>-->
-<!--                    </arguments>-->
-<!--                    <workingDirectory>${project.basedir}/src/main/webapp</workingDirectory>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>bower</executable>
+                    <arguments>
+                        <argument>install</argument>
+                    </arguments>
+                    <workingDirectory>${project.basedir}/src/main/webapp</workingDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

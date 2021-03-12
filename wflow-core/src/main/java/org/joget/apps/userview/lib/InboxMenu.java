@@ -40,9 +40,11 @@ import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
+import org.kecak.apps.userview.model.AceUserviewMenu;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 import org.springframework.context.ApplicationContext;
 
-public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation {
+public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation, AceUserviewMenu {
     private DataList cacheDataList = null;
 
     public static final String PREFIX_SELECTED = "selected_";
@@ -113,27 +115,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
 
     @Override
     public String getJspPage() {
-        String mode = getRequestParameterString("_mode");
-
-        if ("assignment".equals(mode)) {
-            setProperty("customHeader", getPropertyString(mode + "-customHeader"));
-            setProperty("customFooter", getPropertyString(mode + "-customFooter"));
-            setProperty("messageShowAfterComplete", getPropertyString(mode + "-messageShowAfterComplete"));
-            setAlertMessage(getPropertyString(mode + "-messageShowAfterComplete"));
-            return handleForm();
-        } else {
-            String customHeader = "<style>";
-            customHeader += "span.dot_red{background-color: red;display: block;height: 15px;text-align: left;width: 15px;}";
-            customHeader += "span.dot_green{background-color: green;display: block;height: 15px;text-align: left;width: 15px;}";
-            customHeader += "span.dot_yellow{background-color: yellow;display: block;height: 15px;text-align: left;width: 15px;}";
-            customHeader += "</style>\n";
-            if (getPropertyString("list-customHeader") != null) {
-                customHeader += getPropertyString("list-customHeader");
-            }
-            setProperty("customHeader", customHeader);
-            setProperty("customFooter", getPropertyString("list-customFooter"));
-            return handleList();
-        }
+        return getJspPage("userview/plugin/form.jsp", "userview/plugin/datalist.jsp", "userview/plugin/unauthorized.jsp");
     }
 
     protected String handleList() {
@@ -587,5 +569,73 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
         Map<WARNING_TYPE, String[]> warning = new HashMap<WARNING_TYPE, String[]>();
         warning.put(WARNING_TYPE.READONLY, new String[]{ResourceBundleUtil.getMessage("pwa.process")});
         return warning;
+    }
+
+    @Override
+    public String getAceJspPage(BootstrapUserviewTheme bootstrapTheme) {
+        return getJspPage(bootstrapTheme.getFormJsp(), bootstrapTheme.getDataListJsp(), bootstrapTheme.getUnauthorizedJsp());
+    }
+
+    @Override
+    public String getAceRenderPage() {
+        return null;
+    }
+
+    @Override
+    public String getAceDecoratedMenu() {
+        return getDecoratedMenu();
+    }
+
+    protected String getJspPage(String jspFormFile, String jspListFile, String jspUnauthorizedFile) {
+        String mode = getRequestParameterString("_mode");
+
+        if ("assignment".equals(mode)) {
+            setProperty("customHeader", getPropertyString(mode + "-customHeader"));
+            setProperty("customFooter", getPropertyString(mode + "-customFooter"));
+            setProperty("messageShowAfterComplete", getPropertyString(mode + "-messageShowAfterComplete"));
+            setAlertMessage(getPropertyString(mode + "-messageShowAfterComplete"));
+
+//                return handleBootstrapForm();
+            return handleForm(jspFormFile, jspUnauthorizedFile);
+        } else {
+            String customHeader = "<style>";
+            customHeader += "span.dot_red{background-color: red;display: block;height: 15px;text-align: left;width: 15px;}";
+            customHeader += "span.dot_green{background-color: green;display: block;height: 15px;text-align: left;width: 15px;}";
+            customHeader += "span.dot_yellow{background-color: yellow;display: block;height: 15px;text-align: left;width: 15px;}";
+            customHeader += "</style>\n";
+            if (getPropertyString("list-customHeader") != null) {
+                customHeader += getPropertyString("list-customHeader");
+            }
+            setProperty("customHeader", customHeader);
+            setProperty("customFooter", getPropertyString("list-customFooter"));
+            return handleList(jspListFile);
+        }
+    }
+
+    protected String handleForm(String jspFile, String jspUnauthorized) {
+        AppDefinition appDef = AppUtil.getCurrentAppDefinition();
+        if ("submit".equals(getRequestParameterString("_action"))) {
+            // only allow POST
+            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+            if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
+                return jspUnauthorized;
+            }
+
+            // submit form
+            submitForm();
+        } else {
+            displayForm();
+
+        }
+        //reset appDef
+        AppUtil.setCurrentAppDefinition(appDef);
+
+        return jspFile;
+    }
+
+    protected String handleList(String jspFile) {
+        viewList();
+
+        return jspFile;
     }
 }

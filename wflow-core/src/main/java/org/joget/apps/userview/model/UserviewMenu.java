@@ -1,8 +1,12 @@
 package org.joget.apps.userview.model;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.joget.commons.util.StringUtil;
+import org.kecak.apps.userview.model.BootstrapUserviewMenu;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * A base abstract class to develop a Userview Menu plugin. 
@@ -131,7 +135,11 @@ public abstract class UserviewMenu extends ExtElement {
      */
     public String getReadyJspPage() {
         if (readyJspPage == null) {
-            readyJspPage = getJspPage();
+            if(isBootstrapUserviewTheme(userview) && this instanceof BootstrapUserviewMenu) {
+                readyJspPage = ((BootstrapUserviewTheme) userview.getSetting().getTheme()).getBootstrapJspPage(this);
+            } else {
+                readyJspPage = getJspPage();
+            }
         }
         return readyJspPage;
     }
@@ -144,7 +152,11 @@ public abstract class UserviewMenu extends ExtElement {
      */
     public String getReadyRenderPage() {
         if (readyRenderPage == null) {
-            readyRenderPage = getRenderPage();
+            if(isBootstrapUserviewTheme(userview) && this instanceof BootstrapUserviewMenu) {
+                readyRenderPage = ((BootstrapUserviewTheme) userview.getSetting().getTheme()).getBootstrapRenderPage(this);
+            } else {
+                readyRenderPage = getRenderPage();
+            }
         }
         return readyRenderPage;
     }
@@ -234,5 +246,13 @@ public abstract class UserviewMenu extends ExtElement {
     
     public Set<String> getOfflineStaticResources() {
         return null;
+    }
+
+    protected boolean isBootstrapUserviewTheme(Userview userview) {
+        return Optional.ofNullable(userview)
+                .map(Userview::getSetting)
+                .map(UserviewSetting::getTheme)
+                .map(t -> t instanceof BootstrapUserviewTheme)
+                .orElse(false);
     }
 }

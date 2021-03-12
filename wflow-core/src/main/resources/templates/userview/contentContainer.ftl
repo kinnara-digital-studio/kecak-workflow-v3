@@ -6,7 +6,7 @@ ${main_container_before!}
             ${sidebar_before!}
             <div id="${sidebar_id!}" class="${sidebar_classes!}">
                 ${sidebar_inner_before!}
-                ${menus!}
+                ${menus!}                       <#-- see menus.ftl -->
                 ${sidebar_inner_after!}
             </div>
             ${sidebar_after!}
@@ -15,7 +15,7 @@ ${main_container_before!}
         <div id="${content_id!}" class="${content_classes!}">
             <main>
                 ${content_inner_before!}
-                ${content!}
+                ${content!}                     <#-- userview menu's content -->
                 ${content_inner_after!}
             </main>
         </div>

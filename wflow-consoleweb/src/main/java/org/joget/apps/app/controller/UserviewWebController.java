@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import de.bripkens.gravatar.DefaultImage;
+import de.bripkens.gravatar.Gravatar;
+import de.bripkens.gravatar.Rating;
 import org.joget.apm.APMUtil;
 import org.joget.apps.app.dao.UserviewDefinitionDao;
 import org.joget.apps.app.model.AppDefinition;
@@ -15,11 +19,13 @@ import org.joget.apps.userview.service.UserviewThemeProcesser;
 import org.joget.apps.userview.service.UserviewUtil;
 import org.joget.commons.util.SecurityUtil;
 import org.joget.commons.util.StringUtil;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.tensorflow.op.core.BoostedTreesTrainingPredict;
 
 @Controller
 public class UserviewWebController {
@@ -93,8 +99,14 @@ public class UserviewWebController {
             UserviewThemeProcesser processer = new UserviewThemeProcesser(userviewObject, request);
             map.addAttribute("userview", userviewObject);
             map.addAttribute("processer", processer);
+
             String view = processer.getView();
             if (view != null) {
+
+                if(userviewObject.getSetting().getTheme() instanceof BootstrapUserviewTheme) {
+                    ((BootstrapUserviewTheme) userviewObject.getSetting().getTheme()).setJspVariables(map);
+                }
+
                 if (view.startsWith("redirect:")) {
                     map.clear();
                 }

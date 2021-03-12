@@ -40,9 +40,11 @@ import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
+import org.kecak.apps.userview.model.AceUserviewMenu;
+import org.kecak.apps.userview.model.BootstrapUserviewTheme;
 import org.springframework.context.ApplicationContext;
 
-public class RunProcess extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation {
+public class RunProcess extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation, AceUserviewMenu {
 
     @Override
     public String getClassName() {
@@ -672,5 +674,65 @@ public class RunProcess extends UserviewMenu implements PluginWebSupport, PwaOff
             return warning;
         }
         return null;
+    }
+
+    @Override
+    public String getAceJspPage(BootstrapUserviewTheme bootstrapTheme) {
+        return getJspPage(bootstrapTheme.getRunProcessJsp());
+    }
+
+    @Override
+    public String getAceRenderPage() {
+        return null;
+    }
+
+    @Override
+    public String getAceDecoratedMenu() {
+        return getDecoratedMenu();
+    }
+
+    protected String getJspPage(String jspFile) {
+        if ("start".equals(getRequestParameterString("_action")) || "run".equals(getRequestParameterString("_action"))) {
+            // only allow POST
+            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+            if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
+                return "userview/plugin/unauthorized.jsp";
+            }
+
+            startProcess(getRequestParameterString("_action"));
+        } else if ("assignmentView".equals(getRequestParameterString("_action"))) {
+            assignmentView();
+        } else if ("assignmentSubmit".equals(getRequestParameterString("_action"))) {
+            // only allow POST
+            HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+            if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
+                return "userview/plugin/unauthorized.jsp";
+            }
+
+            assignmentSubmit();
+        } else {
+            ApplicationContext ac = AppUtil.getApplicationContext();
+            AppService appService = (AppService) ac.getBean("appService");
+            PackageActivityForm startFormDef = appService.retrieveMappedForm(getRequestParameterString("appId"), getRequestParameterString("appVersion"), getPropertyString("processDefId"), WorkflowUtil.ACTIVITY_DEF_ID_RUN_PROCESS);
+
+            if ("Yes".equals(getPropertyString("runProcessDirectly")) && !((startFormDef != null && (startFormDef.getFormId() != null || PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(startFormDef.getType()))))) {
+                if ("true".equals(getRequestParameter("isPreview"))) {
+                    setProperty("view", "featureDisabled");
+                } else {
+                    viewProcess(null);
+                    String csrfToken = "";
+                    HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+                    if (request != null) {
+                        csrfToken = SecurityUtil.getCsrfTokenName() + "=" + SecurityUtil.getCsrfTokenValue(request);
+                    }
+                    setProperty("csrfToken", csrfToken);
+                    setProperty("view", "processFormPost");
+                }
+            } else {
+                viewProcess(null);
+            }
+        }
+
+        return jspFile;
     }
 }

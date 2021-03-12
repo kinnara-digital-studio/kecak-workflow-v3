@@ -275,7 +275,7 @@ if (!MobileUtil.isMobileDisabled() && MobileUtil.isMobileUserAgent(request)) {
                         <c:set var="defaultAvatar"><c:url value="/images/default-avatar.png" /></c:set>
                   </c:otherwise>
               	</c:choose>
-                <img src="${defaultAvatar}" class="nav-user-photo" alt="User Image" onerror="this.src='<c:url value="/images/default-avatar.png" />'">
+                <img src="${profilePictureUrl}" class="nav-user-photo" alt="User Image" onerror="this.src='<c:url value="/images/default-avatar.png" />'">
                 <span class="user-info">
                   <small>Welcome,</small>
                   ${user.firstName} ${user.lastName}
@@ -329,35 +329,35 @@ if (!MobileUtil.isMobileDisabled() && MobileUtil.isMobileUserAgent(request)) {
               <c:if test="${!empty userview.currentCategory && category.properties.id eq userview.currentCategory.properties.id}">
                   <c:set var="c_class" value="${c_class} active open"/>
               </c:if>
-              
+
               <c:if test="${category.properties.hide != 'yes'}">
-              <li class="${c_class}">
-				<c:set var="firstMenuItem" value="${category.menus[0]}"/>
-              	<c:choose>
-					<c:when test="${!empty firstMenuItem && firstMenuItem.homePageSupported}">
-						<c:set var="menuItemId" value="${firstMenuItem.properties.menuId}"/>
-						<a href="${firstMenuItem.url}" class="dropdown-toggle">
-							<span><ui:stripTag html="${category.properties.label}" relaxed="true"/></span>
-							<b class="arrow icon-angle-down"></b>
-						</a>
-					</c:when>
-					<c:otherwise>
-						<span><ui:stripTag html="${category.properties.label}" relaxed="true"/></span>
-					</c:otherwise>
-				</c:choose>
-                <ul class="submenu">
-                	<c:forEach items="${category.menus}" var="menu" varStatus="mStatus">
-                    	<c:set var="m_class" value=""/>
-                        <c:if test="${!empty userview.current && menu.properties.id eq userview.current.properties.id}">
-                        	<c:set var="m_class" value="${m_class} active"/>
-                        </c:if>
-               			<li class="${m_class}" id="${menu.properties.id}">
-                            ${menu.menu}
-                            <b class="arrow"></b>
-                        </li>
-                      </c:forEach>
-                  </ul>
-            </li> <!-- /.Category Menu -->
+                  <li class="${c_class}">
+                    <c:set var="firstMenuItem" value="${category.menus[0]}"/>
+                    <c:choose>
+                        <c:when test="${!empty firstMenuItem && firstMenuItem.homePageSupported}">
+                            <c:set var="menuItemId" value="${firstMenuItem.properties.menuId}"/>
+                            <a href="${firstMenuItem.url}" class="dropdown-toggle">
+                                <span><ui:stripTag html="${category.properties.label}" relaxed="true"/></span>
+                                <b class="arrow icon-angle-down"></b>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <span><ui:stripTag html="${category.properties.label}" relaxed="true"/></span>
+                        </c:otherwise>
+                    </c:choose>
+                    <ul class="submenu">
+                        <c:forEach items="${category.menus}" var="menu" varStatus="mStatus">
+                            <c:set var="m_class" value=""/>
+                            <c:if test="${!empty userview.current && menu.properties.id eq userview.current.properties.id}">
+                                <c:set var="m_class" value="${m_class} active"/>
+                            </c:if>
+                            <li class="${m_class}" id="${menu.properties.id}">
+                                ${menu.menu}
+                                <b class="arrow"></b>
+                            </li>
+                          </c:forEach>
+                      </ul>
+                </li> <!-- /.Category Menu -->
             </c:if>
             </c:forEach>
           </ul><!-- /.nav-list -->
@@ -413,10 +413,9 @@ if (!MobileUtil.isMobileDisabled() && MobileUtil.isMobileUserAgent(request)) {
     <!-- REQUIRED JS SCRIPTS -->
  	${userview.setting.theme.javascript}
     <!-- Bootstrap 3.3.7 -->
-    
+
     <script src="${pageContext.request.contextPath}/js/vueJs/vue.min.js"></script>
     <script>
-      $.fn.bootstrapBtn = $.fn.button.noConflict();
       $(function(){
         $('input[type=file]').ace_file_input({
           no_file:'No File ...',
