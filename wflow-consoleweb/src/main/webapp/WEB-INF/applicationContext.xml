@@ -67,6 +67,7 @@
         <security:intercept-url pattern="/web/json/apps/published/userviews" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
         <security:intercept-url pattern="/web/json/apps/published/processes" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
         <security:intercept-url pattern="/web/json/data/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
+        <security:intercept-url pattern="/web/json/authentication/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
 
         <!-- Javascript API paths: JS API invokes JSON API, so permissions controlled there  --> 
         <security:intercept-url pattern="/web/js/**"  access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
@@ -139,7 +140,13 @@
         
         <security:custom-filter ref="workflowHttpAuthFilter" after="BASIC_AUTH_FILTER" /> 
     </security:http>
-        
+
+    <bean id="authTokenService" class="org.kecak.apps.app.service.AuthTokenService">
+        <constructor-arg ref="setupManager" />
+    </bean>
+
+    <bean id="workflowApiAuthEntryPoint" class="org.kecak.webapi.security.WorkflowApiAuthenticationEntryPoint" />
+
     <bean id="workflowUserManager" class="org.joget.apps.workflow.security.EnhancedWorkflowUserManager">
     </bean>                
     
@@ -153,7 +160,20 @@
     <bean id="authenticationProvider" class="org.joget.apps.workflow.security.WorkflowAuthenticationProvider">
         <property name="directoryManager" ref="directoryManager"/>
     </bean>
-                                                                                                
+
+    <bean id="jwtAuthenticationProvider" class="org.kecak.apps.workflow.security.JwtTokenAuthenticationProvider">
+        <property name="directoryManager" ref="directoryManager"/>
+        <property name="authTokenService" ref="authTokenService" />
+        <property name="workflowUserManager" ref="workflowUserManager" />
+        <property name="workflowHelper" ref="workflowHelper" />
+    </bean>
+
+    <bean id="workflowJwtAuthFilter" class="org.kecak.webapi.security.WorkflowJwtAuthProcessingFilter">
+        <property name="authenticationEntryPoint" ref="workflowApiAuthEntryPoint" />
+        <property name="authTokenService" ref="authTokenService"/>
+        <property name="directoryManager" ref="directoryManager"/>
+    </bean>
+
     <bean id="workflowHttpAuthFilter" class="org.joget.apps.workflow.security.WorkflowHttpAuthProcessingFilter">
         <property name="authenticationManager" ref="authenticationManager" />
         <property name="workflowUserManager" ref="workflowUserManager"/>

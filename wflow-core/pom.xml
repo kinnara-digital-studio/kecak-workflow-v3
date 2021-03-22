@@ -252,5 +252,13 @@
             <version>2.3.1</version>
         </dependency>
         <!-- End of Scheduler -->
+        <!-- Start of JWT Token -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- End of JWT Token -->
     </dependencies>
 </project>

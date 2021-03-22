@@ -8,6 +8,7 @@ import org.joget.apps.userview.model.UserviewTheme;
 import org.joget.plugin.base.ExtDefaultPlugin;
 import org.joget.plugin.property.model.PropertyEditable;
 import org.joget.plugin.property.service.PropertyUtil;
+import org.kecak.apps.form.model.AceFormElement;
 import org.kecak.apps.form.model.BootstrapFormElement;
 import org.kecak.apps.form.model.DataJsonControllerHandler;
 import org.kecak.apps.userview.model.BootstrapUserviewTheme;
@@ -23,7 +24,7 @@ import java.util.Map;
  * All forms, containers and form fields must extend this class.
  * 
  */
-public abstract class Element extends ExtDefaultPlugin implements PropertyEditable, DataJsonControllerHandler {
+public abstract class Element extends ExtDefaultPlugin implements PropertyEditable, DataJsonControllerHandler, AceFormElement {
 
     private Collection<Element> children = new ArrayList<Element>();
     private Element parent;
@@ -288,6 +289,11 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
      * @return
      */
     public abstract String renderTemplate(FormData formData, Map dataModel);
+
+    @Override
+    public String renderAceTemplate(FormData formData, Map dataModel) {
+        return renderTemplate(formData, dataModel);
+    }
 
     /**
      * HTML template with errors for front-end UI
