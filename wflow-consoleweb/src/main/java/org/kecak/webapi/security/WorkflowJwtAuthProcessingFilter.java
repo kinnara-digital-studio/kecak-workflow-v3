@@ -2,6 +2,7 @@ package org.kecak.webapi.security;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.joget.workflow.model.service.WorkflowUserManager;
 import org.kecak.apps.app.service.AuthTokenService;
 import org.joget.apps.workflow.security.WorkflowUserDetails;
 import org.joget.commons.util.LogUtil;
@@ -39,6 +40,7 @@ public class WorkflowJwtAuthProcessingFilter extends OncePerRequestFilter {
     private AuthTokenService authTokenService;
     private DirectoryManager directoryManager;
     private AuthenticationEntryPoint authenticationEntryPoint;
+    private WorkflowUserManager workflowUserManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -68,6 +70,7 @@ public class WorkflowJwtAuthProcessingFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     logger.info("Authorizated user '{}', setting security context", username);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    workflowUserManager.setCurrentThreadUser(user.getUsername());
                     chain.doFilter(request, response);
                 } else {
                     logger.error("Error when authenticating user");
@@ -104,5 +107,9 @@ public class WorkflowJwtAuthProcessingFilter extends OncePerRequestFilter {
 
     public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationEntryPoint = authenticationEntryPoint;
+    }
+
+    public void setWorkflowUserManager(WorkflowUserManager workflowUserManager) {
+        this.workflowUserManager = workflowUserManager;
     }
 }

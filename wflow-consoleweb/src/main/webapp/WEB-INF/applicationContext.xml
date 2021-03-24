@@ -19,6 +19,7 @@
 
     <security:authentication-manager alias="authenticationManager">
         <security:authentication-provider ref="authenticationProvider" />
+        <security:authentication-provider ref="jwtAuthenticationProvider" />
     </security:authentication-manager>
 
     <!-- Open paths -->        
@@ -137,8 +138,9 @@
         
         <!-- Support Basic Authentication -->
         <security:http-basic />
-        
-        <security:custom-filter ref="workflowHttpAuthFilter" after="BASIC_AUTH_FILTER" /> 
+
+        <security:custom-filter ref="workflowHttpAuthFilter" before="BASIC_AUTH_FILTER" />
+        <security:custom-filter ref="workflowJwtAuthFilter" after="BASIC_AUTH_FILTER" />
     </security:http>
 
     <bean id="authTokenService" class="org.kecak.apps.app.service.AuthTokenService">
@@ -172,6 +174,7 @@
         <property name="authenticationEntryPoint" ref="workflowApiAuthEntryPoint" />
         <property name="authTokenService" ref="authTokenService"/>
         <property name="directoryManager" ref="directoryManager"/>
+        <property name="workflowUserManager" ref="workflowUserManager" />
     </bean>
 
     <bean id="workflowHttpAuthFilter" class="org.joget.apps.workflow.security.WorkflowHttpAuthProcessingFilter">
@@ -182,6 +185,14 @@
         <property name="localeResolver" ref="localeResolver"/>
         <property name="auditTrailManager" ref="auditTrailManager"/>
         <property name="allowSessionCreation" value="true" />
+    </bean>
+
+    <bean id="jwtTokenProcessingFilter" class="org.kecak.apps.workflow.security.JwtTokenProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="workflowUserManager" ref="workflowUserManager"/>
+        <property name="directoryManager" ref="directoryManager"/>
+        <property name="localeResolver" ref="localeResolver"/>
+        <property name="auditTrailManager" ref="auditTrailManager"/>
     </bean>
     
     <bean id="authenticationProcessingFilterEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
