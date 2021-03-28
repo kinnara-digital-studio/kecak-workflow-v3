@@ -1,4 +1,4 @@
-package org.kecak.apps.workflow.security;
+package org.kecak.webapi.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +20,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         super(authorities);
         this.token = token;
         this.userDetails = userDetails;
+        this.setDetails(userDetails);
         setAuthenticated(true);
     }
 

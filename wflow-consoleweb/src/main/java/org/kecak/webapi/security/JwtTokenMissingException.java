@@ -1,4 +1,4 @@
-package org.kecak.apps.workflow.security;
+package org.kecak.webapi.security;
 
 import org.springframework.security.core.AuthenticationException;
 

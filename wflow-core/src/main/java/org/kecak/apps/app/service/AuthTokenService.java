@@ -59,7 +59,7 @@ public class AuthTokenService implements Serializable {
      * @return map
      * @throws ExpiredJwtException
      */
-    public Claims getClaims(String token) throws ExpiredJwtException {
+    public Claims getClaims(String token) throws ExpiredJwtException, SignatureException {
         return Jwts.parser()
                 .setSigningKey(getSecret())
                 .parseClaimsJws(token)

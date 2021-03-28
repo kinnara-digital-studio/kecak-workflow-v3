@@ -1,8 +1,8 @@
-package org.kecak.apps.workflow.security;
+package org.kecak.webapi.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import org.kecak.apps.app.service.AuthTokenService;
+import io.jsonwebtoken.SignatureException;
 import org.joget.apps.workflow.security.WorkflowUserDetails;
 import org.joget.commons.util.HostManager;
 import org.joget.commons.util.LogUtil;
@@ -11,6 +11,7 @@ import org.joget.directory.model.User;
 import org.joget.directory.model.service.DirectoryManager;
 import org.joget.workflow.model.dao.WorkflowHelper;
 import org.joget.workflow.model.service.WorkflowUserManager;
+import org.kecak.apps.app.service.AuthTokenService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -49,21 +50,18 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         HostManager.initHost();
 
-        JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken)authentication;
-        String token = jwtAuthentication.getCredentials().toString();
+        String token = authentication.getCredentials().toString();
 
         try {
-            User user = Optional.ofNullable(token)
-                    .map(authTokenService::getClaims)
+            Claims claims = authTokenService.getClaims(token);
+            User user = Optional.of(claims)
                     .map(Claims::getSubject)
                     .map(directoryManager::getUserByUsername)
                     .orElseThrow(() -> new BadCredentialsException("Invalid token [" + token + "]"));
 
             String username = user.getUsername();
-            workflowUserManager.setCurrentThreadUser(username);
 
             // add audit trail
-            LogUtil.info(getClass().getName(), "Authentication for user " + username + ": " + true);
             workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + ": " + true, new Class[]{String.class}, new Object[]{username}, true);
 
             // get authorities
@@ -77,11 +75,10 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
             }
 
             // return result
-            UserDetails details = new WorkflowUserDetails(user);
-            Authentication authenticatedJwtAuthenticationToken = new JwtAuthenticationToken(token, details, gaList);
-            return authenticatedJwtAuthenticationToken;
-        } catch (ExpiredJwtException e) {
-            LogUtil.info(getClass().getName(), "Authentication for token " + token + ": " + false);
+            UserDetails userDetails = new WorkflowUserDetails(user);
+            return new JwtAuthenticationToken(token, userDetails, gaList);
+        } catch (SignatureException | ExpiredJwtException e) {
+            LogUtil.warn(getClass().getName(), "Authentication for token " + token + ": " + false);
             throw new BadCredentialsException(e.getMessage(), e);
         }
     }
