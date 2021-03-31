@@ -10,12 +10,24 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private UserDetails userDetails;
     private String token;
 
+    /**
+     * Unauthenticated token
+     *
+     * @param token
+     */
     public JwtAuthenticationToken(String token) {
         super(null);
         this.token = token;
         setAuthenticated(false);
     }
 
+    /**
+     * Authenticated token
+     *
+     * @param token
+     * @param userDetails
+     * @param authorities
+     */
     public JwtAuthenticationToken(String token, UserDetails userDetails, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.token = token;

@@ -17,8 +17,8 @@ public class JwtAuthSuccessHandler implements AuthenticationSuccessHandler, Decl
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        UserDetails currnentUser = (UserDetails) authentication.getPrincipal();
-        workflowUserManager.setCurrentThreadUser(currnentUser.getUsername());
+        UserDetails currentUser = (UserDetails) authentication.getPrincipal();
+        workflowUserManager.setCurrentThreadUser(currentUser.getUsername());
 
         Optional<String> loginAs = getOptionalParameter(request, "loginAs");
         if(loginAs.isPresent() && workflowUserManager.isCurrentUserInRole(WorkflowUserManager.ROLE_ADMIN)) {
