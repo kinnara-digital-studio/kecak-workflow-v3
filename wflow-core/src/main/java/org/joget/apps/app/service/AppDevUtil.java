@@ -1063,9 +1063,6 @@ public class AppDevUtil {
         String appDefinitionXml = null;
         ByteArrayOutputStream baos = null;
 
-        TimeZone current = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
-        
         AppDefinition appDef = appDefinition;
         if (appDef instanceof HibernateProxy) {
             appDef = (AppDefinition)((HibernateProxy)appDef).getHibernateLazyInitializer().getImplementation();
@@ -1124,7 +1121,6 @@ public class AppDevUtil {
                     // ignore
                 }
             }
-            TimeZone.setDefault(current);
             appDef.setFormDefinitionList(formDefinitionList);
             appDef.setDatalistDefinitionList(datalistDefinitionList);
             appDef.setUserviewDefinitionList(userviewDefinitionList);
@@ -1146,9 +1142,6 @@ public class AppDevUtil {
     public static String getAppConfigXml(AppDefinition appDefinition) {
         String appDefinitionXml = null;
         ByteArrayOutputStream baos = null;
-
-        TimeZone current = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
         
         AppDefinition appDef = appDefinition;
         if (appDef instanceof HibernateProxy) {
@@ -1195,7 +1188,6 @@ public class AppDevUtil {
                     // ignore
                 }
             }
-            TimeZone.setDefault(current);
             appDef.setFormDefinitionList(formDefinitionList);
             appDef.setDatalistDefinitionList(datalistDefinitionList);
             appDef.setUserviewDefinitionList(userviewDefinitionList);

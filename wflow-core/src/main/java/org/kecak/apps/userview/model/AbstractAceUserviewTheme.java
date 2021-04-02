@@ -1,12 +1,12 @@
 package org.kecak.apps.userview.model;
 
-import org.joget.plugin.enterprise.XadminTheme;
+import org.joget.apps.userview.model.UserviewV5Theme;
 
 /**
  * @author aristo
  *
  * Abstract class to handle Ace Theme
  */
-public abstract class AbstractAceUserviewTheme extends XadminTheme implements MobileApplicationTheme {
+public abstract class AbstractAceUserviewTheme extends UserviewV5Theme implements MobileApplicationTheme {
 
 }

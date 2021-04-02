@@ -24,8 +24,10 @@ import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.StringUtil;
 import com.lowagie.text.pdf.ITextCustomFontResolver;
 import com.lowagie.text.pdf.ITextCustomOutputDevice;
+import javax.servlet.http.HttpServletRequest;
 import org.joget.commons.util.SetupManager;
 import org.joget.workflow.model.WorkflowAssignment;
+import org.joget.workflow.util.WorkflowUtil;
 import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xhtmlrenderer.resource.FSEntityResolver;
@@ -183,7 +185,7 @@ public class FormPdfUtil {
             
             if (form != null) {
                 //set form to readonly
-                FormUtil.setReadOnlyProperty(form, true, true);
+                    FormUtil.setReadOnlyProperty(form, true, false);
 
                 if (hideEmpty != null && hideEmpty) {
                     form = (Form) removeEmptyValueChild(form, form, formData);
@@ -324,6 +326,7 @@ public class FormPdfUtil {
         style += "ul.form-cell-value, ul.subform-cell-value {padding:0; list-style-type:none;}";
         style += ".subform-container.no-frame{border: 0; padding: 0; margin-top:10px; }";
         style += ".subform-container.no-frame, .subform-container.no-frame .subform-section { background: transparent;}";
+        style += ".richtexteditor { float:left;}";
         return style;
     }
     
@@ -335,10 +338,14 @@ public class FormPdfUtil {
      * @return 
      */
     public static String cleanFormHtml(String html, Boolean showAllSelectOptions) {
-        
+        HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
         //remove hidden field
         html = html.replaceAll("<input[^>]*type=\"hidden\"[^>]*>", "");
-
+        html = html.replaceAll("<input[^>]*type=\'hidden\'[^>]*>", "");
+        
+        //remove <br>
+        html = html.replaceAll("<br>", "<br/>");
+        
         //remove form tag
         html = html.replaceAll("<form[^>]*>", "");
         html = html.replaceAll("</\\s?form>", "");
@@ -377,7 +384,76 @@ public class FormPdfUtil {
                 }
             }
         }
+        
+        //convert Image if image doesnt end with />
+        Pattern ImagePattern = Pattern.compile("<img[^>]*[^\\/]>");
+        Matcher ImageMatcher = ImagePattern.matcher(html);
+        while (ImageMatcher.find()) {
+            String image = ImageMatcher.group(0);
+            String replace = image.replaceAll(StringUtil.escapeRegex(">"), StringUtil.escapeRegex("/>"));
+            html = html.replaceAll(StringUtil.escapeRegex(image), StringUtil.escapeRegex(replace));
+        }
+        
+        //convert label for checkbox and radio
+        Pattern formdiv = Pattern.compile("<div class=\"form-cell-value\" >(.|\\s)*?</div>");
+        Matcher divMatcher = formdiv.matcher(html);
+        while (divMatcher.find()) {
+            String divString = divMatcher.group(0);
 
+            Pattern tempPatternLabel = Pattern.compile("<label(.*?)>(.|\\s)*?</label>");
+            Matcher tempMatcherLabel = tempPatternLabel.matcher(divString);
+            int count = 0;
+            String inputStringLabel = "";
+            String replaceLabel = "";
+            while (tempMatcherLabel.find()) {
+
+                inputStringLabel = tempMatcherLabel.group(0);
+                //get the input field
+                Pattern patternInput = Pattern.compile("<input[^>]*>");
+                Matcher matcherInput = patternInput.matcher(inputStringLabel);
+                String tempLabel = "";
+                if (matcherInput.find()) {
+                    tempLabel = matcherInput.group(0);
+                }
+
+                //get the type
+                Pattern patternType = Pattern.compile("type=\"([^\\\"]*)\"");
+                Matcher matcherType = patternType.matcher(tempLabel);
+                String type = "";
+                if (matcherType.find()) {
+                    type = matcherType.group(1);
+                }
+
+                if (type.equalsIgnoreCase("checkbox") || type.equalsIgnoreCase("radio")) {
+                    if (showAllSelectOptions) {
+                        replaceLabel += inputStringLabel.replaceAll("<label(.*?)>", "");
+                        replaceLabel = replaceLabel.replaceAll("</label(.*?)>", "");
+                    } else {
+                        if (inputStringLabel.contains("checked")) {
+                            if (count > 0) {
+                                replaceLabel += ", ";
+                            }
+                            String label = "";
+                            Pattern patternLabel = Pattern.compile("</i>(.|\\s)*?</label>");
+                            Matcher matcherLabel = patternLabel.matcher(inputStringLabel);
+                            if (matcherLabel.find()) {
+                                label = matcherLabel.group(0);
+                                label = label.replaceAll("<(.*?)i>", "");
+                                label = label.replaceAll("</label(.*?)>", "");
+                                label = label.trim();
+                            }
+                            replaceLabel += label;
+                            count += 1;
+                        }
+                    }
+                }
+            }
+            if (count > 0) {
+                replaceLabel = "<span>" + replaceLabel + "</span>";
+            }
+            html = html.replaceAll(StringUtil.escapeRegex(divString), StringUtil.escapeRegex(replaceLabel));
+        }
+        
         //convert input field
         Pattern pattern = Pattern.compile("<input[^>]*>");
         Matcher matcher = pattern.matcher(html);
@@ -395,6 +471,7 @@ public class FormPdfUtil {
             //get the value
             Pattern patternValue = Pattern.compile("value=\"([^\\\"]*)\"");
             Matcher matcherValue = patternValue.matcher(inputString);
+            String replace;
             String value = "";
             if (matcherValue.find()) {
                 value = matcherValue.group(1);
@@ -405,11 +482,24 @@ public class FormPdfUtil {
             } else if (type.equalsIgnoreCase("file") || type.equalsIgnoreCase("button") || type.equalsIgnoreCase("submit") || type.equalsIgnoreCase("reset") || type.equalsIgnoreCase("image")) {
                 html = html.replaceAll(StringUtil.escapeRegex(inputString), "");
             } else if (type.equalsIgnoreCase("checkbox") || type.equalsIgnoreCase("radio")) {
-                String replace = "<img alt=\"\" src=\"" + getResourceURL("/images/black_tick_n.png") + "\"/>";
-                if (inputString.contains("checked")) {
-                    replace = "<img alt=\"\" src=\"" + getResourceURL("/images/black_tick.png") + "\"/>";
+                if (showAllSelectOptions) {
+                    if (inputString.contains("checked")) {
+                        if (request != null) {
+                            replace = "<img style=\"padding-left:20px\" alt=\"\" src=\"" + request.getContextPath() + "/plugin/org.joget.apps.app.lib.BeanShellTool/images/black_tick.png\"/>";
+                        }else{
+                            replace = "<img style=\"padding-left:20px\" alt=\"\" src=\"" + getResourceURL("/images/black_tick.png") + "\"/>";
+                        }
+                    } else {
+                        if (request != null) {
+                            replace = "<img style=\"padding-left:20px\" alt=\"\" src=\"" + request.getContextPath() + "/plugin/org.joget.apps.app.lib.BeanShellTool/images/black_tick_n.png\"/>";
+                        }else{
+                            replace = "<img style=\"padding-left:20px\" alt=\"\" src=\"" + getResourceURL("/images/black_tick_n.png") + "\"/>";
+                        }
+                    }
+                    html = html.replaceAll(StringUtil.escapeRegex(inputString), StringUtil.escapeRegex(replace));
+                } else {
+                    html = html.replaceAll(StringUtil.escapeRegex(inputString), StringUtil.escapeRegex(""));
                 }
-                html = html.replaceAll(StringUtil.escapeRegex(inputString), StringUtil.escapeRegex(replace));
             } else if (type.equalsIgnoreCase("password")) {
                 html = html.replaceAll(StringUtil.escapeRegex(inputString), "<span>**********</span>");
             }
@@ -429,12 +519,29 @@ public class FormPdfUtil {
             while (matcherOption.find()) {
                 String optionString = matcherOption.group(0);
                 String label = matcherOption.group(1);
-
-                if (optionString.contains("selected")) {
-                    if (counter > 0) {
-                        replace += ", ";
+                if (showAllSelectOptions) {
+                    if (optionString.contains("selected")) {
+                        if (request != null) {
+                            replace += "<img style=\"padding-left:20px\" alt=\"\" src=\"" + request.getContextPath() + "/plugin/org.joget.apps.app.lib.BeanShellTool/images/black_tick.png\"/>";
+                        } else {
+                            replace += "<img style=\"padding-left:20px\" alt=\"\" src=\"" + getResourceURL("/images/black_tick.png") + "\"/>";
+                        }
+                    } else {
+                        if (request != null) {
+                            replace += "<img style=\"padding-left:20px\" alt=\"\" src=\"" + request.getContextPath() + "/plugin/org.joget.apps.app.lib.BeanShellTool/images/black_tick_n.png\"/>";
+                        } else {
+                            replace += "<img style=\"padding-left:20px\" alt=\"\" src=\"" + getResourceURL("/images/black_tick_n.png") + "\"/>";
+                        }
                     }
                     replace += label;
+                } else {
+                    if (optionString.contains("selected")) {
+                        if (counter > 0) {
+                            replace += ", ";
+                        }
+                        replace += label;
+                        counter += 1;
+                    }
                 }
             }
 

@@ -29,12 +29,13 @@
             width: 100%;
             height: calc(100% - 34px);
             border: 0;
+            margin-top: 7px
         }
     </style>
     <script>
         var verifyApp = function(downloadUrl) {
             if (typeof downloadUrl === "undefined" || downloadUrl === null || downloadUrl === "") {
-                $("#installApp").hide();                
+                $("#installApp").hide();
                 return;
             }
             var verifyUrl = "${pageContext.request.contextPath}/web/json/apps/verify?url=" + encodeURIComponent(downloadUrl);

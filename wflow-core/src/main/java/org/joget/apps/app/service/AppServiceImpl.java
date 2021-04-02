@@ -112,6 +112,7 @@ import org.joget.workflow.shark.model.dao.WorkflowAssignmentDao;
 import org.joget.workflow.util.WorkflowUtil;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.transform.RegistryMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -1199,12 +1200,12 @@ public class AppServiceImpl implements AppService {
                 byte[] xpdl = null;
                 ByteArrayOutputStream baos = null;
 
-                TimeZone current = TimeZone.getDefault();
-                TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
-
                 try {
                     baos = new ByteArrayOutputStream();
-
+                    
+                    RegistryMatcher m = new RegistryMatcher();
+                    m.bind(Date.class, new CustomDateFormatTransformer());
+                    
                     Serializer serializer = new Persister();
                     serializer.write(copy, baos);
 
@@ -1247,8 +1248,6 @@ public class AppServiceImpl implements AppService {
                             LogUtil.error(getClass().getName(), e, "");
                         }
                     }
-
-                    TimeZone.setDefault(current);
                 }
                 
             } else {
@@ -1280,15 +1279,15 @@ public class AppServiceImpl implements AppService {
     @Override
     @Transactional
     public AppDefinition createNewAppDefinitionVersion(String appId, Long version) {
-        TimeZone current = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
-        
         if (version == null) {
             version = appDefinitionDao.getLatestVersion(appId);
         }
         AppDefinition appDef = appDefinitionDao.loadVersion(appId, version);
         appId = appDef.getAppId();
 
+        RegistryMatcher m = new RegistryMatcher();
+        m.bind(Date.class, new CustomDateFormatTransformer());
+                    
         Serializer serializer = new Persister();
         AppDefinition newAppDef = null;
 
@@ -1331,8 +1330,6 @@ public class AppServiceImpl implements AppService {
         } catch (Exception e) {
             LogUtil.error(AppServiceImpl.class.getName(), e, appId);
             return null;
-        } finally {
-            TimeZone.setDefault(current);
         }
     }
 
@@ -1941,9 +1938,6 @@ public class AppServiceImpl implements AppService {
 
         ByteArrayOutputStream baos = null;
         
-        TimeZone current = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
-        
         try {
             baos = new ByteArrayOutputStream();
 
@@ -1957,6 +1951,9 @@ public class AppServiceImpl implements AppService {
                 tempPackageDefinitionList.add(packageDef);
                 appDef.setPackageDefinitionList(tempPackageDefinitionList);
             }
+            
+            RegistryMatcher m = new RegistryMatcher();
+            m.bind(Date.class, new CustomDateFormatTransformer());
 
             Serializer serializer = new Persister();
             serializer.write(appDef, baos);
@@ -2002,8 +1999,6 @@ public class AppServiceImpl implements AppService {
                     LogUtil.error(getClass().getName(), e, "");
                 }
             }
-            
-            TimeZone.setDefault(current);
         }
         return null;
     }
@@ -2155,9 +2150,6 @@ public class AppServiceImpl implements AppService {
     @Override
     @Transactional
     public AppDefinition importApp(byte[] zip) throws ImportAppException {
-        TimeZone current = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT 0"));
-        
         try {
             byte[] appData = getAppDataXmlFromZip(zip);
             byte[] xpdl = getXpdlFromZip(zip);
@@ -2176,6 +2168,9 @@ public class AppServiceImpl implements AppService {
             replacement.put("</builderDefinitionList-->", "</builderDefinitionList>");
             appData = StringUtil.searchAndReplaceByteContent(appData, replacement);
 
+            RegistryMatcher m = new RegistryMatcher();
+            m.bind(Date.class, new CustomDateFormatTransformer());
+                    
             Serializer serializer = new Persister();
             AppDefinition appDef = serializer.read(AppDefinition.class, new ByteArrayInputStream(appData), false);
 
@@ -2206,8 +2201,6 @@ public class AppServiceImpl implements AppService {
             throw e;
         } catch (Exception e) {
             LogUtil.error(getClass().getName(), e, "");
-        } finally {
-            TimeZone.setDefault(current);
         }
         return null;
     }
