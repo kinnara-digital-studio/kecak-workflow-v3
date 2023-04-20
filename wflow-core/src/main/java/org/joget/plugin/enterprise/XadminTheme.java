@@ -322,9 +322,9 @@ public class XadminTheme extends UniversalTheme {
                         }
                         String attr = "";
                         if ("tab".equalsIgnoreCase(target)) {
-                            attr = "onclick=\"xadmin.add_tab('"+label+"','"+href+"')\"";
+                            attr = "onclick=\"xadmin.add_tab('"+StringUtil.escapeString(label, StringUtil.TYPE_HTML + ";" + StringUtil.TYPE_JAVASCIPT, null)+"','"+href+"')\"";
                         } else if ("popup".equalsIgnoreCase(target)) {
-                            attr = "onclick=\"xadmin.open('"+label+"','"+href+"')\"";
+                            attr = "onclick=\"xadmin.open('"+StringUtil.escapeString(label, StringUtil.TYPE_HTML + ";" + StringUtil.TYPE_JAVASCIPT, null)+"','"+href+"')\"";
                         } else {
                             attr = "href=\"" + href + "\" target=\""+target+"\"";
                         }
@@ -369,9 +369,9 @@ public class XadminTheme extends UniversalTheme {
                         }
                         String attr = "";
                         if ("tab".equalsIgnoreCase(target)) {
-                            attr = "onclick=\"xadmin.add_tab('"+label+"','"+href+"')\"";
+                            attr = "onclick=\"xadmin.add_tab('"+StringUtil.escapeString(label, StringUtil.TYPE_HTML + ";" + StringUtil.TYPE_JAVASCIPT, null)+"','"+href+"')\"";
                         } else if ("popup".equalsIgnoreCase(target)) {
-                            attr = "onclick=\"xadmin.open('"+label+"','"+href+"')\"";
+                            attr = "onclick=\"xadmin.open('"+StringUtil.escapeString(label, StringUtil.TYPE_HTML + ";" + StringUtil.TYPE_JAVASCIPT, null)+"','"+href+"')\"";
                         } else {
                             attr = "href=\"" + href + "\" target=\""+target+"\"";
                         }
@@ -409,7 +409,7 @@ public class XadminTheme extends UniversalTheme {
                   + "    <dl class=\"layui-nav-child\">\n"
                   + "        <dd class=\"inbox-title\"><span>" + ResourceBundleUtil.getMessage("theme.universal.inboxTaskMessage") + "</span><a href=\"#\" class=\"refresh\"><i class=\"layui-icon\">&#xe666;</i></a></dd>"
                   + "        <dd class=\"loading\"><a><span><i class=\"fa fa-spinner fa-spin fa-3x\"></i></span></a></dd>\n"
-                  + "        <dd class=\"\"><a data-href=\""+data.get("base_link") + INBOX+"\" onclick=\"xadmin.add_tab('"+ResourceBundleUtil.getMessage("theme.universal.viewAllTask")+"','"+data.get("base_link") + INBOX+"',true)\" class=\"dropdown-menu-sub-footer\">" + ResourceBundleUtil.getMessage("theme.universal.viewAllTask") + "</a></dd>\n"  
+                  + "        <dd class=\"\"><a data-href=\""+data.get("base_link") + INBOX+"\" onclick=\"xadmin.add_tab('"+StringUtil.escapeString(ResourceBundleUtil.getMessage("theme.universal.viewAllTask"), StringUtil.TYPE_HTML + ";" + StringUtil.TYPE_JAVASCIPT, null)+"','"+data.get("base_link") + INBOX+"',true)\" class=\"dropdown-menu-sub-footer\">" + ResourceBundleUtil.getMessage("theme.universal.viewAllTask") + "</a></dd>\n"  
                   + "    </dl>\n"
                   + "</li>";
         }
@@ -507,7 +507,6 @@ public class XadminTheme extends UniversalTheme {
     
     protected String getMenuScript(Map<String, Object> data){
         String title = " ";
-        String menu = "";
         if (userview.getCurrent() != null) {
             if (PROFILE.equals(getRequestParameter("menuId"))) {
                 title = ResourceBundleUtil.getMessage("theme.universal.profile");
@@ -515,10 +514,6 @@ public class XadminTheme extends UniversalTheme {
                 title = ResourceBundleUtil.getMessage("theme.universal.inbox");
             } else {
                 title = StringUtil.stripAllHtmlTag(userview.getCurrent().getPropertyString("label"));
-            }
-            String decoMenu = userview.getCurrent().getDecoratedMenu();
-            if (decoMenu != null) {
-                menu = transformMenu(userview.getCurrentCategory(), userview.getCurrent(), decoMenu);
             }
         }
         String script = "<script>";
@@ -528,7 +523,7 @@ public class XadminTheme extends UniversalTheme {
         script += "            layui.use(['layer', 'element'], function(){";
         script += "                if (layer !== undefined && element !== undefined ) {";
         script += "                    xadmin.updateTabTitle(\""+StringUtil.escapeString(title, StringUtil.TYPE_JAVASCIPT, null)+"\");";
-        script += "                    xadmin.updateMenu(\""+StringUtil.escapeString(menu, StringUtil.TYPE_JAVASCIPT, null)+"\");";    
+        script += "                    xadmin.updateMenu();";    
         script += "                } else {";
         script += "                    initPage();";
         script += "                }";
@@ -652,24 +647,16 @@ public class XadminTheme extends UniversalTheme {
     
     @Override
     public String decorateMenu(UserviewCategory category, UserviewMenu menu) {
-        String decoratedMenu = menu.getDecoratedMenu();
-        if (((menu instanceof Link) || ((menu instanceof CachedUserviewMenu) && ((CachedUserviewMenu) menu).instanceOf(Link.class))) || decoratedMenu == null || decoratedMenu.isEmpty()) {
-            return getMenuHtml(category, menu, "", null);
+        if (menu.getProperties().containsKey("rowCount") && Boolean.parseBoolean(menu.getPropertyString("rowCount"))) {
+            return getMenuHtml(category, menu, "<span class='pull-right badge rowCount' data-ajaxmenucount=\""+menu.getPropertyString("id")+"\">...</span>", null);
         } else {
-            return transformMenu(category, menu, decoratedMenu);
+            String decoratedMenu = menu.getDecoratedMenu();
+            if (((menu instanceof Link) || ((menu instanceof CachedUserviewMenu) && ((CachedUserviewMenu) menu).instanceOf(Link.class))) || decoratedMenu == null || decoratedMenu.isEmpty()) {
+                return getMenuHtml(category, menu, "", null);
+            } else {
+                return decoratedMenu;
+            }
         }
-    }
-    
-    protected String transformMenu(UserviewCategory category, UserviewMenu menu, String decoratedMenu) {
-        if (decoratedMenu.contains("badge")) {
-            String label = StringUtil.stripAllHtmlTag(menu.getPropertyString("label"));
-            String badge = StringUtil.stripAllHtmlTag(decoratedMenu);
-            badge = badge.replaceFirst(StringUtil.escapeRegex(label), "");
-            return getMenuHtml(category, menu, "<span class='pull-right badge rowCount'>"+badge+"</span>", null);
-        } else {
-            
-        }
-        return decoratedMenu;
     }
     
     protected String getMenuHtml(UserviewCategory category, UserviewMenu menu, String extra, String onclick) {
@@ -691,7 +678,7 @@ public class XadminTheme extends UniversalTheme {
             if ("blank".equals(menu.getPropertyString("target"))) {
                 onclick = "onclick=\"window.open('" + url + "');return false;\"";
             } else if ("self".equals(menu.getPropertyString("target"))) {
-                onclick = "onclick=\"xadmin.redirect('"+StringUtil.stripAllHtmlTag(label)+"','" + url + "');return false;\"";
+                onclick = "onclick=\"xadmin.redirect('"+StringUtil.escapeString(StringUtil.stripAllHtmlTag(label), StringUtil.TYPE_JAVASCIPT, null)+"','" + url + "');return false;\"";
             }
         }
         if (category.getMenus().size() == 1) {
@@ -699,7 +686,7 @@ public class XadminTheme extends UniversalTheme {
             icon = icon.replace("class=\"", "class=\"left-nav-li ");
         }
         if (onclick == null) {
-            onclick = "onclick=\"xadmin.add_tab('"+StringUtil.stripAllHtmlTag(label)+"','"+url+"',true)\"";
+            onclick = "onclick=\"xadmin.add_tab('"+StringUtil.escapeString(StringUtil.stripAllHtmlTag(label), StringUtil.TYPE_JAVASCIPT, null)+"','"+url+"',true)\"";
         }
         return "<a class=\"menu-link default\" "+onclick+">" + icon + "<cite>" + label + "</cite>"+extra+"</a>";
     }

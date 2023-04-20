@@ -23,7 +23,7 @@
         <title><%= ResourceBundleUtil.getMessage("console.header.top.title")%></title>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico"/>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/fontawesome5/css/all.min.css">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/v7.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/kecak_v3.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/console_custom.css">
         <style>
             body {
@@ -145,7 +145,7 @@
                                 <div class="form-row">
                                     <label for="jdbcDriver"><%= ResourceBundleUtil.getMessage("setup.datasource.label.jdbcDriver")%></label>
                                     <span class="form-input">
-                                        <input type="text" size="40" id="jdbcDriver" name="jdbcDriver" value="com.mysql.jdbc.Driver"/>
+                                        <input type="text" size="40" id="jdbcDriver" name="jdbcDriver" value="com.mysql.cj.jdbc.Driver"/>
                                     </span>
                                 </div>
                                 <div class="form-row">
@@ -298,7 +298,7 @@
                     } else if (dbType === "mysql") {
                         $("#jdbcSetup").hide();
                         $("#dbSetup").show();
-                        $("#jdbcDriver").val("com.mysql.jdbc.Driver");
+                        $("#jdbcDriver").val("com.mysql.cj.jdbc.Driver");
                         if (Setup.currentDbType !== dbType) {
                             $("#dbPort").val("3306");
                             dbPort = 3306;

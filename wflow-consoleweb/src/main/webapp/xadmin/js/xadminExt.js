@@ -44,7 +44,17 @@
                 shadeClose: true,
                 shade:0.4,
                 title: title,
-                content: url
+                content: url,
+                cancel: function(){ 
+                    //check is in iframe
+                    if (parent && parent.layer && parent.xadmin && $(window.frameElement)) {
+                        var pindex = parent.layer.getFrameIndex(window.name);
+                        if (pindex) {
+                            parent.layer.restore(pindex);
+                        }
+                    }
+                    return true;
+                }
             });
             
             layer.iframeAuto(index);
@@ -72,35 +82,25 @@
             });
         }
     };
-    win.xadmin.tabMenu = function(tabId, menu) {
-        if (menu !== "") {
-            var menuEl = $(menu);
-            if ($(menuEl).filter("form").length > 0) {
-                return;
-            }
-            var onclick = $(menu).attr("onclick");
-            $("#side-nav a").each(function(){
-                var temp = $(this).attr("onclick");
-                if (temp === onclick) {
-                    if ($(this).hasClass("active")){
-                        $(menuEl).addClass("active");
-                    }
-                    $(this).replaceWith(menuEl);
-                }
-            });
-        }
-    };
     win.xadmin.updateTabTitle = function(title) {
         if (parent && parent.layer && parent.xadmin && $(window.frameElement)) {
             var tabId = $(window.frameElement).attr("tab-id");
             parent.xadmin.tabTitle(tabId, title);
         }
     };
-    win.xadmin.updateMenu = function(menu) {
-        if (parent && parent.layer && parent.xadmin && $(window.frameElement) && menu !== "") {
-            var tabId = $(window.frameElement).attr("tab-id");
-            parent.xadmin.tabMenu(tabId, menu);
+    win.xadmin.updateMenu = function() {
+        if (parent && parent.AjaxMenusCount) {
+            parent.AjaxMenusCount.init();
         }
+    };
+    win.xadmin.validateUrl = function(url) {
+        var currentURL = window.location.href;
+        // if same userview page, only same userview page can open in xadmin tab.
+        // please refer to XadminTheme.java line 676 & xadmin.redirect
+        if (url.indexOf(currentURL.substring(currentURL.indexOf("/web/userview"), currentURL.lastIndexOf("/") + 1)) !== -1) { 
+            return true;
+        }
+        return false;
     };
 
     PopupDialog.prototype.show = function() {

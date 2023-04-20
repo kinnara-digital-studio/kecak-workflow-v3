@@ -267,7 +267,7 @@ public class FormServiceImpl implements FormService {
     public FormData submitForm(Form form, FormData formData, boolean ignoreValidation) {
         FormData updatedFormData = formData;
         updatedFormData = FormUtil.executeElementFormatDataForValidation(form, formData);
-        if (!ignoreValidation) {
+        if (!ignoreValidation || !formData.getDoValidation()) {
             updatedFormData = validateFormData(form, formData);
         } else {
             updatedFormData.clearFormErrors();
@@ -528,7 +528,7 @@ public class FormServiceImpl implements FormService {
      */
     @Override
     public FormData recursiveExecuteFormStoreBinders(Form form, Element element, FormData formData) {
-        if (!element.isReadonly(formData) && element.isAuthorize(formData)) {
+        if (!element.isReadonly(formData) && element.isAuthorize(formData) && element.continueValidation(formData)) {
 
             //load child element store binder to store before the main form
             Collection<Element> children = element.getChildren(formData);

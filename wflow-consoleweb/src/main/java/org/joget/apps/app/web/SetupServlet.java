@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
@@ -25,13 +26,15 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.joget.apps.app.model.AppDefinition;
 import org.joget.apps.app.service.AppService;
 import org.joget.apps.app.service.AppUtil;
+import org.joget.commons.spring.model.Setting;
 import org.joget.commons.spring.web.CustomContextLoaderListener;
 import org.joget.commons.spring.web.CustomDispatcherServlet;
-import org.joget.commons.util.DynamicDataSourceManager;
-import org.joget.commons.util.HostManager;
-import org.joget.commons.util.LogUtil;
-import org.joget.commons.util.ResourceBundleUtil;
-import org.joget.commons.util.SecurityUtil;
+import org.joget.commons.util.*;
+import org.kecak.apps.scheduler.SchedulerManager;
+import org.kecak.apps.scheduler.SchedulerPluginJob;
+import org.kecak.apps.scheduler.model.SchedulerDetails;
+import org.kecak.apps.scheduler.model.TriggerTypes;
+import org.kecak.commons.security.SecureDataEncryptionImpl;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -101,6 +104,7 @@ public class SetupServlet extends HttpServlet {
             Statement stmt = null;
             ResultSet rs = null;
             InputStream in = null;
+            InputStream inQuartz = null;
             BasicDataSource ds = new BasicDataSource();
             ds.setDriverClassName(jdbcDriver);
             ds.setUrl(jdbcUrl);
@@ -119,7 +123,7 @@ public class SetupServlet extends HttpServlet {
                         LogUtil.info(getClass().getName(), "Use database " + dbName);
                         con.setCatalog(dbName);
                     } catch (SQLException ex) {
-                        // ignore
+                        LogUtil.error(getClass().getName(), ex, ex.getMessage());
                     }
                 }
 
@@ -139,12 +143,16 @@ public class SetupServlet extends HttpServlet {
                 if (!exists) {
                     // get schema file
                     String schemaFile = null;
+                    String quartzSchemaFile;
                     if ("oracle".equals(dbType) || jdbcUrl.contains("oracle")) {
                         schemaFile = "/setup/sql/jwdb-oracle.sql";
+                        quartzSchemaFile = "/setup/sql/quartz-oracle.sql";
                     } else if ("sqlserver".equals(dbType) || jdbcUrl.contains("sqlserver")) {
                         schemaFile = "/setup/sql/jwdb-mssql.sql";
+                        quartzSchemaFile = "/setup/sql/quartz-mssql.sql";
                     } else if ("mysql".equals(dbType) || jdbcUrl.contains("mysql")) {
                         schemaFile = "/setup/sql/jwdb-mysql.sql";
+                        quartzSchemaFile = "/setup/sql/quartz-mysql.sql";
                     } else {
                         throw new SQLException("Unrecognized database type, please setup the datasource manually");
                     }
@@ -167,7 +175,9 @@ public class SetupServlet extends HttpServlet {
                     LogUtil.info(getClass().getName(), "Execute schema " + schemaFile);
                     ScriptRunner runner = new ScriptRunner(con, false, true);
                     in = getClass().getResourceAsStream(schemaFile);
+                    inQuartz = getClass().getResourceAsStream(quartzSchemaFile);
                     runner.runScript(new BufferedReader(new InputStreamReader(in)));
+                    runner.runScript(new BufferedReader(new InputStreamReader(inQuartz)));
                 }
                 if ("true".equals(sampleUsers)) {
                     // create users
@@ -227,7 +237,45 @@ public class SetupServlet extends HttpServlet {
                 
                 LogUtil.info(getClass().getName(), "Profile init complete: " + profileName);
                 LogUtil.info(getClass().getName(), "===== Database Setup Complete =====");
-                
+
+                //Initialize security
+                final SetupManager setupManager = (SetupManager) AppUtil.getApplicationContext().getBean("setupManager");
+                {
+                    final Setting setting = new Setting();
+                    setting.setProperty(SetupManager.PROPERTY_SETUP_SECURITY_SALT);
+                    setting.setValue(SecurityUtil.generateRandomString(32, true, true, true, false, true));
+                    setupManager.saveSetting(setting);
+                }
+
+                {
+                    final Setting setting = new Setting();
+                    setting.setProperty(SetupManager.PROPERTY_SETUP_SECURITY_KEY);
+                    setting.setValue(SecurityUtil.generateRandomString(16, true, true, true, false, true));
+                    setupManager.saveSetting(setting);
+                }
+
+                LogUtil.info(getClass().getName(), "===== Security Setup Complete =====");
+
+                //Initialize Scheduler Job
+                SchedulerDetails schedulerDetails = new SchedulerDetails();
+                schedulerDetails.setJobName("SchedulerPluginJob");
+                schedulerDetails.setJobClassName(SchedulerPluginJob.class.getName());
+//                    schedulerDetails.setCronExpression("0 0/1 * * * ? *"); // run every 1 minute
+                schedulerDetails.setCronExpression("0 0/5 * * * ? *"); // run every 5 minutes
+                schedulerDetails.setGroupJobName("SchedulerPluginJob");
+                schedulerDetails.setGroupTriggerName("SchedulerPluginJob");
+                Date now = new Date();
+                schedulerDetails.setDateCreated(now);
+                schedulerDetails.setCreatedBy("admin");
+                schedulerDetails.setDateModified(now);
+                schedulerDetails.setModifiedBy("admin");
+                schedulerDetails.setTriggerTypes(TriggerTypes.CRON);
+                schedulerDetails.setTriggerName("SchedulerPluginJob");
+                SchedulerManager schedulerManager = (SchedulerManager) AppUtil.getApplicationContext().getBean("schedulerManager");
+                schedulerManager.saveOrUpdateJobDetails(schedulerDetails);
+
+                LogUtil.info(getClass().getName(), "===== Scheduler Setup Complete =====");
+
             } catch (Exception ex) {
                 LogUtil.error(getClass().getName(), null, ex.toString());
                 success = false;
@@ -262,6 +310,13 @@ public class SetupServlet extends HttpServlet {
                 if (in != null) {
                     try {
                         in.close();
+                    } catch (IOException ex) {
+                        // ignore
+                    }
+                }
+                if(inQuartz != null) {
+                    try {
+                        inQuartz.close();
                     } catch (IOException ex) {
                         // ignore
                     }
