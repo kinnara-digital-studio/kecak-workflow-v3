@@ -1,7 +1,11 @@
 package org.joget.plugin.base;
 
+import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * A base abstract class that must be extended by every plugins
@@ -45,6 +49,22 @@ public abstract class ExtDefaultPlugin extends DefaultPlugin {
     public String getPropertyString(String property) {
         String value = (properties != null && properties.get(property) != null) ? (String) properties.get(property) : "";
         return value;
+    }
+
+    /**
+     * Get a plugin property value by property key and return in {@link Map}. Non-exist key
+     * will return an empty map instead of NULL value.
+     *
+     * @param property
+     */
+    @Nonnull
+    public Map<String, String>[] getPropertyGrid(String property) {
+        return Optional.ofNullable(getProperty(property))
+                .map(o -> (Object[]) o)
+                .map(Arrays::stream)
+                .orElseGet(Stream::empty)
+                .map(o -> (Map<String, String>) o)
+                .toArray(Map[]::new);
     }
     
     /**
