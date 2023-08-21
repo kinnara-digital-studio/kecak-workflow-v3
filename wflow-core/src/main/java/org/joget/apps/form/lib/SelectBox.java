@@ -71,7 +71,11 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
 
     @Override
     public FormData formatDataForValidation(FormData formData) {
-        String[] paramValues = Arrays.stream(FormUtil.getRequestParameterValues(this, formData))
+        String[] paramValues = Optional.ofNullable(FormUtil.getRequestParameterValues(this, formData))
+                .map(Arrays::stream)
+                .orElseGet(Stream::empty)
+                .map(s -> s.split(";"))
+                .flatMap(Arrays::stream)
                 .map(this::decrypt)
                 .toArray(String[]::new);
 

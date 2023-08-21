@@ -50,7 +50,7 @@ public class CheckBox extends SelectBox implements FormBuilderPaletteElement {
 
                 // set value into Properties and FormRowSet object
                 FormRow result = new FormRow();
-                result.setProperty(id, delimitedValue);
+                result.setProperty(id, isASwitch(formData) && delimitedValue.isEmpty() ? "false" : delimitedValue);
                 rowSet = new FormRowSet();
                 rowSet.add(result);
             }
@@ -111,6 +111,13 @@ public class CheckBox extends SelectBox implements FormBuilderPaletteElement {
     @Override
     public String getFormBuilderIcon() {
         return "<i class=\"far fa-check-square\"></i>";
+    }
+
+    protected boolean isASwitch(FormData formData) {
+        List<FormRow> options = (List<FormRow>) FormUtil.getElementPropertyOptionsMap(this, formData);
+        return options != null
+                && options.size() == 1
+                && "true".equalsIgnoreCase(options.get(0).getProperty(FormUtil.PROPERTY_VALUE));
     }
 }
 
