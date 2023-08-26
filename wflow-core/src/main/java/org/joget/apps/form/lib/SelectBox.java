@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
@@ -175,15 +176,18 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
         final List<String> databaseEncryptedValues = new ArrayList<>();
 
         @Nonnull
-        final List<Map> optionsMap = getOptionMap(formData)
-                .stream()
+        final List<Map> optionsMap = Optional.of(formData)
+                .map(this::getOptionMap)
+                .map(Collection::stream)
+                .orElseGet(Stream::empty)
+                .filter(Objects::nonNull)
                 .peek(r -> {
-                    final String value = r.get(FormUtil.PROPERTY_VALUE).toString();
-                    final String encrypted = encrypt(value);
+                    final String value = String.valueOf(r.getOrDefault(FormUtil.PROPERTY_VALUE, ""));
+                    final String encrypted = SelectBox.this.encrypt(value);
 
                     r.put(FormUtil.PROPERTY_VALUE, encrypted);
 
-                    if(databasePlainValues.stream().anyMatch(value::equals)) {
+                    if (databasePlainValues.stream().anyMatch(value::equals)) {
                         databaseEncryptedValues.add(encrypted);
                     }
                 })
