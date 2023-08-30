@@ -1,5 +1,7 @@
 package org.joget.apps.form.lib;
 
+import com.kinnarastudio.commons.Try;
+import com.kinnarastudio.commons.jsonstream.JSONCollectors;
 import org.joget.apps.app.dao.FormDefinitionDao;
 import org.joget.apps.app.model.AppDefinition;
 import org.joget.apps.app.model.FormDefinition;
@@ -103,7 +105,7 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
                 }
             } else {
                 Collection<FormRow> optionMap = FormUtil.getElementPropertyOptionsMap(this, formData);
-                
+
                 //for other child implementation which does not using options binder & option grid, do nothing
                 if (optionMap == null || optionMap.isEmpty()) {
                     return formData;
@@ -168,15 +170,12 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
         dynamicOptions(formData);
 
         // set value
-        @Nonnull
-        final List<String> databasePlainValues = Arrays.stream(FormUtil.getElementPropertyValues(this, formData))
+        @Nonnull final List<String> databasePlainValues = Arrays.stream(FormUtil.getElementPropertyValues(this, formData))
                 .collect(Collectors.toList());
 
-        @Nonnull
-        final List<String> databaseEncryptedValues = new ArrayList<>();
+        @Nonnull final List<String> databaseEncryptedValues = new ArrayList<>();
 
-        @Nonnull
-        final List<Map> optionsMap = Optional.of(formData)
+        @Nonnull final List<Map> optionsMap = Optional.of(formData)
                 .map(this::getOptionMap)
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
@@ -200,7 +199,7 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
 
         final String formDefId;
         final Form form = FormUtil.findRootForm(this);
-        if(form != null) {
+        if (form != null) {
             formDefId = form.getPropertyString(FormUtil.PROPERTY_ID);
         } else {
             formDefId = "";
@@ -209,15 +208,11 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
 
         final AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
         if (appDefinition != null) {
-            final String appId = appDefinition.getAppId();;
+            final String appId = appDefinition.getAppId();
             final String appVersion = appDefinition.getVersion().toString();
+            dataModel.put("appId", appId);
+            dataModel.put("appVersion", appVersion);
 
-            dataModel.put("appId", appDefinition.getAppId());
-            dataModel.put("appVersion", appDefinition.getVersion());
-
-            final String fieldId = getPropertyString(FormUtil.PROPERTY_ID);
-            final String nonce = generateNonce(appId, appVersion, formDefId, fieldId);
-            dataModel.put("nonce", nonce);
         }
 
         dataModel.put("width", "resolve");
@@ -264,16 +259,16 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
     protected void dynamicOptions(FormData formData) {
         if (getControlElement(formData) != null) {
             setProperty("controlFieldParamName", FormUtil.getElementParameterName(getControlElement(formData)));
-
             FormUtil.setAjaxOptionsElementProperties(this, formData);
         }
     }
 
     public Element getControlElement(FormData formData) {
         if (controlElement == null) {
-            if (getPropertyString("controlField") != null && !getPropertyString("controlField").isEmpty()) {
+            String controlField = getPropertyString("controlField");
+            if (controlField != null && !controlField.isEmpty()) {
                 Form form = FormUtil.findRootForm(this);
-                controlElement = FormUtil.findElement(getPropertyString("controlField"), form, formData);
+                controlElement = FormUtil.findElement(controlField, form, formData);
             }
         }
         return controlElement;
@@ -330,19 +325,16 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
         final String grouping = getOptionalParameter(request, "grouping", "");
         final String[] values = getOptionalParameterValues(request, "value", new String[0]);
         final String nonce = getRequiredParameter(request, "nonce");
+        final String binderData = getRequiredParameter(request, "binderData");
 
         final AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
         final String appId = appDefinition.getAppId();
         final String appVersion = appDefinition.getVersion().toString();
 
-        if(!verifyNonce(nonce, appId, appVersion, formDefId, fieldId)) {
-            throw new ApiException(HttpServletResponse.SC_UNAUTHORIZED, "Invalid nonce token");
-        }
-
         final FormData formData = new FormData();
         final Form form = generateForm(appDefinition, formDefId);
 
-        final JSONArray jsonResults = new JSONArray();
+        final JSONArray jsonResults;
         final Element element = FormUtil.findElement(fieldId, form, formData);
 
         if (!(element instanceof SelectBox)) {
@@ -351,10 +343,9 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
 
         final JSONObject jsonData = new JSONObject();
 
-        FormUtil.executeOptionBinders(element, formData);
-
-        final List<FormRow> optionsRowSet = new ArrayList<>(FormUtil.getElementPropertyOptionsMap(element, formData));
+        final List<FormRow> optionsRowSet = FormUtil.getAjaxOptionsBinderData(grouping, appDefinition, nonce, binderData);
         if (values.length > 0) {
+            jsonResults = new JSONArray();
             for (String value : values) {
                 for (FormRow row : optionsRowSet) {
                     boolean found = value.equals(row.getProperty(FormUtil.PROPERTY_VALUE));
@@ -366,40 +357,40 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
                             jsonResults.put(jsonRow);
 
                             break;
-                        } catch (JSONException ignored) {}
+                        } catch (JSONException ignored) {
+                        }
                     }
                 }
             }
         } else {
+            final String search = getOptionalParameter(request, "search", "");
+            final Pattern searchPattern = Pattern.compile(search, Pattern.CASE_INSENSITIVE);
+            final long page = Long.parseLong(getOptionalParameter(request, "page", "1"));
+
             try {
-                final String search = getOptionalParameter(request, "search", "");
-                final Pattern searchPattern = Pattern.compile(search, Pattern.CASE_INSENSITIVE);
-                final long page = Long.parseLong(getOptionalParameter(request, "page", "1"));
-
                 jsonData.put("page", page);
+            } catch (JSONException ignored) {
+            }
 
-                int skip = (int) ((page - 1) * PAGE_SIZE);
-                int pageSize = (int) PAGE_SIZE;
-                for (int i = 0, size = optionsRowSet.size(); i < size && pageSize > 0; i++) {
-                    FormRow formRow = optionsRowSet.get(i);
-                    if (searchPattern.matcher(formRow.getProperty(FormUtil.PROPERTY_LABEL)).find() && (
-                            grouping.isEmpty()
-                                    || grouping.equalsIgnoreCase(formRow.getProperty(FormUtil.PROPERTY_GROUPING)))) {
+            int skip = (int) ((page - 1) * PAGE_SIZE);
+            int pageSize = (int) PAGE_SIZE;
 
-                        if (skip > 0) {
-                            skip--;
-                        } else {
-                            try {
-                                JSONObject jsonRow = new JSONObject();
-                                jsonRow.put("id", ((SelectBox) element).encrypt(formRow.getProperty(FormUtil.PROPERTY_VALUE)));
-                                jsonRow.put("text", formRow.getProperty(FormUtil.PROPERTY_LABEL));
-                                jsonResults.put(jsonRow);
-                                pageSize--;
-                            } catch (JSONException ignored) {}
-                        }
-                    }
-                }
-            } catch (JSONException ignored) {}
+            jsonResults = Optional.ofNullable(optionsRowSet)
+                    .map(Collection::stream)
+                    .orElseGet(Stream::empty)
+                    .filter(r -> {
+                        final String label = r.getProperty(FormUtil.PROPERTY_LABEL);
+                        return searchPattern.matcher(label).find();
+                    })
+                    .skip(skip)
+                    .limit(pageSize)
+                    .map(Try.onFunction(r -> {
+                        final JSONObject jsonRow = new JSONObject();
+                        jsonRow.put("id", ((SelectBox) element).encrypt(r.getProperty(FormUtil.PROPERTY_VALUE)));
+                        jsonRow.put("text", r.getProperty(FormUtil.PROPERTY_LABEL));
+                        return jsonRow;
+                    }))
+                    .collect(JSONCollectors.toJSONArray());
         }
 
         try {
@@ -499,18 +490,14 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
         return SecurityUtil.generateNonce(new String[]{getName(), appId, appVersion, formDefId, fieldId}, 1);
     }
 
-    protected boolean verifyNonce(String nonce, String appId, String appVersion, String formDefId, String fieldId) {
-        return SecurityUtil.verifyNonce(nonce, new String[]{getName(), appId, appVersion, formDefId, fieldId});
-    }
-
     protected String encrypt(String rawContent) {
         return encrypt(rawContent, "true".equalsIgnoreCase(getPropertyString("encryption")));
     }
 
     protected String encrypt(String rawContent, boolean encryption) {
-        if(encryption) {
+        if (encryption) {
             String encrypted = SecurityUtil.encrypt(rawContent);
-            if(verifyEncryption(rawContent, encrypted)) {
+            if (verifyEncryption(rawContent, encrypted)) {
                 return encrypted;
             } else {
                 LogUtil.warn(getClassName(), "Failed to verify encrypted value, use raw content");
@@ -522,6 +509,7 @@ public class SelectBox extends Element implements FormBuilderPaletteElement, For
 
     /**
      * For testing purpose
+     *
      * @param rawContent
      * @param encryptedValue
      * @return

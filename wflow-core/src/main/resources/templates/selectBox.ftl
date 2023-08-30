@@ -46,7 +46,7 @@
         </#list>
     </#if>
 
-        <#if (element.properties.controlField?? && element.properties.controlField! != "" && !(element.properties.readonly! == 'true' && element.properties.readonlyLabel! == 'true')) >
+    <#if (element.properties.controlField?? && element.properties.controlField! != "" && !(element.properties.readonly! == 'true' && element.properties.readonlyLabel! == 'true')) >
         <script type="text/javascript">
             $(document).ready(function(){
                 $("#${elementParamName!}${element.properties.elementUniqueKey!}").dynamicOptions({
@@ -78,7 +78,7 @@
                    searching: () => '${element.properties.messageSearching!'@@form.selectbox.messageSearching.value@@'}'
                 }
 
-                <#if element.properties.lazyLoading! == 'true' >
+                <#if element.properties.lazyLoading! == 'true' && element.properties.controlField! != ''>
                     ,ajax: {
                         url: '${request.contextPath}/web/json/app/${appId!}/${appVersion!}/plugin/${className}/service',
                         delay : 500,
@@ -88,10 +88,9 @@
                                 search: params.term,
                                 formDefId : '${formDefId!}',
                                 fieldId : '${element.properties.id!}',
-                                nonce : '${nonce!}',
-                                <#if element.properties.controlField! != '' >
-                                    grouping : FormUtil.getValue('${element.properties.controlField!}'),
-                                </#if>
+                                nonce : "${element.properties.nonce!}",
+                                binderData : "${element.properties.binderData!}",
+                                grouping : FormUtil.getValue('${element.properties.controlField!}'),
                                 page : params.page || 1
                             };
                         }
