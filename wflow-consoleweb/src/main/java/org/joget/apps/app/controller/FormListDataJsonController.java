@@ -57,7 +57,7 @@ public class FormListDataJsonController {
     /**
      * Load a specific form record
      * GET /json/data/form/load/(*:appId)/(*:formId)/(*:primaryKeyValue)
-     * curl -v -X POST -d "j_username=admin&j_password=admin" http://localhost:8080/jw/web/json/data/form/load/crm/crm_account/001
+     * curl -v -X POST -d "j_username=admin&j_password=admin" http://localhost:8080/web/json/data/form/load/crm/crm_account/001
      * @param writer
      * @param response
      * @param appId
@@ -91,8 +91,8 @@ public class FormListDataJsonController {
     /**
      * Create or update a form record
      * POST /json/data/form/store/(*:appId)/(*:formId)/(*:primaryKeyValue)
-     * curl -v -X POST -d "j_username=admin&j_password=admin&accountName=001%Updated&address=001%20Address" http://localhost:8080/jw/web/json/data/form/store/crm//crm_account/001
-     * curl -v --header "Authorization: Basic YWRtaW46YWRtaW4=" -F "accountName=001 Updated" -F "address=001 Address" http://localhost:8080/jw/web/json/data/form/store/crm//crm_account/001
+     * curl -v -X POST -d "j_username=admin&j_password=admin&accountName=001%Updated&address=001%20Address" http://localhost:8080/web/json/data/form/store/crm//crm_account/001
+     * curl -v --header "Authorization: Basic YWRtaW46YWRtaW4=" -F "accountName=001 Updated" -F "address=001 Address" http://localhost:8080/web/json/data/form/store/crm//crm_account/001
      * @param writer
      * @param request
      * @param response
