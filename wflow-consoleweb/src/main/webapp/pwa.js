@@ -8,9 +8,9 @@ PwaUtil = {
     
     homePageLink: "",
 
-    serviceWorkerPath: "/jw/sw.js",
+    serviceWorkerPath: "/sw.js",
 
-    subscriptionApiPath: "/jw/web/console/profile/subscription",
+    subscriptionApiPath: "/web/console/profile/subscription",
     
     pushEnabled: true,
     
