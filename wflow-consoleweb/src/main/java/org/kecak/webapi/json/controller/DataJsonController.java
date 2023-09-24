@@ -3586,7 +3586,8 @@ public class DataJsonController implements Declutter {
      * @return
      */
     protected boolean isDefaultUserToHavePermission() {
-        return WorkflowUtil.isCurrentUserInRole(WorkflowUtil.ROLE_ADMIN);
+        return !WorkflowUtil.isCurrentUserAnonymous();
+//        return WorkflowUtil.isCurrentUserInRole(WorkflowUtil.ROLE_ADMIN);
     }
 
     /**
