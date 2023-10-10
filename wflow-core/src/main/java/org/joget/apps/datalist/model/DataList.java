@@ -10,6 +10,7 @@ import org.displaytag.tags.TableTagParameters;
 import org.displaytag.util.ParamEncoder;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.datalist.service.DataListDecorator;
+import org.joget.apps.userview.model.Permission;
 import org.joget.apps.userview.model.UserviewPermission;
 import org.joget.apps.userview.model.UserviewTheme;
 import org.joget.commons.util.LogUtil;
@@ -83,7 +84,7 @@ public class DataList {
     private boolean isAuthorized = true;
     private String unauthorizedMsg = null;
 
-    private UserviewPermission permission = null;
+    private Permission permission = null;
 
     private UserviewTheme theme;
 
@@ -977,14 +978,14 @@ public class DataList {
     /**
      * Set permission * * @param permission
      */
-    public void setPermission(UserviewPermission permission) {
+    public void setPermission(Permission permission) {
         this.permission = permission;
     }
 
     /**
      * Get permission * * @return
      */
-    public UserviewPermission getPermission() {
+    public Permission getPermission() {
         return permission;
     }
 

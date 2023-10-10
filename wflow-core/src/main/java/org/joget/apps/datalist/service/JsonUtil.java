@@ -242,7 +242,7 @@ public class JsonUtil {
                 object.setFilters(temp4);
 
                 // set permission
-                UserviewPermission permission = parsePermissionFromJsonObject(obj);
+                Permission permission = parsePermissionFromJsonObject(obj);
                 object.setPermission(permission);
             } else {
                 object.setColumns(new DataListColumn[0]);
@@ -579,7 +579,7 @@ public class JsonUtil {
                 }
 
                 if (column.has(PROPERTY_PERMISSION) && !column.isNull(PROPERTY_PERMISSION)) {
-                    UserviewPermission permission = parsePermissionFromJsonObject(column);
+                    Permission permission = parsePermissionFromJsonObject(column);
                     dataListColumn.setPermission(permission);
                 }
                 
@@ -652,13 +652,13 @@ public class JsonUtil {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public static UserviewPermission parsePermissionFromJsonObject(JSONObject obj) throws JSONException, InstantiationException, IllegalAccessException {
+    public static Permission parsePermissionFromJsonObject(JSONObject obj) throws JSONException, InstantiationException, IllegalAccessException {
         try {
             if (!obj.isNull(PROPERTY_PERMISSION) && !"".equals(obj.getString(PROPERTY_PERMISSION))) {
                 JSONObject permissionObj = obj.getJSONObject(PROPERTY_PERMISSION);
                 if (permissionObj.has(PROPERTY_CLASS_NAME)) {
                     String className = permissionObj.getString(PROPERTY_CLASS_NAME);
-                    UserviewPermission permission = (UserviewPermission) loadPlugin(className);
+                    Permission permission = (Permission) loadPlugin(className);
                     if (permission != null) {
                         permission.setProperties(PropertyUtil.getProperties(permissionObj.getJSONObject(PROPERTY_PROPERTIES)));
                         return permission;

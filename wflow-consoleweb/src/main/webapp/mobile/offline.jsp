@@ -27,7 +27,7 @@
                 </p>
             </div>
             <div id="footer">
-                <a href="http://www.joget.com">&copy; Kecak Workflow - Joget Inc</a>
+                <a href="http://www.joget.com">&copy; Kecak Workflow</a>
             </div>
         </div>
     </body>

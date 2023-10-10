@@ -1,6 +1,7 @@
 package org.joget.apps.datalist.model;
 
 import org.joget.apps.app.service.AppUtil;
+import org.joget.apps.userview.model.Permission;
 import org.joget.apps.userview.model.UserviewPermission;
 import org.joget.directory.model.User;
 import org.joget.directory.model.service.DirectoryManager;
@@ -120,7 +121,7 @@ public class DataListColumn {
     /**
      * Whoever can access this action
      */
-    private UserviewPermission permission;
+    private Permission permission;
 
     /**
      * Convenience method to add a format to this column
@@ -255,7 +256,7 @@ public class DataListColumn {
         this.renderHtml = renderHtml;
     }
 
-    public void setPermission(UserviewPermission permission) {
+    public void setPermission(Permission permission) {
         this.permission = permission;
     }
 

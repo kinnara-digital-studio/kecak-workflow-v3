@@ -71,11 +71,11 @@ public class DataListService {
 
         final DataList dataList = JsonUtil.fromJson(json, DataList.class);
 
-        final Optional<UserviewPermission> optPermission = Optional.ofNullable(dataList)
+        final Optional<Permission> optPermission = Optional.ofNullable(dataList)
                 .map(DataList::getPermission);
 
         if (!ignorePermission&& optPermission.isPresent()) {
-            final UserviewPermission permission = optPermission.get();
+            final Permission permission = optPermission.get();
             final DirectoryManager directoryManager = (DirectoryManager) AppUtil.getApplicationContext().getBean("directoryManager");
             final User user = directoryManager.getUserByUsername(WorkflowUtil.getCurrentUsername());
 

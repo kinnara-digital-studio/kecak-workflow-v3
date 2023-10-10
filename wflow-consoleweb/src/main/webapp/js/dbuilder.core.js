@@ -1198,6 +1198,13 @@ DatalistBuilder = {
                 }]
             },
             {
+                label : get_dbuilder_msg('dbuilder.permission'),
+                name  : 'permission',
+                type : 'elementselect',
+                options_ajax : '[CONTEXT_PATH]/web/property/json/getElements?classname=org.joget.apps.datalist.model.DatalistPermission',
+                url : '[CONTEXT_PATH]/web/property/json' + DatalistBuilder.appPath + '/getPropertyOptions'
+            },
+            {
                 label : get_dbuilder_msg('dbuilder.export.include'),
                 name  : 'include_export',
                 type : 'checkbox',
@@ -1574,6 +1581,19 @@ DatalistBuilder = {
                       {label : get_dbuilder_msg('dbuilder.tablet')}
                   ]}
               ]
+            },
+            {
+                title: get_dbuilder_msg('dbuilder.advanceProperties'),
+                properties : [
+                    {
+                        label : get_dbuilder_msg('dbuilder.permission'),
+                        name  : 'permission',
+                        required : 'false',
+                        type : 'elementselect',
+                        options_ajax : '[CONTEXT_PATH]/web/property/json/getElements?classname=org.joget.apps.datalist.model.DatalistPermission',
+                        url : '[CONTEXT_PATH]/web/property/json' + DatalistBuilder.appPath + '/getPropertyOptions'
+                    }
+                ]
             }
         ];
     },

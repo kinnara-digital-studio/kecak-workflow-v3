@@ -3,10 +3,7 @@ package org.joget.apps.app.controller;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -306,7 +303,9 @@ public class FormBuilderWebController {
                 
                 //get binder of main form
                 FormStoreBinder mainBinder = form.getStoreBinder();
-                FormRowSet rows = formData.getStoreBinderData(mainBinder);
+                FormRowSet rows = Optional.ofNullable(mainBinder)
+                        .map(formData::getStoreBinderData)
+                        .orElseGet(FormRowSet::new);
                 
                 for (FormRow row : rows) {
                     Map<String, String> decrypted = new HashMap<String, String>();
