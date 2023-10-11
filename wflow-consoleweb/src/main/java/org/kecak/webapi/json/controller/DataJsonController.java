@@ -792,13 +792,7 @@ public class DataJsonController implements Declutter {
             jsonResponse.put(FIELD_DIGEST, currentDigest);
 
             // delete data
-            deleteData(form, formData, true);
-
-            // abort related process
-            if (abort) {
-                WorkflowAssignment assignment = getAssignmentByProcess(formData.getProcessId());
-                abortProcess(assignment, terminate);
-            }
+            deleteData(form, formData, true, abort);
 
             jsonResponse.put(FIELD_MESSAGE, MESSAGE_SUCCESS);
 
@@ -2550,7 +2544,7 @@ public class DataJsonController implements Declutter {
             formData.addRequestParameterValues(parameterName, new String[]{terminate ? "terminated" : "aborted"});
             submitForm(form, formData, true);
         } else {
-            deleteData(form, formData, true);
+            deleteData(form, formData, true, true);
         }
 
         return new AbstractMap.SimpleEntry<>(form, formData);
@@ -2797,30 +2791,14 @@ public class DataJsonController implements Declutter {
      * @param deepClean clean related form data
      * @throws ApiException
      */
-    protected void deleteData(@Nonnull Form form, @Nonnull FormData formData, boolean deepClean) throws ApiException {
-        String primaryKey = formData.getPrimaryKeyValue();
-
+    protected void deleteData(@Nonnull Form form, @Nonnull FormData formData, boolean deepClean, boolean abortProcess) throws ApiException {
         if (FormUtil.isReadonly(form, formData) || form.getStoreBinder() == null) {
-            throw new ApiException(HttpServletResponse.SC_UNAUTHORIZED, "Form [" + form.getPropertyString("id") + "] is not writable");
+            throw new ApiException(HttpServletResponse.SC_UNAUTHORIZED, "Form [" + form.getPropertyString("id") + "] is not deletable");
         }
 
-        formDataDao.delete(form, new String[]{primaryKey});
-
-        // delete sub data
-        if (deepClean) {
-            Optional.of(formData)
-                    .map(FormData::getLoadBinderMap)
-                    .map(Map::entrySet)
-                    .map(Collection::stream)
-                    .orElseGet(Stream::empty)
-                    .filter(e -> e.getKey() instanceof FormDataDeletableBinder)
-                    .forEach(e -> {
-                        FormDataDeletableBinder formLoadBinder = (FormDataDeletableBinder) e.getKey();
-                        String formId = formLoadBinder.getFormId();
-                        String tableName = formLoadBinder.getTableName();
-                        formDataDao.delete(formId, tableName, e.getValue());
-                    });
-        }
+        formData.addFormResult(FormUtil.FORM_RESULT_LOAD_ALL_DATA, FormUtil.FORM_RESULT_LOAD_ALL_DATA); //for Multipage form
+        formData = FormUtil.executeLoadBinders(form, formData);
+        FormUtil.recursiveExecuteFormDeleteBinders(form, formData, deepClean, deepClean, abortProcess, deepClean, deepClean);
     }
 
     /**
