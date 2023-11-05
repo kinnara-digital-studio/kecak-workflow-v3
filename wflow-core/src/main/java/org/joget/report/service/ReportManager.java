@@ -171,6 +171,25 @@ public class ReportManager {
     }
 
     /**
+     *
+     * @param appId
+     * @param appVersion
+     * @param processDefId
+     * @param processInstanceId
+     * @param activityDefId
+     * @param fromDate
+     * @param toDate
+     * @param sort
+     * @param desc
+     * @param start
+     * @param rows
+     * @return
+     */
+    public Collection<ReportWorkflowActivityInstance> getReportWorkflowActivityInstanceList(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date fromDate, Date toDate, String sort, Boolean desc, Integer start, Integer rows) {
+        return reportWorkflowActivityInstanceDao.getReportWorkflowActivityInstanceList(appId, appVersion, processDefId, processInstanceId, activityDefId, fromDate, toDate, sort, desc, start, rows);
+    }
+
+    /**
      * Retrieves the number of activity instances from report table
      * @param appId
      * @param appVersion
@@ -194,6 +213,21 @@ public class ReportManager {
      */
     public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, boolean hasSlaOnly) {
         return reportWorkflowActivityInstanceDao.getReportWorkflowActivityInstanceListSize(appId, appVersion, processDefId, processInstanceId, activityDefId, hasSlaOnly);
+    }
+
+    /**
+     *
+     * @param appId
+     * @param appVersion
+     * @param processDefId
+     * @param processInstanceId
+     * @param activityDefId
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date fromDate, Date toDate) {
+        return reportWorkflowActivityInstanceDao.getReportWorkflowActivityInstanceListSize(appId, appVersion, processDefId, processInstanceId, activityDefId, fromDate, toDate);
     }
 
     /**

@@ -1,6 +1,8 @@
 package org.joget.report.dao;
 
 import java.util.Collection;
+import java.util.Date;
+
 import org.joget.report.model.ReportWorkflowActivityInstance;
 
 public interface ReportWorkflowActivityInstanceDao {
@@ -15,9 +17,14 @@ public interface ReportWorkflowActivityInstanceDao {
 
     public Collection<ReportWorkflowActivityInstance> getReportWorkflowActivityInstanceList(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, boolean hasSlaOnly, String sort, Boolean desc, Integer start, Integer rows);
 
+    public Collection<ReportWorkflowActivityInstance> getReportWorkflowActivityInstanceList(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date from, Date to, String sort, Boolean desc, Integer start, Integer rows);
+
     public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String activityDefId);
     
     public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String activityDefId, boolean hasSlaOnly);
     
     public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, boolean hasSlaOnly);
+
+    public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date from, Date to);
+
 }

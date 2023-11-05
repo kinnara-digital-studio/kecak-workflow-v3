@@ -2,6 +2,7 @@ package org.joget.report.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import org.joget.commons.spring.model.AbstractSpringDao;
 import org.joget.commons.util.LogUtil;
@@ -71,7 +72,50 @@ public class ReportWorkflowActivityInstanceDaoImpl extends AbstractSpringDao imp
 
         return (List<ReportWorkflowActivityInstance>) super.find(ENTITY_NAME, condition, params.toArray(), sort, desc, start, rows);
     }
-    
+
+    @Override
+    public Collection<ReportWorkflowActivityInstance> getReportWorkflowActivityInstanceList(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date fromDate, Date toDate, String sort, Boolean desc, Integer start, Integer rows) {
+        String condition = " WHERE 1=1";
+        Collection params = new ArrayList();
+
+        if (appId != null && !appId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.reportWorkflowPackage.reportApp.appId = ?";
+            params.add(appId);
+        }
+
+        if (appVersion != null && !appVersion.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.reportWorkflowPackage.reportApp.appVersion = ?";
+            params.add(appVersion);
+        }
+
+        if (processDefId != null && !processDefId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.processDefId = ?";
+            params.add(processDefId);
+        }
+
+        if (processInstanceId != null && !processInstanceId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.instanceId = ?";
+            params.add(processInstanceId);
+        }
+
+        if (activityDefId != null && !activityDefId.isEmpty()) {
+            condition += " AND e.reportWorkflowActivity.activityDefId = ?";
+            params.add(activityDefId);
+        }
+
+        if (fromDate != null) {
+            condition += " AND e.finishTime >= ?";
+            params.add(fromDate);
+        }
+
+        if(toDate != null) {
+            condition += " AND e.finishTime <= ?";
+            params.add(toDate);
+        }
+
+        return (List<ReportWorkflowActivityInstance>) super.find(ENTITY_NAME, condition, params.toArray(), sort, desc, start, rows);
+    }
+
     @Override
     public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String activityDefId) {
         return getReportWorkflowActivityInstanceListSize(appId, appVersion, processDefId, activityDefId, false);
@@ -114,6 +158,49 @@ public class ReportWorkflowActivityInstanceDaoImpl extends AbstractSpringDao imp
         
         if (hasSlaOnly) {
             condition += " AND e.due IS NOT NULL";
+        }
+
+        return super.count(ENTITY_NAME, condition, params.toArray());
+    }
+
+    @Override
+    public long getReportWorkflowActivityInstanceListSize(String appId, String appVersion, String processDefId, String processInstanceId, String activityDefId, Date fromDate, Date toDate) {
+        String condition = " WHERE 1=1";
+        Collection params = new ArrayList();
+
+        if (appId != null && !appId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.reportWorkflowPackage.reportApp.appId = ?";
+            params.add(appId);
+        }
+
+        if (appVersion != null && !appVersion.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.reportWorkflowPackage.reportApp.appVersion = ?";
+            params.add(appVersion);
+        }
+
+        if (processDefId != null && !processDefId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.reportWorkflowProcess.processDefId = ?";
+            params.add(processDefId);
+        }
+
+        if (processInstanceId != null && !processInstanceId.isEmpty()) {
+            condition += " AND e.reportWorkflowProcessInstance.instanceId = ?";
+            params.add(processInstanceId);
+        }
+
+        if (activityDefId != null && !activityDefId.isEmpty()) {
+            condition += " AND e.reportWorkflowActivity.activityDefId = ?";
+            params.add(activityDefId);
+        }
+
+        if (fromDate != null) {
+            condition += " AND e.finishTime >= ?";
+            params.add(fromDate);
+        }
+
+        if(toDate != null) {
+            condition += " AND e.finishTime <= ?";
+            params.add(toDate);
         }
 
         return super.count(ENTITY_NAME, condition, params.toArray());
