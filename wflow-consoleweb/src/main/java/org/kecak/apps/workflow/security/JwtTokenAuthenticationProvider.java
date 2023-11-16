@@ -28,6 +28,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Deprecated
+ *
+ * Is not used anymore
+ */
+@Deprecated
 public class JwtTokenAuthenticationProvider implements AuthenticationProvider, MessageSourceAware {
 
     private DirectoryManager directoryManager;
