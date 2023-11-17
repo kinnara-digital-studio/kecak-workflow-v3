@@ -143,7 +143,7 @@
         
         <!-- Support Basic Authentication -->
         <security:http-basic />
-        <security:custom-filter ref="workflowJwtAuthFilter" after="DIGEST_AUTH_FILTER" />
+        <security:custom-filter ref="workflowJwtAuthFilter" before="BASIC_AUTH_FILTER" />
         <security:custom-filter ref="workflowHttpAuthFilter" after="BASIC_AUTH_FILTER" />
     </security:http>
         
@@ -177,18 +177,14 @@
         <property name="allowSessionCreation" value="true" />
     </bean>
 
-    <bean id="workflowJwtAuthFilter" class="org.kecak.webapi.security.WorkflowJwtAuthProcessingFilter">
-        <!--        <constructor-arg ref="authenticationManager" />-->
-        <!--        <constructor-arg ref="workflowApiAuthEntryPoint" />-->
-        <property name="authenticationEntryPoint" ref="workflowApiAuthEntryPoint" />
-        <property name="authTokenService" ref="authTokenService"/>
-        <property name="directoryManager" ref="directoryManager"/>
-    </bean>
-
     <!-- Begin of JTW -->
-
     <bean id="jwtAuthSuccessHandler" class="org.kecak.apps.workflow.security.JwtAuthSuccessHandler">
         <property name="workflowUserManager" ref="workflowUserManager" />
+    </bean>
+
+    <bean id="workflowJwtAuthFilter" class="org.kecak.webapi.security.WorkflowJwtAuthProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="authenticationSuccessHandler" ref="jwtAuthSuccessHandler"/>
     </bean>
 
     <bean id="jwtAuthenticationProvider" class="org.kecak.apps.workflow.security.JwtTokenAuthenticationProvider">

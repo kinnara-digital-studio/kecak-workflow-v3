@@ -21,19 +21,16 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-/**
- * Deprecated
- *
- * Is not used anymore
- */
-@Deprecated
 public class JwtTokenAuthenticationProvider implements AuthenticationProvider, MessageSourceAware {
 
     private DirectoryManager directoryManager;
@@ -66,7 +63,6 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
                     .orElseThrow(() -> new BadCredentialsException("Invalid token [" + token + "]"));
 
             String username = user.getUsername();
-            workflowUserManager.setCurrentThreadUser(username);
 
             // add audit trail
             LogUtil.info(getClass().getName(), "Authentication for user " + username + ": " + true);
@@ -74,18 +70,20 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
 
             // get authorities
             Collection<Role> roles = directoryManager.getUserRoles(username);
-            List<GrantedAuthority> gaList = new ArrayList<>();
-            if (roles != null && !roles.isEmpty()) {
-                for (Role role : roles) {
-                    GrantedAuthority ga = new SimpleGrantedAuthority(role.getId());
-                    gaList.add(ga);
-                }
-            }
 
-            // return result
+            List<GrantedAuthority> gaList = Optional.ofNullable(roles)
+                    .map(Collection::stream)
+                    .orElseGet(Stream::empty)
+                    .map(Role::getId)
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
             UserDetails details = new WorkflowUserDetails(user);
+
             Authentication authenticatedJwtAuthenticationToken = new JwtAuthenticationToken(token, details, gaList);
+
             return authenticatedJwtAuthenticationToken;
+
         } catch (ExpiredJwtException e) {
             LogUtil.info(getClass().getName(), "Authentication for token " + token + ": " + false);
             throw new BadCredentialsException(e.getMessage(), e);

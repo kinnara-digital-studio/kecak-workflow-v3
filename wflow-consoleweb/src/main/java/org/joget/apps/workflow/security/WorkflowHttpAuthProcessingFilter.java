@@ -67,22 +67,6 @@ public class WorkflowHttpAuthProcessingFilter extends UsernamePasswordAuthentica
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-        final boolean isBearer = Optional.of(request)
-                .map(r -> r.getHeader(WorkflowJwtAuthProcessingFilter.TOKEN_HEADER))
-                .map(s -> s.startsWith("Bearer "))
-                .orElse(false);
-
-        final boolean isAuthenticated = Optional.of(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::isAuthenticated)
-                .orElse(false);
-
-
-        if(isBearer && isAuthenticated) {
-            chain.doFilter(servletRequest, servletResponse);
-            return;
-        }
-
         Boolean requiresAuthentication;
         try {
             if (request != null) {
@@ -136,6 +120,14 @@ public class WorkflowHttpAuthProcessingFilter extends UsernamePasswordAuthentica
     
     @Override
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        final boolean isBearer = Optional.ofNullable(request.getHeader(WorkflowJwtAuthProcessingFilter.TOKEN_HEADER))
+                .map(s -> s.startsWith("Bearer "))
+                .orElse(false);
+
+        if(isBearer) {
+            return false;
+        }
+
         boolean isAnonymous = workflowUserManager.isCurrentUserAnonymous();
         boolean requiresAuth = false;
         String uri = request.getRequestURI();

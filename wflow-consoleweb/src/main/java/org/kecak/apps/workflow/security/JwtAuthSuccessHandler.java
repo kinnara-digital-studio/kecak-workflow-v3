@@ -1,8 +1,10 @@
 package org.kecak.apps.workflow.security;
 
-import com.kinnarastudio.commons.Declutter;
+import com.kinnarastudio.commons.Try;
+import org.joget.commons.util.LogUtil;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -12,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-public class JwtAuthSuccessHandler implements AuthenticationSuccessHandler, Declutter {
+public class JwtAuthSuccessHandler implements AuthenticationSuccessHandler {
     private WorkflowUserManager workflowUserManager;
 
     @Override
@@ -21,8 +23,10 @@ public class JwtAuthSuccessHandler implements AuthenticationSuccessHandler, Decl
         workflowUserManager.setCurrentThreadUser(currentUser.getUsername());
 
         Optional<String> loginAs = getOptionalParameter(request, "loginAs");
-        if(loginAs.isPresent() && workflowUserManager.isCurrentUserInRole(WorkflowUserManager.ROLE_ADMIN)) {
-            workflowUserManager.setCurrentThreadUser(loginAs.get());
+        if (loginAs.isPresent() && workflowUserManager.isCurrentUserInRole(WorkflowUserManager.ROLE_ADMIN)) {
+            String loginAsUser = loginAs.get();
+            LogUtil.info(getClass().getName(), "Login As [" + loginAsUser + "]");
+            workflowUserManager.setCurrentThreadUser(loginAsUser);
         }
     }
 
@@ -41,6 +45,6 @@ public class JwtAuthSuccessHandler implements AuthenticationSuccessHandler, Decl
         return Optional.of(parameterName)
                 .map(request::getParameter)
                 .map(String::trim)
-                .filter(not(String::isEmpty));
+                .filter(Try.onPredicate(String::isEmpty).negate());
     }
 }
