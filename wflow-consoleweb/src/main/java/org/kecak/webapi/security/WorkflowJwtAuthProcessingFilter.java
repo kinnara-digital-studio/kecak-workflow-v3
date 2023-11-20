@@ -22,7 +22,7 @@ public class WorkflowJwtAuthProcessingFilter extends AbstractAuthenticationProce
     public final static String TOKEN_HEADER = "Authorization";
 
     protected WorkflowJwtAuthProcessingFilter() {
-        super(new AntPathRequestMatcher("/**"));
+        super(new AntPathRequestMatcher("/web/json/**"));
     }
 
     @Override
