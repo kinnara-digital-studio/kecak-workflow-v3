@@ -914,6 +914,7 @@ public class DataJsonController implements Declutter {
                                       @RequestParam(value = "page", required = false, defaultValue = "0") final Integer page,
                                       @RequestParam(value = "start", required = false, defaultValue = "0") final Integer start,
                                       @RequestParam(value = "rows", required = false, defaultValue = "0") final Integer rows,
+                                      @RequestParam(value = "search", required = false, defaultValue = "") final String search,
                                       @RequestParam(value = "includeSubForm", required = false, defaultValue = "false") final Boolean includeSubForm,
                                       @RequestParam(value = "digest", required = false) final String digest)
             throws IOException, JSONException {
@@ -933,13 +934,17 @@ public class DataJsonController implements Declutter {
                 throw new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Invalid element [" + elementId + "]");
             }
 
-            long pageSize = rows != null && rows > 0 ? rows : page != null && page > 0 ? DataList.DEFAULT_PAGE_SIZE : DataList.MAXIMUM_PAGE_SIZE;
-            long rowStart = start != null ? start : page != null && page > 0 ? ((page - 1) * pageSize) : 0;
+            long pageSize = getPageSize(page, rows);
+            long rowStart = getRowStart(page, start, rows);
 
             Collection<FormRow> optionRows = FormUtil.getElementPropertyOptionsMap(element, formData);
 
             @Nonnull
             FormRowSet formRows = optionRows.stream()
+                    .filter(r -> {
+                        final String val = r.getProperty(FormUtil.PROPERTY_LABEL);
+                        return search == null || search.isEmpty() || val.contains(search);
+                    })
                     .skip(rowStart)
                     .limit(pageSize)
                     .collect(Collectors.toCollection(FormRowSet::new));
@@ -1088,8 +1093,8 @@ public class DataJsonController implements Declutter {
                 JSONArray jsonData = Optional.of(dataList)
                         .map(d -> d.getRows(pageSize, rowStart))
                         .map(collection -> (DataListCollection<Map<String, Object>>) collection)
-                        .orElse(new DataListCollection<>())
-                        .stream()
+                        .map(Collection::stream)
+                        .orElseGet(Stream::empty)
 
                         // reformat content value
                         .map(row -> formatRow(dataList, row))
@@ -3813,5 +3818,14 @@ public class DataJsonController implements Declutter {
                 parameters,
                 null
         );
+    }
+
+    protected int getPageSize(Integer page, Integer rows) {
+        return rows != null && rows > 0 ? rows : page != null && page > 0 ? DataList.DEFAULT_PAGE_SIZE : DataList.MAXIMUM_PAGE_SIZE;
+    }
+
+    protected long getRowStart(Integer page, Integer start, Integer rows) {
+        long pageSize = getPageSize(page, rows);
+        return start != null ? start : page != null && page > 0 ? ((page - 1) * pageSize) : 0;
     }
 }
