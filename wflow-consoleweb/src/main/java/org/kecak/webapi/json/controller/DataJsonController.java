@@ -905,6 +905,101 @@ public class DataJsonController implements Declutter {
         }
     }
 
+    @RequestMapping(value = "/json/data/app/(*:appId)/(~:appVersion)/form/(*:formDefId)/(*:elementId)/options/(*:value)", method = RequestMethod.GET)
+    public void getElementOptionsData(final HttpServletRequest request, final HttpServletResponse response,
+                                      @RequestParam("appId") final String appId,
+                                      @RequestParam(value = "appVersion", required = false, defaultValue = "0") Long appVersion,
+                                      @RequestParam("formDefId") final String formDefId,
+                                      @RequestParam("elementId") final String elementId,
+                                      @RequestParam("value") final String value,
+                                      @RequestParam(value = "includeSubForm", required = false, defaultValue = "false") final Boolean includeSubForm,
+                                      @RequestParam(value = "digest", required = false) final String digest)
+            throws IOException, JSONException {
+
+        LogUtil.info(getClass().getName(), "Executing Rest API [" + request.getRequestURI() + "] in method [" + request.getMethod() + "] contentType [" + request.getContentType() + "] as [" + WorkflowUtil.getCurrentUsername() + "]");
+
+        try {
+            final FormData formData = new FormData();
+
+            // get current App
+            AppDefinition appDefinition = getApplicationDefinition(appId, ifNullThen(appVersion, 0L));
+
+            Form form = getForm(appDefinition, formDefId, formData, false);
+
+            Element element = FormUtil.findElement(elementId, form, formData, includeSubForm);
+            if (element == null) {
+                throw new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Invalid element [" + elementId + "]");
+            }
+
+            Collection<FormRow> optionRows = FormUtil.getElementPropertyOptionsMap(element, formData);
+
+            @Nonnull final FormRow row = optionRows.stream()
+                    .filter(r -> {
+                        final String val = r.getProperty(FormUtil.PROPERTY_VALUE, "").toLowerCase(Locale.ROOT);
+                        return value.equals(val);
+                    })
+                    .findFirst()
+                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_FOUND, "Options value not found"));
+
+            // construct response
+
+            @Nonnull
+            JSONObject jsonData = new JSONObject(row);
+
+            @Nullable
+            String currentDigest = getDigest(jsonData);
+
+            JSONObject jsonResponse = new JSONObject();
+
+            if (!Objects.equals(currentDigest, digest)) {
+                jsonResponse.put(FIELD_DATA, jsonData);
+            }
+
+            jsonResponse.put(FIELD_MESSAGE, MESSAGE_SUCCESS);
+            jsonResponse.put(FIELD_DIGEST, currentDigest);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            response.getWriter().write(jsonResponse.toString());
+
+            addAuditTrail("getElementOptionsData", request,
+                    response,
+                    appId,
+                    appVersion,
+                    formDefId,
+                    elementId,
+                    value,
+                    includeSubForm,
+                    digest);
+
+        } catch (ApiException e) {
+            response.sendError(e.getErrorCode(), e.getMessage());
+            LogUtil.error(getClass().getName(), e, "HTTP error [" + e.getErrorCode() + "] : " + e.getMessage());
+        }
+    }
+
+    /**
+     *
+     *
+     * @param request
+     * @param response
+     * @param appId
+     * @param appVersion
+     * @param formDefId
+     * @param elementId
+     * @param page
+     * @param start
+     * @param rows
+     * @param search    Match by VALUE and LABEL
+     * @param value     Match by VALUE
+     * @param label     Match by LABEL
+     * @param group     Match by GROUPING
+     * @param includeSubForm
+     * @param digest
+     * @throws IOException
+     * @throws JSONException
+     */
+
     @RequestMapping(value = "/json/data/app/(*:appId)/(~:appVersion)/form/(*:formDefId)/(*:elementId)/options", method = RequestMethod.GET)
     public void getElementOptionsData(final HttpServletRequest request, final HttpServletResponse response,
                                       @RequestParam("appId") final String appId,
@@ -914,7 +1009,10 @@ public class DataJsonController implements Declutter {
                                       @RequestParam(value = "page", required = false, defaultValue = "0") final Integer page,
                                       @RequestParam(value = "start", required = false, defaultValue = "0") final Integer start,
                                       @RequestParam(value = "rows", required = false, defaultValue = "0") final Integer rows,
-                                      @RequestParam(value = "search", required = false, defaultValue = "") final String search,
+                                      @RequestParam(value = "search", required = false, defaultValue = "") final String[] search,
+                                      @RequestParam(value = FormUtil.PROPERTY_VALUE, required = false, defaultValue = "") final String[] value,
+                                      @RequestParam(value = FormUtil.PROPERTY_LABEL, required = false, defaultValue = "") final String[] label,
+                                      @RequestParam(value = FormUtil.PROPERTY_GROUPING, required = false, defaultValue = "") final String[] group,
                                       @RequestParam(value = "includeSubForm", required = false, defaultValue = "false") final Boolean includeSubForm,
                                       @RequestParam(value = "digest", required = false) final String digest)
             throws IOException, JSONException {
@@ -939,11 +1037,60 @@ public class DataJsonController implements Declutter {
 
             Collection<FormRow> optionRows = FormUtil.getElementPropertyOptionsMap(element, formData);
 
-            @Nonnull
-            FormRowSet formRows = optionRows.stream()
+            final String[] searches = Optional.ofNullable(search)
+                    .map(Arrays::stream)
+                    .orElseGet(Stream::empty)
+                    .map(s -> s.split(";"))
+                    .flatMap(Arrays::stream)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> s.toLowerCase(Locale.ROOT))
+                    .toArray(String[]::new);
+
+            final String[] values = Optional.ofNullable(value)
+                    .map(Arrays::stream)
+                    .orElseGet(Stream::empty)
+                    .map(s -> s.split(";"))
+                    .flatMap(Arrays::stream)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> s.toLowerCase(Locale.ROOT))
+                    .toArray(String[]::new);
+
+            final String[] labels = Optional.ofNullable(label)
+                    .map(Arrays::stream)
+                    .orElseGet(Stream::empty)
+                    .map(s -> s.split(";"))
+                    .flatMap(Arrays::stream)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> s.toLowerCase(Locale.ROOT))
+                    .toArray(String[]::new);
+
+            final String[] groups = Optional.ofNullable(group)
+                    .map(Arrays::stream)
+                    .orElseGet(Stream::empty)
+                    .map(s -> s.split(";"))
+                    .flatMap(Arrays::stream)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> s.toLowerCase(Locale.ROOT))
+                    .toArray(String[]::new);
+
+            @Nonnull final FormRowSet formRows = optionRows.stream()
                     .filter(r -> {
-                        final String val = r.getProperty(FormUtil.PROPERTY_LABEL);
-                        return search == null || search.isEmpty() || val.contains(search);
+                        final String byValue = r.getProperty(FormUtil.PROPERTY_VALUE, "").toLowerCase(Locale.ROOT);
+                        final String byLabel = r.getProperty(FormUtil.PROPERTY_LABEL, "").toLowerCase(Locale.ROOT);
+
+                        return searches.length == 0 || Arrays.stream(searches).anyMatch(s -> byValue.contains(s) || byLabel.contains(s));
+                    })
+                    .filter(r -> {
+                        final String val = r.getProperty(FormUtil.PROPERTY_VALUE, "").toLowerCase(Locale.ROOT);
+                        return values.length == 0 || Arrays.stream(values).anyMatch(val::contains);
+                    })
+                    .filter(r -> {
+                        final String val = r.getProperty(FormUtil.PROPERTY_LABEL, "").toLowerCase(Locale.ROOT);
+                        return labels.length == 0 || Arrays.stream(labels).anyMatch(val::contains);
+                    })
+                    .filter(r -> {
+                        final String val = r.getProperty(FormUtil.PROPERTY_GROUPING, "").toLowerCase(Locale.ROOT);
+                        return groups.length == 0 || Arrays.stream(groups).anyMatch(val::contains);
                     })
                     .skip(rowStart)
                     .limit(pageSize)
@@ -979,6 +1126,10 @@ public class DataJsonController implements Declutter {
                     page,
                     start,
                     rows,
+                    search,
+                    value,
+                    label,
+                    group,
                     includeSubForm,
                     digest);
 
@@ -3658,7 +3809,7 @@ public class DataJsonController implements Declutter {
 
                     Optional.of(elementId)
                             .map(key -> {
-                                if(e instanceof FileDownloadSecurity && fileMap.containsKey(key)) {
+                                if (e instanceof FileDownloadSecurity && fileMap.containsKey(key)) {
                                     return getTempFilePath(key);
                                 } else {
                                     return data.get(key);
@@ -3672,7 +3823,6 @@ public class DataJsonController implements Declutter {
     }
 
     /**
-     *
      * @param elementId
      * @return
      */
