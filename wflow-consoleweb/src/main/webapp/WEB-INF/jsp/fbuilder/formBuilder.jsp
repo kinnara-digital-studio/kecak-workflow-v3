@@ -90,6 +90,7 @@
             };
 
             $(document).ready(function() {
+                /*
                 let lockSocket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '${pageContext.request.contextPath}/web/websocket/app/<c:out value="${appId}"/>/${appDefinition.version}/plugin/org.kecak.apps.app.lib.UrlLockSocket');
 
                 lockSocket.onmessage = function(event) {
@@ -100,6 +101,7 @@
                 };
 
                 lockSocket.onopen = () => lockSocket.send('/web/fbuilder/app/<c:out value="${appId}"/>/${appDefinition.version}/form/<c:out value="${formId}"/>');
+                */
 
                 // initialize the form
                 FormBuilder.appId = '<c:out value="${appId}"/>';
