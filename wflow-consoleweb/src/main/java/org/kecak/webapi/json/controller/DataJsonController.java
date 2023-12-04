@@ -70,6 +70,7 @@ public class DataJsonController implements Declutter {
     private final static String FIELD_VALIDATION_ERROR = "validation_error";
     private final static String FIELD_DIGEST = "digest";
     private final static String FIELD_TOTAL = "total";
+    private final static String FIELD_COUNT = "count";
 
     private final static String MESSAGE_VALIDATION_ERROR = "Validation Error";
     private final static String MESSAGE_SUCCESS = "Success";
@@ -1073,7 +1074,8 @@ public class DataJsonController implements Declutter {
                     .map(s -> s.toLowerCase(Locale.ROOT))
                     .toArray(String[]::new);
 
-            @Nonnull final FormRowSet formRows = optionRows.stream()
+            @Nonnull
+            final FormRowSet formRows = optionRows.stream()
                     .filter(r -> {
                         final String byValue = r.getProperty(FormUtil.PROPERTY_VALUE, "").toLowerCase(Locale.ROOT);
                         final String byLabel = r.getProperty(FormUtil.PROPERTY_LABEL, "").toLowerCase(Locale.ROOT);
@@ -1098,18 +1100,19 @@ public class DataJsonController implements Declutter {
 
             // construct response
 
-            @Nonnull
-            JSONArray jsonArrayData = FormDataUtil.convertFormRowSetToJsonArray(element, formData, formRows, false);
+            final JSONArray jsonArrayData = FormDataUtil.convertFormRowSetToJsonArray(element, formData, formRows, false);
 
             @Nullable
-            String currentDigest = getDigest(jsonArrayData);
+            final String currentDigest = getDigest(jsonArrayData);
 
-            JSONObject jsonResponse = new JSONObject();
+            final JSONObject jsonResponse = new JSONObject();
 
             if (!Objects.equals(currentDigest, digest)) {
                 jsonResponse.put(FIELD_DATA, jsonArrayData);
             }
 
+            jsonResponse.put(FIELD_COUNT, jsonArrayData.length());
+            jsonResponse.put(FIELD_TOTAL, optionRows.size());
             jsonResponse.put(FIELD_MESSAGE, MESSAGE_SUCCESS);
             jsonResponse.put(FIELD_DIGEST, currentDigest);
 
@@ -1241,7 +1244,7 @@ public class DataJsonController implements Declutter {
             getCollectFilters(request.getParameterMap(), dataList);
 
             try {
-                JSONArray jsonData = Optional.of(dataList)
+                final JSONArray jsonData = Optional.of(dataList)
                         .map(d -> d.getRows(pageSize, rowStart))
                         .map(collection -> (DataListCollection<Map<String, Object>>) collection)
                         .map(Collection::stream)
@@ -1253,9 +1256,9 @@ public class DataJsonController implements Declutter {
                         // collect as JSON
                         .collect(JSONCollectors.toJSONArray());
 
-                String currentDigest = getDigest(jsonData);
+                final String currentDigest = getDigest(jsonData);
 
-                JSONObject jsonResponse = new JSONObject();
+                final JSONObject jsonResponse = new JSONObject();
 
                 jsonResponse.put(FIELD_TOTAL, dataList.getSize());
 
