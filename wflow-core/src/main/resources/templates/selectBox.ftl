@@ -69,7 +69,7 @@
         $(document).ready(function(){
             let $selectbox = $('select#${elementParamName!}${element.properties.elementUniqueKey!}.js-select2').kecakSelect2({
                 dropdownAutoWidth : true,
-                width : '${width!'resolve'}',
+                width : '${(element.properties.size)!"70"}%',
                 theme : 'default',
                 language : {
                    errorLoading: () => '${element.properties.messageErrorLoading!'@@form.selectbox.messageErrorLoading.value@@'}',

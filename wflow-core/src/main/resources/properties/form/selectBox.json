@@ -86,7 +86,9 @@
     {
         name : 'size',
         label : '@@form.selectbox.size@@',
-        type : 'textfield'
+        type : 'textfield',
+        regex_validation: '^\\d+$',
+        validation_message : '@@form.selectbox.invalidNumber@@'
     },
     {
         name : 'readonly',
