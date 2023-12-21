@@ -48,7 +48,17 @@ public class AuthTokenService implements Serializable {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
+    @Nullable
+    public Object getClaimDataFromToken(String token, final String key) throws ExpiredJwtException {
+        return getClaimFromToken(token, c -> c.get(key));
+    }
+
+    @Nullable
+    public <T> T getClaimDataFromToken(String token, final String key, final Class<T> aClass) throws ExpiredJwtException {
+        return getClaimFromToken(token, c -> c.get(key, aClass));
+    }
+
+    protected <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
         final Claims claims = getClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -90,16 +100,32 @@ public class AuthTokenService implements Serializable {
         return doGenerateToken(Optional.ofNullable(claims).orElseGet(HashMap::new), Optional.ofNullable(username).orElse(WorkflowUserManager.ROLE_ANONYMOUS));
     }
 
-    private String doGenerateToken(@Nonnull Map<String, Object> claims, @Nonnull String subject) {
+    public String generateToken(String username, Map<String, Object> claims, int expiresInMinutes) {
+        return doGenerateToken(Optional.ofNullable(claims).orElseGet(HashMap::new), Optional.ofNullable(username).orElse(WorkflowUserManager.ROLE_ANONYMOUS), expiresInMinutes);
+    }
+
+    protected String doGenerateToken(@Nonnull Map<String, Object> claims, @Nonnull String subject) {
         final Date createdDate = clock.now();
-        final Date expirationDate = calculateExpirationDate(createdDate);
         return Jwts.builder()
                 .setClaims(claims)
                 .setId(UUID.randomUUID().toString())
                 .setSubject(subject)
                 .setIssuer(ISSUER)
                 .setIssuedAt(createdDate)
-//                .setExpiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS512, getSecret())
+                .compact();
+    }
+
+    protected String doGenerateToken(@Nonnull Map<String, Object> claims, @Nonnull String subject, int expiresInMinutes) {
+        final Date createdDate = clock.now();
+        final Date expirationDate = calculateExpirationDate(createdDate, expiresInMinutes);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setId(UUID.randomUUID().toString())
+                .setSubject(subject)
+                .setIssuer(ISSUER)
+                .setIssuedAt(createdDate)
+                .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, getSecret())
                 .compact();
     }
@@ -145,15 +171,25 @@ public class AuthTokenService implements Serializable {
         return (user != null && username.equals(user.getUsername()) && !isTokenExpired(token));
     }
 
-    private @Nonnull Date calculateExpDateRefToken(Date createdDate) {
+    @Nonnull
+    protected Date calculateExpDateRefToken(Date createdDate) {
         return new Date(createdDate.getTime() + expirationRefreshToken * 1000);
     }
 
-    private @Nonnull Date calculateExpirationDate(Date createdDate) {
-        return new Date(createdDate.getTime() + expiration * 1000);
+    protected Date calculateExpirationDate(Date createdDate) {
+        return calculateExpirationDate(createdDate, 60);
     }
 
-    public @Nonnull String getSecret() {
+    @Nonnull
+    protected Date calculateExpirationDate(Date createdDate, int minutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(createdDate);
+        calendar.add(Calendar.MINUTE, minutes);
+        return calendar.getTime();
+    }
+
+    @Nonnull
+    public String getSecret() {
         return secret;
     }
 
