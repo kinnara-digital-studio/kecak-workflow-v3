@@ -1703,6 +1703,65 @@ public class WorkflowManagerImpl implements WorkflowManager {
         return null;
     }
 
+    @Override
+    public String getActivityVariable(String activityInstanceId, String variableId) {
+        WorkflowActivity activity = getActivityById(activityInstanceId);
+
+        WorkflowVariable wfVariable = getActivityVariable(activity, variableId);
+
+        if(wfVariable != null && wfVariable.getVal() != null) {
+            return String.valueOf(wfVariable.getVal());
+        }
+
+        return null;
+    }
+
+    @Override
+    public WorkflowVariable getActivityVariable(WorkflowActivity activity, String variableId) {
+        SharkConnection sc = null;
+
+        try {
+            if(activity == null) {
+                return null;
+            }
+
+            String processInstanceId = activity.getProcessId();
+            String activityInstanceId = activity.getId();
+            if (processInstanceId == null || processInstanceId.trim().isEmpty() || activityInstanceId == null || activityInstanceId.trim().isEmpty()) {
+                return null;
+            }
+
+            sc = connect();
+
+            WfActivity wfActivity = sc.getActivity(processInstanceId, activityInstanceId);
+
+            if (wfActivity != null) {
+                Map varMap = wfActivity.process_context();
+                LogUtil.debug(getClass().getName(), "varMap: " + varMap);
+
+                if (!varMap.isEmpty()) {
+                    Object val = varMap.get(variableId);
+                    WorkflowVariable wv = new WorkflowVariable();
+                    wv.setId(variableId);
+                    wv.setName(variableId);
+                    wv.setVal(val);
+
+                    return wv;
+                }
+            }
+        } catch (Exception ex) {
+            LogUtil.error(getClass().getName(), ex, "");
+        } finally {
+            try {
+                disconnect(sc);
+            } catch (Exception e) {
+                LogUtil.error(getClass().getName(), e, "");
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Returns a list of workflow variables for the specified activity instance ID (for any user)
      * @param activityId

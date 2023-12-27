@@ -64,6 +64,22 @@ public interface WorkflowManager {
     String getProcessVariable(String processInstanceId, String variableId);
 
     /**
+     * Returns the variable value based on a activity instance ID.
+     * @param activityInstanceId
+     * @param variableId
+     * @return
+     */
+    String getActivityVariable(String activityInstanceId, String variableId);
+
+    /**
+     * Returns the workflow variable based on a activity instance.
+     * @param activity
+     * @param variableId
+     * @return
+     */
+    WorkflowVariable getActivityVariable(WorkflowActivity activity, String variableId);
+
+    /**
      * Accept an assignment (for the current user) based on the activity instance ID.
      * 
      * @deprecated Since v3, the concept of accept & withdraw assignment is removed  
