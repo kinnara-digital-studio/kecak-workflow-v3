@@ -69,7 +69,7 @@ public abstract class AbstractSpringDao extends HibernateDaoSupport {
             String filteredSort = filterSpace(sort);
             query += " ORDER BY " + filteredSort;
 
-            if (desc) {
+            if (desc != null && desc) {
                 query += " DESC";
             }
         }
