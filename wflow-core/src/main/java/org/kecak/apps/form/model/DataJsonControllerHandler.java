@@ -1,8 +1,11 @@
 package org.kecak.apps.form.model;
 
+import com.kinnarastudio.commons.Try;
+import com.kinnarastudio.commons.jsonstream.JSONStream;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.service.FormUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import javax.annotation.Nonnull;
@@ -44,6 +47,10 @@ public interface DataJsonControllerHandler {
 
         if (value instanceof Double) {
             return new String[]{String.format("%f", value).replaceAll("(?<!\\.)0+$", "")};
+        } else if(value instanceof JSONArray) {
+            return JSONStream.of((JSONArray) value, Try.onBiFunction(JSONArray::getString))
+                    .filter(s -> !s.isEmpty())
+                    .toArray(String[]::new);
         } else {
             return new String[]{String.valueOf(value)};
         }

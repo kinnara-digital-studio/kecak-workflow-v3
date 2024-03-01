@@ -328,14 +328,4 @@
             <version>2.3.2</version>
         </dependency>
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <url>dav:https://dev.joget.org/archiva/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>https://dev.joget.org/archiva/repository/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

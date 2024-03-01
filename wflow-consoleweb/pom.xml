@@ -8,9 +8,9 @@
     <name>wflow-consoleweb</name>
     <url>http://kecak.org</url>
     <scm>
-        <connection>scm:git:ssh://git@repo.joget.org:2224/joget/jw-community.git</connection>
-        <developerConnection>scm:git:ssh://git@repo.joget.org:2224/joget/jw-community.git</developerConnection>
-        <url>ssh://git@repo.joget.org:2224/joget/jw-community.git</url>
+        <connection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</developerConnection>
+        <url>ssh://git@github.com:kinnara-digital-studio/kecak-workflow-v3.git</url>
         <tag>7.0.36</tag>
     </scm>
     <dependencies>
