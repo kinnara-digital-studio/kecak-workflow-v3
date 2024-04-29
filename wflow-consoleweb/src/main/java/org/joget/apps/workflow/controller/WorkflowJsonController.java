@@ -2,6 +2,9 @@ package org.joget.apps.workflow.controller;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+
+import org.joget.apps.app.model.PackageActivityForm;
+import org.joget.apps.app.model.PackageDefinition;
 import org.joget.commons.util.DynamicDataSourceManager;
 import org.joget.commons.util.LogUtil;
 import java.io.IOException;
@@ -632,6 +635,18 @@ public class WorkflowJsonController {
             data.put("label", assignment.getActivityName());
             data.put("description", assignment.getDescription());
 
+            String activityId = assignment.getActivityId();
+            AppDefinition appDef = appService.getAppDefinitionForWorkflowActivity(activityId);
+            PackageDefinition packageDef = appDef.getPackageDefinition();
+            String processDefIdWithoutVersion = WorkflowUtil.getProcessDefIdWithoutVersion(assignment.getProcessDefId());
+            WorkflowActivity activity = workflowManager.getActivityById(activityId);
+            String activityDefId = activity.getActivityDefId();
+            PackageActivityForm activityForm = packageDef.getPackageActivityForm(processDefIdWithoutVersion, activityDefId);
+            if (activityForm != null && PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(activityForm.getType())) {
+                String formUrl = activityForm.getFormUrl();
+                data.put("externalFormUrl", formUrl);
+            }
+
             jsonObject.accumulate("data", data);
         }
 
@@ -815,6 +830,17 @@ public class WorkflowJsonController {
             JSONObject variableObj = new JSONObject();
             variableObj.accumulate(variable.getId(), (variable.getVal()!=null)?variable.getVal():"");
             jsonObject.accumulate("variable", variableObj);
+        }
+
+        AppDefinition appDef = appService.getAppDefinitionForWorkflowActivity(activityId);
+        PackageDefinition packageDef = appDef.getPackageDefinition();
+        String processDefIdWithoutVersion = WorkflowUtil.getProcessDefIdWithoutVersion(assignment.getProcessDefId());
+        WorkflowActivity activity = workflowManager.getActivityById(activityId);
+        String activityDefId = activity.getActivityDefId();
+        PackageActivityForm activityForm = packageDef.getPackageActivityForm(processDefIdWithoutVersion, activityDefId);
+        if (activityForm != null && PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(activityForm.getType())) {
+            String formUrl = activityForm.getFormUrl();
+            jsonObject.put("externalFormUrl", formUrl);
         }
 
         AppUtil.writeJson(writer, jsonObject, callback);
