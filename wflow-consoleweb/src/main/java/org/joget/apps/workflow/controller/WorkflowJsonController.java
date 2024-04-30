@@ -3,6 +3,7 @@ package org.joget.apps.workflow.controller;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 
+import com.kinnarastudio.commons.Try;
 import org.joget.apps.app.model.PackageActivityForm;
 import org.joget.apps.app.model.PackageDefinition;
 import org.joget.commons.util.DynamicDataSourceManager;
@@ -10,12 +11,8 @@ import org.joget.commons.util.LogUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,8 +25,7 @@ import org.joget.workflow.model.WorkflowProcess;
 import org.joget.workflow.model.WorkflowVariable;
 import org.joget.commons.util.PagedList;
 import org.joget.directory.model.service.DirectoryManager;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.Header;
@@ -644,8 +640,14 @@ public class WorkflowJsonController {
             PackageActivityForm activityForm = packageDef.getPackageActivityForm(processDefIdWithoutVersion, activityDefId);
             if (activityForm != null && PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(activityForm.getType())) {
                 String formUrl = activityForm.getFormUrl();
-                data.put("externalFormUrl", formUrl);
+                data.put("externalFormUrl", AppUtil.processHashVariable(formUrl, assignment, null,  null, appDef));
             }
+
+            WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
+            Optional.ofNullable(process)
+                    .map(WorkflowProcess::getRecordId)
+                    .filter(s -> !s.isEmpty())
+                    .ifPresent(s -> data.put("recordId", s));
 
             jsonObject.accumulate("data", data);
         }
@@ -840,8 +842,14 @@ public class WorkflowJsonController {
         PackageActivityForm activityForm = packageDef.getPackageActivityForm(processDefIdWithoutVersion, activityDefId);
         if (activityForm != null && PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(activityForm.getType())) {
             String formUrl = activityForm.getFormUrl();
-            jsonObject.put("externalFormUrl", formUrl);
+            jsonObject.put("externalFormUrl", AppUtil.processHashVariable(formUrl, assignment, null, null, appDef));
         }
+
+        WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
+        Optional.ofNullable(process)
+                .map(WorkflowProcess::getRecordId)
+                .filter(s -> !s.isEmpty())
+                .ifPresent(Try.onConsumer(s -> jsonObject.put("recordId", s)));
 
         AppUtil.writeJson(writer, jsonObject, callback);
     }
