@@ -2284,7 +2284,7 @@ public class DataJsonController implements Declutter {
 
             JSONArray jsonListData = assignments.stream()
                     .map(Try.onFunction(a -> internalDeleteAssignmentData(a, terminate, statusField)))
-                    .collect(JSONCollectors.toJSONArray(JSONArray::new, Try.onFunction(p -> {
+                    .collect(JSONCollectors.toJSONArray(JSONArray::new, Try.<Map.Entry<Form, FormData>, Object, ApiException>onFunction(p -> {
                         FormData formData = p.getValue();
 
                         if (minify) {
@@ -3158,7 +3158,7 @@ public class DataJsonController implements Declutter {
                         .orElseGet(Stream::empty)
                         .filter(Objects::nonNull)
                         .findFirst()
-                        .map(Try.onFunction(f -> f.handleColumnValueResponse(dataList, column, f, row, value))))
+                        .map(Try.<DataListColumnFormat, Object, JSONException>onFunction(f -> f.handleColumnValueResponse(dataList, column, f, row, value))))
                 .orElse(value);
     }
 

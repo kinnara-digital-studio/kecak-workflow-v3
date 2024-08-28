@@ -89,11 +89,11 @@
                         <configuration>
                             <tasks>
                                 <property file="src/main/resources/install.properties" />
-                                
+
                                 <delete dir="target" />
                                 <mkdir dir="target" />
                                 <mkdir dir="builds" />
-                                
+
                                 <copy todir="target/data">
                                     <fileset dir="src/main/resources/data" />
                                 </copy>
@@ -121,7 +121,7 @@
                                 <get src="https://dev.joget.org/downloads/dependencies/apache-ant-${apache-ant.version}-bin.tar.gz" dest="downloads/apache-ant-${apache-ant.version}-bin.tar.gz" username="public" password="public" usetimestamp="true" />
                                 <get src="https://dev.joget.org/downloads/dependencies/mariadb-noinstall-${mariadb.version}-win32.zip" dest="downloads/mariadb-noinstall-${mariadb.version}-win32.zip" username="public" password="public" usetimestamp="true" />
                                 <get src="https://dev.joget.org/downloads/dependencies/jre${jre.version}.tar.gz" dest="downloads/jre${jre.version}.tar.gz" username="public" password="public" usetimestamp="true" />
-                                
+
                                 <untar compression="gzip" dest="target">
                                     <fileset dir="downloads/">
                                         <include name="apache-tomcat-${tomcat.version}.tar.gz" />
@@ -147,7 +147,7 @@
                                         <include name="*/jwdesigner.war" />
                                     </fileset>
                                 </copy>
-                                -->                                
+                                -->
                                 <copy tofile="target/apache-tomcat-${tomcat.version}/conf/server.xml" file="src/main/resources/server.xml" overwrite="true" />
                                 <copy tofile="target/apache-tomcat-${tomcat.version}/conf/context.xml" file="src/main/resources/context.xml" overwrite="true" />
                                 <copy todir="target/mariadb-${mariadb.version}-win32/" file="src/main/resources/my.ini" />
@@ -203,9 +203,9 @@
                                         <include name="VERSION.txt" />
                                     </tarfileset>
                                     <tarfileset dir="target" filemode="755" prefix="joget-linux-${project.version}">
-                                        <include name="apache-ant-${apache-ant.version}/bin/ant" />
-                                        <include name="apache-tomcat-${tomcat.version}/bin/*.sh" />
-                                        <include name="*.sh" />
+                                        <include name="apache-ant-${apache-ant.version}/bin/ant"/>
+                                        <include name="apache-tomcat-${tomcat.version}/bin/*.sh"/>
+                                        <include name="*.sh"/>
                                     </tarfileset>
                                 </tar>
 
@@ -220,13 +220,13 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nsis-maven-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.0-alpha-1</version>
                 <executions>
                     <execution>
                         <phase>install</phase>
                         <goals>
-                            <goal>generate-project</goal>  
-                            <goal>compile</goal>           
+                            <goal>generate-project</goal>
+                            <goal>compile</goal>
                         </goals>
                     </execution>
                 </executions>
