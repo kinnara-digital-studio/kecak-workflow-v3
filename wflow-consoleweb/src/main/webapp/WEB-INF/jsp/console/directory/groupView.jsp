@@ -6,7 +6,7 @@
     <div id="nav-title">
         <p><i class="fas fa-users"></i> <fmt:message key='console.header.menu.label.users'/></p>
     </div>
-    <div id="nav-body">
+    <div id="navdy">
         <ul id="nav-list">
             <jsp:include page="directorySubMenu.jsp" flush="true" />
         </ul>
@@ -71,6 +71,7 @@
                        column2="{key: 'firstName', label: 'console.directory.user.common.label.firstName', sortable: true}"
                        column3="{key: 'lastName', label: 'console.directory.user.common.label.lastName', sortable: true}"
                        column4="{key: 'email', label: 'console.directory.user.common.label.email', sortable: true}"
+                       column5="{key: 'telephoneNumber', label: 'console.directory.user.common.label.telephoneNumber', sortable: true}"
                        />
         </div>
     </div>

@@ -325,6 +325,7 @@ public class DirectoryJsonController {
                 data.put("firstName", user.getFirstName());
                 data.put("lastName", user.getLastName());
                 data.put("email", user.getEmail());
+                data.put("telephoneNumber", user.getTelephoneNumber());
                 data.put("active", (user.getActive() == 1)? ResourceBundleUtil.getMessage("console.directory.user.common.label.status.active") : ResourceBundleUtil.getMessage("console.directory.user.common.label.status.inactive"));
                 jsonObject.accumulate("data", data);
             }
@@ -365,6 +366,7 @@ public class DirectoryJsonController {
                 data.put("firstName", user.getFirstName());
                 data.put("lastName", user.getLastName());
                 data.put("email", user.getEmail());
+                data.put("telephoneNumber", user.getTelephoneNumber());
                 jsonObject.accumulate("data", data);
             }
         }

@@ -8,6 +8,7 @@
         <property column="firstName" name="firstName" type="string"/>
         <property column="lastName" name="lastName" type="string"/>
         <property column="email" name="email" type="string"/>
+        <property column="telephoneNumber" name="telephoneNumber" type="string"/>
         <property column="timeZone" name="timeZone" type="string"/>
         <property column="locale" name="locale" type="string"/>
         <property column="active" name="active" type="integer"/>

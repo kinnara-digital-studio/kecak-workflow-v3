@@ -239,6 +239,10 @@ public class UserProfileMenu extends UserviewMenu {
                 currentUser.setEmail(getRequestParameterString("email"));
             }
 
+            if ("".equals(getPropertyString("f_telephoneNumber"))) {
+                currentUser.setTelephoneNumber(getRequestParameterString("telephoneNumber"));
+            }
+
             if ("".equals(getPropertyString("f_timeZone"))) {
                 currentUser.setTimeZone(getRequestParameterString("timeZone"));
             }

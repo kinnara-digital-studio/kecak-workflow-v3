@@ -1018,6 +1018,7 @@ public class ConsoleWebController {
                     u.setFirstName(user.getFirstName());
                     u.setLastName(user.getLastName());
                     u.setEmail(user.getEmail());
+                    u.setTelephoneNumber(user.getTelephoneNumber());
                     if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
                         u.setConfirmPassword(user.getPassword());
                         if (us != null) {
@@ -1423,6 +1424,7 @@ public class ConsoleWebController {
                 currentUser.setFirstName(user.getFirstName());
                 currentUser.setLastName(user.getLastName());
                 currentUser.setEmail(user.getEmail());
+                currentUser.setTelephoneNumber(user.getTelephoneNumber());
                 currentUser.setTimeZone(user.getTimeZone());
                 currentUser.setLocale(user.getLocale());
                 if (user.getPassword() != null && user.getConfirmPassword() != null && user.getPassword().length() > 0 && user.getPassword().equals(user.getConfirmPassword())) {

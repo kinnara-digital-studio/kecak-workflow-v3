@@ -251,6 +251,7 @@ public class PresenceManager {
             UserEntry userEntry = new UserEntry();
             userEntry.setUsername(user.getUsername());
             userEntry.setEmail(user.getEmail());
+            userEntry.setTelephoneNumber(user.getTelephoneNumber());
             userEntry.setLastAccess(new Date());
             sessionMap.put(sessionId, userEntry);
             LogUtil.debug(PresenceManager.class.getName(), "join:" + path + ":" + user.getUsername() + ":" + sessionId);
@@ -332,6 +333,7 @@ public class PresenceManager {
     public static class UserEntry {
         String username;
         String email;
+        String telephoneNumber;
         Date lastAccess;
 
         public String getUsername() {
@@ -348,6 +350,14 @@ public class PresenceManager {
 
         public void setEmail(String email) {
             this.email = email;
+        }
+
+        public String getTelephoneNumber() {
+            return telephoneNumber;
+        }
+
+        public void setTelephoneNumber(String telephoneNumber) {
+            this.telephoneNumber = telephoneNumber;
         }
 
         public Date getLastAccess() {

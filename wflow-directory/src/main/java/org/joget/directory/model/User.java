@@ -21,6 +21,7 @@ public class User implements Serializable, Auditable {
     private String firstName;
     private String lastName;
     private String email;
+    private String telephoneNumber;
     private Integer active;
     private String timeZone;
     private String locale;
@@ -64,6 +65,14 @@ public class User implements Serializable, Auditable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
     }
 
     public String getFirstName() {
