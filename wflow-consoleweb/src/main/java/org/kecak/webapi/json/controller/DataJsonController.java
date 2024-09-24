@@ -1247,8 +1247,8 @@ public class DataJsonController implements Declutter {
                 final JSONArray jsonData = Optional.of(dataList)
                         .map(d -> d.getRows(pageSize, rowStart))
                         .map(collection -> (DataListCollection<Map<String, Object>>) collection)
-                        .map(Collection::stream)
-                        .orElseGet(Stream::empty)
+                        .stream()
+                        .flatMap(Collection::stream)
 
                         // reformat content value
                         .map(row -> formatRow(dataList, row))
