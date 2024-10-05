@@ -981,8 +981,6 @@ public class DataJsonController implements Declutter {
     }
 
     /**
-     *
-     *
      * @param request
      * @param response
      * @param appId
@@ -992,10 +990,10 @@ public class DataJsonController implements Declutter {
      * @param page
      * @param start
      * @param rows
-     * @param search    Match by VALUE and LABEL
-     * @param value     Match by VALUE
-     * @param label     Match by LABEL
-     * @param group     Match by GROUPING
+     * @param search         Match by VALUE and LABEL
+     * @param value          Match by VALUE
+     * @param label          Match by LABEL
+     * @param group          Match by GROUPING
      * @param includeSubForm
      * @param digest
      * @throws IOException
@@ -1075,8 +1073,7 @@ public class DataJsonController implements Declutter {
                     .map(s -> s.toLowerCase(Locale.ROOT))
                     .toArray(String[]::new);
 
-            @Nonnull
-            final FormRowSet formRows = optionRows.stream()
+            @Nonnull final FormRowSet formRows = optionRows.stream()
                     .filter(r -> {
                         final String byValue = r.getProperty(FormUtil.PROPERTY_VALUE, "").toLowerCase(Locale.ROOT);
                         final String byLabel = r.getProperty(FormUtil.PROPERTY_LABEL, "").toLowerCase(Locale.ROOT);
@@ -1103,8 +1100,7 @@ public class DataJsonController implements Declutter {
 
             final JSONArray jsonArrayData = FormDataUtil.convertFormRowSetToJsonArray(element, formData, formRows, false);
 
-            @Nullable
-            final String currentDigest = getDigest(jsonArrayData);
+            @Nullable final String currentDigest = getDigest(jsonArrayData);
 
             final JSONObject jsonResponse = new JSONObject();
 
@@ -3853,10 +3849,10 @@ public class DataJsonController implements Declutter {
     protected WorkflowProcessResult submitFormToStartProcess(PackageActivityForm packageActivityForm, FormData formData) {
         Map<String, String> workflowVariables = generateWorkflowVariable(packageActivityForm.getForm(), formData);
         formData.addRequestParameterValues(AssignmentCompleteButton.DEFAULT_ID, new String[]{AssignmentCompleteButton.DEFAULT_ID});
-        final String appId = packageActivityForm.getPackageDefinition().getAppId();
-        final String appVersion = packageActivityForm.getPackageDefinition().getVersion().toString();
-        final String formDefId = packageActivityForm.getProcessDefId();
-        return appService.submitFormToStartProcess(appId, appVersion, packageActivityForm, formDefId, formData, workflowVariables, null);
+        final String appId = packageActivityForm.getPackageDefinition().getAppDefinition().getAppId();
+        final String appVersion = packageActivityForm.getPackageDefinition().getAppDefinition().getVersion().toString();
+        final String processDefId = packageActivityForm.getProcessDefId();
+        return appService.submitFormToStartProcess(appId, appVersion, packageActivityForm, processDefId, formData, workflowVariables, null);
     }
 
     /**
