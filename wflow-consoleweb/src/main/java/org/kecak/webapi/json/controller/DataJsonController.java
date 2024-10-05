@@ -374,12 +374,13 @@ public class DataJsonController implements Declutter {
             PackageActivityForm packageActivityForm = Optional.ofNullable(appService.viewStartProcessForm(appDefinition.getAppId(), appDefinition.getVersion().toString(), processDefId, null, ""))
                     .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Start Process [" + processDefId + "] has not been mapped to form"));
 
-            Form form = Optional.of(packageActivityForm)
-                    .map(PackageActivityForm::getForm)
-                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
-
             FormData formData = new FormData();
             formData.addRequestParameterValues(DataJsonControllerHandler.PARAMETER_DATA_JSON_CONTROLLER, new String[]{DataJsonControllerHandler.PARAMETER_DATA_JSON_CONTROLLER});
+
+            Form form = Optional.of(packageActivityForm)
+                    .map(PackageActivityForm::getFormId)
+                    .map(Try.onFunction(formDefId -> getForm(appDefinition, formDefId, formData, false)))
+                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
 
             // check form permission
             if (!isAuthorize(form, formData)) {
@@ -1450,17 +1451,20 @@ public class DataJsonController implements Declutter {
                 throw new ApiException(HttpServletResponse.SC_UNAUTHORIZED, "User [" + WorkflowUtil.getCurrentUsername() + "] is not allowed to start process [" + processDefId + "]");
             }
 
+            final FormData formData = new FormData();
+
             // get process form
-            PackageActivityForm packageActivityForm = Optional.ofNullable(appService.viewStartProcessForm(appDefinition.getAppId(), appDefinition.getVersion().toString(), processDefId, null, ""))
+            PackageActivityForm packageActivityForm = Optional.ofNullable(appService.viewStartProcessForm(appDefinition.getAppId(), appDefinition.getVersion().toString(), processDefId, formData, ""))
                     .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Start Process [" + processDefId + "] has not been mapped to form"));
 
             Form form = Optional.of(packageActivityForm)
-                    .map(PackageActivityForm::getForm)
-                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
+                    .map(PackageActivityForm::getFormId)
+                    .map(Try.onFunction(formDefId -> getForm(appDefinition, formDefId, formData, false)))
+                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
 
             // read request body and convert request body to json
             JSONObject jsonBody = getRequestPayload(request);
-            final FormData formData = fillStoreBinderInFormData(jsonBody, form, new FormData(), true);
+            fillStoreBinderInFormData(jsonBody, form, formData, true);
 
             if (isNotEmpty(asOptions)) {
                 formData.addRequestParameterValues(DataJsonControllerHandler.PARAMETER_AS_OPTIONS, new String[]{"true"});
@@ -1526,15 +1530,18 @@ public class DataJsonController implements Declutter {
                 throw new ApiException(HttpServletResponse.SC_UNAUTHORIZED, "User [" + WorkflowUtil.getCurrentUsername() + "] is not allowed to start process [" + processDefId + "]");
             }
 
+            final FormData formData = new FormData();
+
             // get process form
-            PackageActivityForm packageActivityForm = Optional.ofNullable(appService.viewStartProcessForm(appDefinition.getAppId(), appDefinition.getVersion().toString(), processDefId, null, ""))
+            PackageActivityForm packageActivityForm = Optional.ofNullable(appService.viewStartProcessForm(appDefinition.getAppId(), appDefinition.getVersion().toString(), processDefId, formData, ""))
                     .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Start Process [" + processDefId + "] has not been mapped to form"));
 
             Form form = Optional.of(packageActivityForm)
-                    .map(PackageActivityForm::getForm)
-                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
+                    .map(PackageActivityForm::getFormId)
+                    .map(Try.onFunction(formDefId -> getForm(appDefinition, formDefId, formData, false)))
+                    .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Error retrieving form for [" + packageActivityForm.getActivityDefId() + "]"));
 
-            final FormData formData = addRequestParameterForMultipart(form, new FormData(), request.getParameterMap());
+            addRequestParameterForMultipart(form, formData, request.getParameterMap());
             if (asOptions) {
                 formData.addRequestParameterValues(DataJsonControllerHandler.PARAMETER_AS_OPTIONS, new String[]{"true"});
             }
@@ -3793,7 +3800,7 @@ public class DataJsonController implements Declutter {
      * @param data
      * @return result
      */
-    protected FormData addRequestParameterForMultipart(Form form, FormData formData, Map<String, String[]> data) {
+    protected FormData addRequestParameterForMultipart(Form form, @Nonnull FormData formData, Map<String, String[]> data) {
         // register primary key
         if (formData.getPrimaryKeyValue() == null && data.containsKey("id")) {
             String[] values = data.get("id");
@@ -3848,7 +3855,7 @@ public class DataJsonController implements Declutter {
         formData.addRequestParameterValues(AssignmentCompleteButton.DEFAULT_ID, new String[]{AssignmentCompleteButton.DEFAULT_ID});
         final String appId = packageActivityForm.getPackageDefinition().getAppId();
         final String appVersion = packageActivityForm.getPackageDefinition().getVersion().toString();
-        final String formDefId = packageActivityForm.getFormId();
+        final String formDefId = packageActivityForm.getProcessDefId();
         return appService.submitFormToStartProcess(appId, appVersion, packageActivityForm, formDefId, formData, workflowVariables, null);
     }
 
