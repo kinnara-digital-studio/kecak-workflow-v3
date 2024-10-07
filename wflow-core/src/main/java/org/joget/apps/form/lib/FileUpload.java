@@ -6,14 +6,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -29,19 +27,20 @@ import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.model.FormPermission;
 import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
+import org.joget.apps.form.service.FileUtil;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.apps.userview.model.Permission;
 import org.joget.apps.userview.model.PwaOfflineResources;
-import org.joget.commons.util.FileManager;
-import org.joget.commons.util.FileStore;
-import org.joget.commons.util.ResourceBundleUtil;
-import org.joget.commons.util.SecurityUtil;
+import org.joget.commons.util.*;
 import org.joget.directory.model.User;
 import org.joget.plugin.base.PluginManager;
 import org.joget.plugin.base.PluginWebSupport;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.form.service.FormDataUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileUpload extends Element implements FormBuilderPaletteElement, FileDownloadSecurity, PluginWebSupport, PwaOfflineResources {
@@ -445,5 +444,138 @@ public class FileUpload extends Element implements FormBuilderPaletteElement, Fi
         urls.add(contextPath + "/plugin/org.joget.apps.form.lib.FileUpload/js/jquery.fileupload.js");
         
         return urls;
+    }
+
+    @Override
+    public String[] handleMultipartDataRequest(String[] values, Element element, FormData formData) {
+        final String elementId = element.getPropertyString("id");
+
+        List<String> filePathList = new ArrayList<>();
+
+        try {
+            MultipartFile[] fileStore = FileStore.getFiles(elementId);
+            if (fileStore != null) {
+                for (MultipartFile file : fileStore) {
+                    final String filePath = FileManager.storeFile(file);
+                    filePathList.add(filePath);
+                }
+            }
+        } catch (FileLimitException e) {
+            LogUtil.error(getClassName(), e, e.getMessage());
+        }
+
+        if (filePathList.isEmpty()) {
+            return FormUtil.getElementPropertyValues(element, formData);
+        } else {
+            return filePathList.toArray(new String[0]);
+        }
+    }
+
+    @Override
+    public String[] handleJsonDataRequest(@Nullable Object value, @Nonnull Element element, FormData formData) {
+        String stringValue = value == null ? "" : value.toString();
+
+        JSONArray jsonValue;
+        try {
+            jsonValue = new JSONArray(stringValue);
+        } catch (JSONException e) {
+            // handle if it is not an array
+            jsonValue = new JSONArray();
+            jsonValue.put(stringValue);
+        }
+
+        List<String> result = new ArrayList<>();
+        for (int i = 0, size = jsonValue.length(); i < size; i++) {
+            try {
+                String data = jsonValue.getString(i);
+                Matcher dataPattern = FormDataUtil.DATA_PATTERN.matcher(data);
+
+                String tempFilePath;
+
+                // as data uri
+                if (dataPattern.find()) {
+                    String contentType = dataPattern.group("mime");
+                    String extension = contentType.split("/")[1];
+                    String fileName = FormDataUtil.getFileName(dataPattern.group("properties"), extension);
+                    String base64 = dataPattern.group("data");
+
+                    // store in app_tempupload
+                    MultipartFile multipartFile = FormDataUtil.decodeFile(fileName, contentType, base64.trim());
+                    tempFilePath = FileManager.storeFile(multipartFile);
+                } else {
+                    tempFilePath = data;
+                }
+
+                // check if file really exist in app_tempupload or in current record
+                if (FileManager.getFileByPath(tempFilePath) != null || FileUtil.getFile(tempFilePath, this, getPrimaryKeyValue(formData)).isFile()) {
+                    result.add(tempFilePath);
+                }
+
+            } catch (JSONException | IOException e) {
+                LogUtil.error(getClassName(), e, e.getMessage());
+            }
+        }
+
+        // clean field for empty result
+        if (result.isEmpty()) {
+            result.add("");
+        }
+
+        return result.toArray(new String[0]);
+    }
+
+    @Override
+    public Object handleElementValueResponse(@Nonnull Element element, @Nonnull FormData formData) throws JSONException {
+        if (isReadOnlyLabel() || asAttachment(formData)) {
+            return getFileDownloadLink(formData);
+        } else {
+            return FormUtil.getElementPropertyValue(this, formData);
+        }
+    }
+
+    protected boolean isReadOnlyLabel() {
+        return "true".equalsIgnoreCase(getPropertyString(FormUtil.PROPERTY_READONLY))
+                && "true".equalsIgnoreCase(getPropertyString(FormUtil.PROPERTY_READONLY_LABEL));
+    }
+
+    protected boolean asAttachment(FormData formData) {
+        return Boolean.parseBoolean(getPropertyString("attachment"))
+                || "true".equalsIgnoreCase(formData.getRequestParameter(PARAMETER_AS_LINK));
+    }
+
+    protected String getFileDownloadLink(FormData formData) {
+        AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
+        // set value
+        String[] values = FormUtil.getElementPropertyValues(this, formData);
+        return Arrays.stream(values)
+                .filter(Objects::nonNull)
+                .map(fileName -> {
+                    // determine actual path for the file uploads
+                    String appId = appDefinition.getAppId();
+                    long appVersion = appDefinition.getVersion();
+                    String formDefId = Optional.ofNullable(FormUtil.findRootForm(this))
+                            .map(new Function<Form, String>() {
+                                @Override
+                                public String apply(Form f) {
+                                    return f.getPropertyString(FormUtil.PROPERTY_ID);
+                                }
+                            })
+                            .orElse("");
+                    String encodedFileName = fileName;
+                    String primaryKeyValue = formData.getPrimaryKeyValue();
+                    try {
+                        encodedFileName = URLEncoder.encode(fileName, "UTF8").replaceAll("\\+", "%20");
+                    } catch (UnsupportedEncodingException ex) {
+                        // ignore
+                    }
+
+                    String filePath = "/web/client/app/" + appId + "/" + appVersion + "/form/download/" + formDefId + "/" + primaryKeyValue + "/" + encodedFileName + ".";
+                    if (asAttachment(formData)) {
+                        filePath += "?attachment=true";
+                    }
+
+                    return filePath;
+                })
+                .collect(Collectors.joining(";"));
     }
 }
