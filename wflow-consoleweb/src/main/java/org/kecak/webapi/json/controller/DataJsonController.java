@@ -1567,6 +1567,55 @@ public class DataJsonController implements Declutter {
         }
     }
 
+
+    /**
+     * Assignment Save Draft
+     *
+     * @param request
+     * @param response
+     * @param assignmentId
+     * @param minify
+     */
+    @RequestMapping(value = "/json/data/assignment/(*:assignmentId)", method = {RequestMethod.PUT}, headers = "content-type=application/json")
+    public void putAssignment(final HttpServletRequest request, final HttpServletResponse response,
+                              @RequestParam("assignmentId") String assignmentId,
+                              @RequestParam(value = "minify", defaultValue = "false") Boolean minify) throws IOException, JSONException {
+
+        LogUtil.info(getClass().getName(), "Executing Rest API [" + request.getRequestURI() + "] in method [" + request.getMethod() + "] contentType [" + request.getContentType() + "] as [" + WorkflowUtil.getCurrentUsername() + "]");
+
+        try {
+            // get assignment
+            final WorkflowAssignment assignment = getAssignment(assignmentId);
+
+            // read request body and convert request body to json
+            final JSONObject jsonBody = getRequestPayload(request);
+
+            final FormData formData = new FormData() {{
+                setActivityId(assignment.getActivityId());
+            }};
+
+            // get assignment form
+            @Nonnull final Form form = getForm(assignment, formData, true);
+            final FormData readyToSubmitFormData = fillStoreBinderInFormData(jsonBody, form, formData, true);
+
+            // submit form
+            final FormData resultFormData = submitForm(form, readyToSubmitFormData, false);
+
+            // return processResult
+            JSONObject jsonResponse = getJsonResponseResult(form, resultFormData, minify);
+            response.getWriter().write(jsonResponse.toString());
+
+            addAuditTrail("putAssignment", request,
+                    response,
+                    assignmentId,
+                    minify);
+
+        } catch (ApiException e) {
+            response.sendError(e.getErrorCode(), e.getMessage());
+            LogUtil.error(getClass().getName(), e, "HTTP error [" + e.getErrorCode() + "] : " + e.getMessage());
+        }
+    }
+
     /**
      * Post Assignment Complete
      * <p>
@@ -1577,7 +1626,7 @@ public class DataJsonController implements Declutter {
      * @param assignmentId Assignment ID
      * @param minify       Response only returns primaryKey
      */
-    @RequestMapping(value = "/json/data/assignment/(*:assignmentId)", method = {RequestMethod.POST, RequestMethod.PUT}, headers = "content-type=application/json")
+    @RequestMapping(value = "/json/data/assignment/(*:assignmentId)", method = {RequestMethod.POST}, headers = "content-type=application/json")
     public void postAssignmentComplete(final HttpServletRequest request, final HttpServletResponse response,
                                        @RequestParam("assignmentId") String assignmentId,
                                        @RequestParam(value = "minify", defaultValue = "false") Boolean minify)
@@ -3062,6 +3111,12 @@ public class DataJsonController implements Declutter {
     protected Form getForm(@Nonnull WorkflowAssignment assignment, @Nonnull final FormData formData, boolean optimizeReadonlyElementsDataLoading) throws ApiException {
         // get application definition
         @Nonnull AppDefinition appDefinition = getApplicationDefinition(assignment);
+
+        WorkflowProcess process = workflowManager.getProcess(assignment.getProcessId());
+        if(process != null) {
+            formData.setProcessId(process.getId());
+            formData.setPrimaryKeyValue(process.getRecordId());
+        }
 
         if (optimizeReadonlyElementsDataLoading) {
             // optimize form loading for non-GET

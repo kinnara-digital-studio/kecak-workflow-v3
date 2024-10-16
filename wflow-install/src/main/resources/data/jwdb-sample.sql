@@ -3030,7 +3030,7 @@ CREATE TABLE `dir_organization` (
 
 LOCK TABLES `dir_organization` WRITE;
 /*!40000 ALTER TABLE `dir_organization` DISABLE KEYS */;
-INSERT INTO `dir_organization` VALUES ('ORG-001','Joget.Org','',NULL);
+INSERT INTO `dir_organization` VALUES ('ORG-001','org.kecak','',NULL);
 /*!40000 ALTER TABLE `dir_organization` ENABLE KEYS */;
 UNLOCK TABLES;
 
