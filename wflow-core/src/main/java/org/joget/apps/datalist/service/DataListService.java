@@ -71,23 +71,14 @@ public class DataListService {
 
         final DataList dataList = JsonUtil.fromJson(json, DataList.class);
 
-        final Optional<Permission> optPermission = Optional.ofNullable(dataList)
-                .map(DataList::getPermission);
-
-        if (!ignorePermission&& optPermission.isPresent()) {
-            final Permission permission = optPermission.get();
-            final DirectoryManager directoryManager = (DirectoryManager) AppUtil.getApplicationContext().getBean("directoryManager");
-            final User user = directoryManager.getUserByUsername(WorkflowUtil.getCurrentUsername());
-
-            permission.setCurrentUser(user);
-            if (!permission.isAuthorize()) {
-                LogUtil.info(getClass().getName(), "User [" + user.getUsername() + "] is unauthorized to access datalist [" + dataList.getId() + "]");
-                return null;
-            }
-        }
-
         // check column permission
         if (dataList != null) {
+            if(!dataList.isIsAuthorized()) {
+                final User user = directoryManager.getUserByUsername(WorkflowUtil.getCurrentUsername());
+                LogUtil.warn(getClass().getName(), "User [" + user.getUsername() + "] is unauthorized to access datalist [" + dataList.getId() + "]");
+                return null;
+            }
+
             DataListColumn[] columns = Optional.of(dataList)
                     .map(DataList::getColumns)
                     .map(Arrays::stream)

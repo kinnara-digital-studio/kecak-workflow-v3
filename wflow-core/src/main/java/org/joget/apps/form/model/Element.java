@@ -1,9 +1,7 @@
 package org.joget.apps.form.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.service.FormService;
 import org.joget.apps.form.service.FormUtil;
@@ -550,5 +548,28 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
             }
         }
         return permissionKeys.get(formData);
+    }
+
+    /**
+     * Hibernate data type
+     *
+     * @return
+     */
+    public Type getType() {
+        return Optional.ofNullable(getValidator())
+                .map(v -> v.getPropertyString("type"))
+                .filter("numeric"::equalsIgnoreCase)
+                .map(b -> Type.NUMERIC)
+                .orElse(Type.TEXT);
+    }
+
+    /**
+     * Element Type
+     */
+    public enum Type {
+        TEXT,
+        NUMERIC,
+        DATE,
+        DATETIME
     }
 }

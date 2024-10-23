@@ -3771,8 +3771,9 @@ public class DataJsonController implements Declutter {
      * @return
      */
     protected boolean isAuthorize(@Nonnull DataList dataList) {
-        final boolean isPermissionSet = dataList.getPermission() != null;
-        return !isPermissionSet && isDefaultUserToHavePermission() || isPermissionSet && dataListService.isAuthorize(dataList);
+//        final boolean isPermissionSet = dataList.getPermission() != null;
+//        return !isPermissionSet && isDefaultUserToHavePermission() || isPermissionSet && dataListService.isAuthorize(dataList);
+        return dataList.isIsAuthorized();
     }
 
     /**

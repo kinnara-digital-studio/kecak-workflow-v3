@@ -978,6 +978,7 @@ public class DataList {
     /**
      * Set permission * * @param permission
      */
+    @Deprecated
     public void setPermission(Permission permission) {
         this.permission = permission;
     }
@@ -985,6 +986,7 @@ public class DataList {
     /**
      * Get permission * * @return
      */
+    @Deprecated
     public Permission getPermission() {
         return permission;
     }
