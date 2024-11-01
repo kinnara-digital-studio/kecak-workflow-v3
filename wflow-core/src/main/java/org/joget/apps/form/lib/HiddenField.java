@@ -1,6 +1,8 @@
 package org.joget.apps.form.lib;
 
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormBuilderPaletteElement;
@@ -10,6 +12,12 @@ import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.commons.util.ResourceBundleUtil;
+import org.joget.commons.util.StringUtil;
+import org.joget.workflow.model.WorkflowAssignment;
+import org.joget.workflow.model.service.WorkflowManager;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class HiddenField extends Element implements FormBuilderPaletteElement {
 
@@ -122,5 +130,37 @@ public class HiddenField extends Element implements FormBuilderPaletteElement {
         }
 
         return rowSet;
+    }
+
+    @Override
+    public String[] handleMultipartDataRequest(@Nonnull String[] values, @Nonnull Element element, @Nonnull FormData formData) {
+        return handleDataRequestParameter(element, formData);
+    }
+
+    @Override
+    public String[] handleJsonDataRequest(@Nullable Object value, @Nonnull Element element, @Nonnull FormData formData) {
+        return handleDataRequestParameter(element, formData);
+    }
+
+    protected String[] handleDataRequestParameter(Element element, FormData formData) {
+        WorkflowManager workflowManager = (WorkflowManager) AppUtil.getApplicationContext().getBean("workflowManager");
+        WorkflowAssignment assignment = workflowManager.getAssignment(formData.getActivityId());
+
+        String elementId = element.getPropertyString(FormUtil.PROPERTY_ID);
+        String defaultValue = AppUtil.processHashVariable(element.getPropertyString(FormUtil.PROPERTY_VALUE), assignment, null, null);
+        FormRowSet rows = formData.getLoadBinderData(element);
+        if(rows == null || rows.isEmpty()) {
+            return new String[] { defaultValue };
+        }
+
+        String databaseValue = rows.get(0).getProperty(elementId, "");
+
+        String priority = element.getPropertyString("useDefaultWhenEmpty");
+
+        if (StringUtils.isNotEmpty(priority) && (("true".equals(priority) && StringUtils.isEmpty(databaseValue)) || "valueOnly".equals(priority))) {
+            return new String[] { defaultValue };
+        }
+
+        return new String[] { StringUtils.firstNonEmpty(databaseValue, defaultValue) };
     }
 }

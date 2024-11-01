@@ -2,14 +2,18 @@ package org.kecak.apps.form.model;
 
 import com.kinnarastudio.commons.Try;
 import com.kinnarastudio.commons.jsonstream.JSONStream;
+import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.service.FormUtil;
+import org.joget.workflow.model.WorkflowAssignment;
+import org.joget.workflow.model.service.WorkflowManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 /**
  * Handler for DataJsonController, this interface will be called
@@ -29,8 +33,10 @@ public interface DataJsonControllerHandler {
      * @param formData
      * @return data that will be passed to request parameter
      */
-    default String[] handleMultipartDataRequest(@Nonnull String[] values, @Nonnull Element element, FormData formData) {
-        return values;
+    default String[] handleMultipartDataRequest(@Nonnull String[] values, @Nonnull Element element, @Nonnull FormData formData) {
+        return Arrays.stream(values)
+                .map(s -> AppUtil.processHashVariable(s, formData.getAssignment(), null, null))
+                .toArray(String[]::new);
     }
 
     /**
@@ -52,7 +58,7 @@ public interface DataJsonControllerHandler {
                     .filter(s -> !s.isEmpty())
                     .toArray(String[]::new);
         } else {
-            return new String[]{String.valueOf(value)};
+            return new String[]{AppUtil.processHashVariable(String.valueOf(value), formData.getAssignment(), null, null)};
         }
     }
 

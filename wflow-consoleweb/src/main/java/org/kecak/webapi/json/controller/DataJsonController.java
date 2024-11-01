@@ -3167,8 +3167,8 @@ public class DataJsonController implements Declutter {
     protected void getCollectFilters(@Nonnull final Map<String, String[]> requestParameters, @Nonnull final DataList dataList) {
         Optional.of(dataList)
                 .map(DataList::getFilters)
-                .map(Arrays::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Arrays::stream)
 
                 .filter(f -> Optional.of(f)
                         .map(DataListFilter::getName)

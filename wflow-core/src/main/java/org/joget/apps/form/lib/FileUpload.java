@@ -447,7 +447,7 @@ public class FileUpload extends Element implements FormBuilderPaletteElement, Fi
     }
 
     @Override
-    public String[] handleMultipartDataRequest(String[] values, Element element, FormData formData) {
+    public String[] handleMultipartDataRequest(@Nonnull String[] values, @Nonnull Element element, @Nonnull FormData formData) {
         final String elementId = element.getPropertyString("id");
 
         List<String> filePathList = new ArrayList<>();
