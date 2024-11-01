@@ -2,7 +2,6 @@ package org.joget.apps.form.lib;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormBuilderPaletteElement;
@@ -12,7 +11,6 @@ import org.joget.apps.form.model.FormRow;
 import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.commons.util.ResourceBundleUtil;
-import org.joget.commons.util.StringUtil;
 import org.joget.workflow.model.WorkflowAssignment;
 import org.joget.workflow.model.service.WorkflowManager;
 
@@ -157,10 +155,31 @@ public class HiddenField extends Element implements FormBuilderPaletteElement {
 
         String priority = element.getPropertyString("useDefaultWhenEmpty");
 
-        if (StringUtils.isNotEmpty(priority) && (("true".equals(priority) && StringUtils.isEmpty(databaseValue)) || "valueOnly".equals(priority))) {
+        if (isNotEmpty(priority) && (("true".equals(priority) && isEmpty(databaseValue)) || "valueOnly".equals(priority))) {
             return new String[] { defaultValue };
         }
 
-        return new String[] { StringUtils.firstNonEmpty(databaseValue, defaultValue) };
+        final String value = firstNonEmpty(databaseValue, defaultValue);
+        return new String[] { value };
+    }
+
+    protected String firstNonEmpty(String... values) {
+        if(values == null) {
+            return null;
+        }
+
+        for (String value : values) {
+            if(isNotEmpty(value)) return value;
+        }
+
+        return null;
+    }
+
+    protected boolean isNotEmpty(String value) {
+        return value != null && !value.isEmpty();
+    }
+
+    protected boolean isEmpty(String value) {
+        return value == null || value.isEmpty();
     }
 }
