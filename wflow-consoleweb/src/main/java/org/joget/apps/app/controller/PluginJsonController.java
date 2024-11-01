@@ -69,6 +69,7 @@ public class PluginJsonController {
                             || plugin instanceof ParticipantPlugin
                             || plugin instanceof ApplicationPlugin
                             || plugin instanceof EmailProcessorPlugin
+                            || plugin instanceof HashVariablePlugin
                             || plugin instanceof SchedulerPlugin) {
                         pluginList.add(plugin);
                     }
