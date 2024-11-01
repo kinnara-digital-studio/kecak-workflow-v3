@@ -1038,8 +1038,8 @@ public class DataJsonController implements Declutter {
             Collection<FormRow> optionRows = FormUtil.getElementPropertyOptionsMap(element, formData);
 
             final String[] searches = Optional.ofNullable(search)
-                    .map(Arrays::stream)
-                    .orElseGet(Stream::empty)
+                    .stream()
+                    .flatMap(Arrays::stream)
                     .map(s -> s.split(";"))
                     .flatMap(Arrays::stream)
                     .filter(s -> !s.isEmpty())
@@ -1047,8 +1047,8 @@ public class DataJsonController implements Declutter {
                     .toArray(String[]::new);
 
             final String[] values = Optional.ofNullable(value)
-                    .map(Arrays::stream)
-                    .orElseGet(Stream::empty)
+                    .stream()
+                    .flatMap(Arrays::stream)
                     .map(s -> s.split(";"))
                     .flatMap(Arrays::stream)
                     .filter(s -> !s.isEmpty())
@@ -1056,8 +1056,8 @@ public class DataJsonController implements Declutter {
                     .toArray(String[]::new);
 
             final String[] labels = Optional.ofNullable(label)
-                    .map(Arrays::stream)
-                    .orElseGet(Stream::empty)
+                    .stream()
+                    .flatMap(Arrays::stream)
                     .map(s -> s.split(";"))
                     .flatMap(Arrays::stream)
                     .filter(s -> !s.isEmpty())
@@ -1065,8 +1065,8 @@ public class DataJsonController implements Declutter {
                     .toArray(String[]::new);
 
             final String[] groups = Optional.ofNullable(group)
-                    .map(Arrays::stream)
-                    .orElseGet(Stream::empty)
+                    .stream()
+                    .flatMap(Arrays::stream)
                     .map(s -> s.split(";"))
                     .flatMap(Arrays::stream)
                     .filter(s -> !s.isEmpty())
