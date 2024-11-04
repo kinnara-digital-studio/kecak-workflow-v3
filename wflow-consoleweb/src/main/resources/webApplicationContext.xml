@@ -14,7 +14,7 @@
  
     <!-- START web relevant bean-->
     <context:annotation-config/>
-    <context:component-scan base-package="org.joget,org.kecak"/>
+    <context:component-scan base-package="org.joget, org.kecak"/>
 
     <context:property-placeholder location="classpath:conf/quartz-setup.properties"/>
 

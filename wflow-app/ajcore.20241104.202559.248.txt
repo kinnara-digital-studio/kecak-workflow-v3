@@ -1,0 +1,506 @@
+---- AspectJ Properties ---
+AspectJ Compiler 1.9.1 built on Friday Apr 20, 2018 at 16:47:33 GMT
+---- Dump Properties ---
+Dump file: ajcore.20241104.202559.248.txt
+Dump reason: org.aspectj.weaver.BCException
+Dump on exception: true
+Dump at exit condition: abort
+---- Exception Information ---
+---- System Properties ---
+sun.desktop=gnome
+awt.toolkit=sun.awt.X11.XToolkit
+java.specification.version=11
+sun.cpu.isalist=
+sun.jnu.encoding=UTF-8
+java.class.path=/snap/intellij-idea-community/548/plugins/maven/lib/maven3/boot/plexus-classworlds-2.8.0.jar:/snap/intellij-idea-community/548/plugins/maven/lib/maven3/boot/plexus-classworlds.license
+java.vm.vendor=Ubuntu
+sun.arch.data.model=64
+java.vendor.url=https://ubuntu.com/
+user.timezone=Asia/Jakarta
+maven.conf=/snap/intellij-idea-community/548/plugins/maven/lib/maven3/conf
+os.name=Linux
+java.vm.specification.version=11
+sun.java.launcher=SUN_STANDARD
+user.country=US
+sun.boot.library.path=/usr/lib/jvm/java-11-openjdk-amd64/lib
+sun.java.command=org.codehaus.classworlds.Launcher -Didea.version=2024.2.4 clean install -Dmaven.test.skip=true
+jdk.debug=release
+maven.home=/snap/intellij-idea-community/548/plugins/maven/lib/maven3
+sun.cpu.endian=little
+user.home=/home/aristo
+user.language=en
+java.specification.vendor=Oracle Corporation
+java.version.date=2024-07-16
+java.home=/usr/lib/jvm/java-11-openjdk-amd64
+file.separator=/
+java.vm.compressedOopsMode=Zero based
+line.separator=
+
+java.specification.name=Java Platform API Specification
+java.vm.specification.vendor=Oracle Corporation
+java.awt.graphicsenv=sun.awt.X11GraphicsEnvironment
+sun.management.compiler=HotSpot 64-Bit Tiered Compilers
+java.runtime.version=11.0.24+8-post-Ubuntu-1ubuntu324.04.1
+user.name=aristo
+path.separator=:
+securerandom.source=file:/dev/./urandom
+os.version=6.8.0-48-generic
+java.runtime.name=OpenJDK Runtime Environment
+file.encoding=UTF-8
+guice.disable.misplaced.annotation.check=true
+java.vm.name=OpenJDK 64-Bit Server VM
+maven.ext.class.path=/snap/intellij-idea-community/548/plugins/maven/lib/maven-event-listener.jar
+java.vendor.url.bug=https://bugs.launchpad.net/ubuntu/+source/openjdk-lts
+java.io.tmpdir=/tmp
+idea.version=2024.2.4
+java.version=11.0.24
+maven.test.skip=true
+user.dir=/home/aristo/Developments/Java/kecak-workflow-v3/wflow-app
+os.arch=amd64
+maven.multiModuleProjectDirectory=/home/aristo/Developments/Java/kecak-workflow-v3/wflow-app
+jansi.passthrough=true
+java.vm.specification.name=Java Virtual Machine Specification
+java.awt.printerjob=sun.print.PSPrinterJob
+sun.os.patch.level=unknown
+java.library.path=/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+java.vm.info=mixed mode, sharing
+java.vendor=Ubuntu
+java.vm.version=11.0.24+8-post-Ubuntu-1ubuntu324.04.1
+java.specification.maintenance.version=2
+classworlds.conf=/snap/intellij-idea-community/548/plugins/maven/lib/maven3/bin/m2.conf
+sun.io.unicode.encoding=UnicodeLittle
+java.class.version=55.0
+---- Command Line ---
+-Xajruntimetarget:1.5
+-1.8
+-classpath
+/home/aristo/.m2/repository/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar:/home/aristo/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/aristo/.m2/repository/org/springframework/spring-test/4.3.29.RELEASE/spring-test-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar:/home/aristo/.m2/repository/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar:/home/aristo/.m2/repository/javax/servlet/jstl/1.2/jstl-1.2.jar:/home/aristo/.m2/repository/org/apache/taglibs/taglibs-standard-impl/1.2.5/taglibs-standard-impl-1.2.5.jar:/home/aristo/.m2/repository/org/json/json/20080701/json-20080701.jar:/home/aristo/.m2/repository/commons-fileupload/commons-fileupload/1.3.3/commons-fileupload-1.3.3.jar:/home/aristo/.m2/repository/commons-codec/commons-codec/1.15/commons-codec-1.15.jar:/home/aristo/.m2/repository/org/w3c/jigsaw/jigsaw/2.2.6/jigsaw-2.2.6.jar:/home/aristo/.m2/repository/javax/cache/cache-api/1.0.0/cache-api-1.0.0.jar:/home/aristo/.m2/repository/org/aspectj/aspectjrt/1.9.1/aspectjrt-1.9.1.jar:/home/aristo/.m2/repository/javax/websocket/javax.websocket-api/1.1/javax.websocket-api-1.1.jar:/home/aristo/.m2/repository/org/apache/camel/camel-core/2.15.1/camel-core-2.15.1.jar:/home/aristo/.m2/repository/org/apache/camel/camel-stream/2.15.1/camel-stream-2.15.1.jar:/home/aristo/.m2/repository/org/apache/camel/camel-jms/2.15.1/camel-jms-2.15.1.jar:/home/aristo/.m2/repository/org/apache/camel/camel-spring/2.15.1/camel-spring-2.15.1.jar:/home/aristo/.m2/repository/org/apache/camel/camel-mail/2.15.1/camel-mail-2.15.1.jar:/home/aristo/.m2/repository/com/kinnarastudio/kinnara-commons/3.0.0/kinnara-commons-3.0.0.jar:/home/aristo/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar:/home/aristo/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar:/home/aristo/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-wfengine/target/wflow-wfengine-7.0-SNAPSHOT.jar:/home/aristo/.m2/repository/xerces/xercesImpl/2.12.2/xercesImpl-2.12.2.jar:/home/aristo/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar:/home/aristo/.m2/repository/EnhydraShark/shark-maven/2.0.1/shark-maven-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkadminapi/2.0.1/sharkadminapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkassignment-historyrelated/2.0.1/sharkassignment-historyrelated-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkassignment-standard/2.0.1/sharkassignment-standard-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkassignment-xpdlstraightparticipantmapping/2.0.1/sharkassignment-xpdlstraightparticipantmapping-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkclientapi/2.0.1/sharkclientapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkcommonapi/2.0.1/sharkcommonapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkcorbaclientapi/2.0.1/sharkcorbaclientapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkinternalapi/2.0.1/sharkinternalapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkkernel-standard/2.0.1/sharkkernel-standard-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkutilities-misc/2.0.1/sharkutilities-misc-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkutilities-wmentity/2.0.1/sharkutilities-wmentity-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkutilities-xpil/2.0.1/sharkutilities-xpil-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkwebservice-asapapi/2.0.1/sharkwebservice-asapapi-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkwebservice-wfxmlapi/2.0.1/sharkwebservice-wfxmlapi-2.0.1.jar:/home/aristo/.m2/repository/TogetherRelationalObjects/tro-localcontext/7.1-1-professional/tro-localcontext-7.1-1-professional.jar:/home/aristo/.m2/repository/EnhydraShark/twexpdl/2.0.1/twexpdl-2.0.1.jar:/home/aristo/.m2/repository/TogetherApplicationFramework/util/7.1-1-community/util-7.1-1-community.jar:/home/aristo/.m2/repository/EnhydraShark/sharkscripting-standard/2.0.1/sharkscripting-standard-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkclientutilities-misc/2.0.1/sharkclientutilities-misc-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkinstancepersistence-dods/2.0.1/sharkinstancepersistence-dods-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkinstancepersistence-dodslayer/2.0.1/sharkinstancepersistence-dodslayer-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkrepositorypersistence-dods/2.0.1/sharkrepositorypersistence-dods-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharkrepositorypersistence-dodslayer/2.0.1/sharkrepositorypersistence-dodslayer-2.0.1.jar:/home/aristo/.m2/repository/EnhydraShark/sharklogging-standard/2.0.1/sharklogging-standard-2.0.1.jar:/home/aristo/.m2/repository/TogetherRelationalObjects/dbmanager/7.1-1-professional/dbmanager-7.1-1-professional.jar:/home/aristo/.m2/repository/TogetherApplicationFramework/eaf-api/7.1-1-community/eaf-api-7.1-1-community.jar:/home/aristo/.m2/repository/TogetherApplicationFramework/eafconfreader/7.1-1-community/eafconfreader-7.1-1-community.jar:/home/aristo/.m2/repository/org/apache-extras/beanshell/bsh/2.0b6/bsh-2.0b6.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-commons/target/wflow-commons-7.0-SNAPSHOT.jar:/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar:/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar:/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-1.2-api/2.17.1/log4j-1.2-api-2.17.1.jar:/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-slf4j-impl/2.17.1/log4j-slf4j-impl-2.17.1.jar:/home/aristo/.m2/repository/org/springframework/spring-orm/4.3.29.RELEASE/spring-orm-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-jdbc/4.3.29.RELEASE/spring-jdbc-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-context-support/4.3.29.RELEASE/spring-context-support-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-aspects/4.3.29.RELEASE/spring-aspects-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/aspectj/aspectjweaver/1.9.1/aspectjweaver-1.9.1.jar:/home/aristo/.m2/repository/org/springframework/spring-webmvc/4.3.29.RELEASE/spring-webmvc-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-web/4.3.29.RELEASE/spring-web-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/org/springmodules/spring-modules-validation/0.8/spring-modules-validation-0.8.jar:/home/aristo/.m2/repository/commons-digester/commons-digester/1.7/commons-digester-1.7.jar:/home/aristo/.m2/repository/antlr/antlr/2.7.6/antlr-2.7.6.jar:/home/aristo/.m2/repository/commons-validator/commons-validator/1.5.1/commons-validator-1.5.1.jar:/home/aristo/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar:/home/aristo/.m2/repository/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.jar:/home/aristo/.m2/repository/org/springframework/security/spring-security-acl/4.1.5.RELEASE/spring-security-acl-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/security/spring-security-core/4.1.5.RELEASE/spring-security-core-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/security/spring-security-web/4.1.5.RELEASE/spring-security-web-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/security/spring-security-config/4.1.5.RELEASE/spring-security-config-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/hibernate/hibernate-core/4.3.11.Final/hibernate-core-4.3.11.Final.jar:/home/aristo/.m2/repository/org/jboss/logging/jboss-logging-annotations/1.2.0.Beta1/jboss-logging-annotations-1.2.0.Beta1.jar:/home/aristo/.m2/repository/org/jboss/spec/javax/transaction/jboss-transaction-api_1.2_spec/1.0.0.Final/jboss-transaction-api_1.2_spec-1.0.0.Final.jar:/home/aristo/.m2/repository/org/hibernate/common/hibernate-commons-annotations/4.0.5.Final/hibernate-commons-annotations-4.0.5.Final.jar:/home/aristo/.m2/repository/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar:/home/aristo/.m2/repository/org/jboss/jandex/1.1.0.Final/jandex-1.1.0.Final.jar:/home/aristo/.m2/repository/org/hibernate/hibernate-entitymanager/4.3.11.Final/hibernate-entitymanager-4.3.11.Final.jar:/home/aristo/.m2/repository/org/javassist/javassist/3.28.0-GA/javassist-3.28.0-GA.jar:/home/aristo/.m2/repository/org/jboss/logging/jboss-logging/3.1.4.GA/jboss-logging-3.1.4.GA.jar:/home/aristo/.m2/repository/org/dom4j/dom4j/2.1.3/dom4j-2.1.3.jar:/home/aristo/.m2/repository/javax/transaction/jta/1.1/jta-1.1.jar:/home/aristo/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.36/jcl-over-slf4j-1.7.36.jar:/home/aristo/.m2/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar:/home/aristo/.m2/repository/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4.jar:/home/aristo/.m2/repository/org/apache/commons/commons-dbcp2/2.1.1/commons-dbcp2-2.1.1.jar:/home/aristo/.m2/repository/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar:/home/aristo/.m2/repository/org/apache/commons/commons-email/1.5/commons-email-1.5.jar:/home/aristo/.m2/repository/commons-io/commons-io/2.7/commons-io-2.7.jar:/home/aristo/.m2/repository/org/codehaus/btm/btm/2.1.4/btm-2.1.4.jar:/home/aristo/.m2/repository/org/apache/tomcat/tomcat-jdbc/8.5.76/tomcat-jdbc-8.5.76.jar:/home/aristo/.m2/repository/org/apache/tomcat/tomcat-juli/8.5.76/tomcat-juli-8.5.76.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-jdbc/target/wflow-jdbc-7.0-SNAPSHOT.jar:/home/aristo/.m2/repository/org/mariadb/jdbc/mariadb-java-client/2.5.0/mariadb-java-client-2.5.0.jar:/home/aristo/.m2/repository/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar:/home/aristo/.m2/repository/net/sf/ehcache/ehcache-core/2.6.10/ehcache-core-2.6.10.jar:/home/aristo/.m2/repository/org/jsoup/jsoup/1.15.3/jsoup-1.15.3.jar:/home/aristo/.m2/repository/org/owasp/csrfguard/3.1.0/csrfguard-3.1.0.jar:/home/aristo/.m2/repository/com/atomikos/transactions-jta/3.8.0/transactions-jta-3.8.0.jar:/home/aristo/.m2/repository/com/atomikos/transactions/3.8.0/transactions-3.8.0.jar:/home/aristo/.m2/repository/com/atomikos/transactions-api/3.8.0/transactions-api-3.8.0.jar:/home/aristo/.m2/repository/com/atomikos/atomikos-util/3.8.0/atomikos-util-3.8.0.jar:/home/aristo/.m2/repository/org/mockito/mockito-all/1.9.0/mockito-all-1.9.0.jar:/home/aristo/.m2/repository/com/drewnoakes/metadata-extractor/2.18.0/metadata-extractor-2.18.0.jar:/home/aristo/.m2/repository/com/adobe/xmp/xmpcore/6.1.11/xmpcore-6.1.11.jar:/home/aristo/.m2/repository/org/jasypt/jasypt/1.9.2/jasypt-1.9.2.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-directory/target/wflow-directory-7.0-SNAPSHOT.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-plugin-base/target/wflow-plugin-base-7.0-SNAPSHOT.jar:/home/aristo/.m2/repository/org/apache/felix/org.apache.felix.main/6.0.2/org.apache.felix.main-6.0.2.jar:/home/aristo/.m2/repository/org/apache/felix/org.apache.felix.framework/6.0.2/org.apache.felix.framework-6.0.2.jar:/home/aristo/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.9/animal-sniffer-annotations-1.9.jar:/home/aristo/.m2/repository/org/freemarker/freemarker/2.3.31/freemarker-2.3.31.jar:/home/aristo/.m2/repository/net/sf/opencsv/opencsv/1.8/opencsv-1.8.jar:/home/aristo/.m2/repository/com/carrotsearch/thirdparty/simple-xml-safe/2.7.1/simple-xml-safe-2.7.1.jar:/home/aristo/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar:/home/aristo/.m2/repository/org/apache/httpcomponents/httpcore/4.4.13/httpcore-4.4.13.jar:/home/aristo/.m2/repository/org/apache/httpcomponents/httpmime/4.5.1/httpmime-4.5.1.jar:/home/aristo/.m2/repository/javax/annotation/javax.annotation-api/1.3.1/javax.annotation-api-1.3.1.jar:/home/aristo/.m2/repository/net/sf/json-lib/json-lib/2.4/json-lib-2.4-jdk15.jar:/home/aristo/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5.jar:/home/aristo/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/home/aristo/.m2/repository/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar:/home/aristo/.m2/repository/displaytag/displaytag/1.2/displaytag-1.2.jar:/home/aristo/.m2/repository/com/github/librepdf/openpdf/1.2.10/openpdf-1.2.10.jar:/home/aristo/.m2/repository/com/github/albfernandez/juniversalchardet/2.3.0/juniversalchardet-2.3.0.jar:/home/aristo/.m2/repository/org/bouncycastle/bcmail-jdk15on/1.60/bcmail-jdk15on-1.60.jar:/home/aristo/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.67/bcprov-jdk15on-1.67.jar:/home/aristo/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.60/bcpkix-jdk15on-1.60.jar:/home/aristo/.m2/repository/org/xhtmlrenderer/flying-saucer-pdf-openpdf/9.1.16/flying-saucer-pdf-openpdf-9.1.16.jar:/home/aristo/.m2/repository/org/xhtmlrenderer/flying-saucer-core/9.1.16/flying-saucer-core-9.1.16.jar:/home/aristo/.m2/repository/nl/martijndwars/web-push/3.1.1/web-push-3.1.1.jar:/home/aristo/.m2/repository/com/beust/jcommander/1.72/jcommander-1.72.jar:/home/aristo/.m2/repository/org/apache/httpcomponents/httpasyncclient/4.1.3/httpasyncclient-4.1.3.jar:/home/aristo/.m2/repository/org/apache/httpcomponents/httpcore-nio/4.4.6/httpcore-nio-4.4.6.jar:/home/aristo/.m2/repository/org/bitbucket/b_c/jose4j/0.7.11/jose4j-0.7.11.jar:/home/aristo/.m2/repository/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar:/home/aristo/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/aristo/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/aristo/.m2/repository/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar:/home/aristo/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar:/home/aristo/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/aristo/.m2/repository/org/directwebremoting/dwr/2.0.11-RELEASE/dwr-2.0.11-RELEASE.jar:/home/aristo/.m2/repository/de/bripkens/gravatar4java/1.2/gravatar4java-1.2.jar:/home/aristo/.m2/repository/com/asual/lesscss/lesscss-engine/1.5.1/lesscss-engine-1.5.1.jar:/home/aristo/.m2/repository/org/mozilla/rhino/1.7R4/rhino-1.7R4.jar:/home/aristo/.m2/repository/org/apache/poi/poi/4.1.2/poi-4.1.2.jar:/home/aristo/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar:/home/aristo/.m2/repository/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar:/home/aristo/.m2/repository/com/zaxxer/SparseBitSet/1.2/SparseBitSet-1.2.jar:/home/aristo/.m2/repository/org/apache/poi/poi-ooxml/4.1.2/poi-ooxml-4.1.2.jar:/home/aristo/.m2/repository/org/apache/poi/poi-ooxml-schemas/4.1.2/poi-ooxml-schemas-4.1.2.jar:/home/aristo/.m2/repository/org/apache/xmlbeans/xmlbeans/3.1.0/xmlbeans-3.1.0.jar:/home/aristo/.m2/repository/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar:/home/aristo/.m2/repository/org/apache/commons/commons-compress/1.21/commons-compress-1.21.jar:/home/aristo/.m2/repository/org/mnode/ical4j/ical4j/3.0.7/ical4j-3.0.7.jar:/home/aristo/.m2/repository/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2.jar:/home/aristo/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/home/aristo/.m2/repository/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar:/home/aristo/.m2/repository/org/tensorflow/tensorflow/1.15.0/tensorflow-1.15.0.jar:/home/aristo/.m2/repository/org/tensorflow/libtensorflow/1.15.0/libtensorflow-1.15.0.jar:/home/aristo/.m2/repository/org/tensorflow/libtensorflow_jni/1.15.0/libtensorflow_jni-1.15.0.jar:/home/aristo/.m2/repository/org/tensorflow/proto/1.15.0/proto-1.15.0.jar:/home/aristo/.m2/repository/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar:/home/aristo/.m2/repository/org/eclipse/jgit/org.eclipse.jgit/4.11.0.201803080745-r/org.eclipse.jgit-4.11.0.201803080745-r.jar:/home/aristo/.m2/repository/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar:/home/aristo/.m2/repository/com/jcraft/jzlib/1.1.1/jzlib-1.1.1.jar:/home/aristo/.m2/repository/com/googlecode/javaewah/JavaEWAH/1.1.6/JavaEWAH-1.1.6.jar:/home/aristo/.m2/repository/com/github/wendykierp/JTransforms/3.1/JTransforms-3.1-with-dependencies.jar:/home/aristo/.m2/repository/pl/edu/icm/JLargeArrays/1.5/JLargeArrays-1.5.jar:/home/aristo/.m2/repository/com/github/fge/json-patch/1.9/json-patch-1.9.jar:/home/aristo/.m2/repository/com/github/fge/jackson-coreutils/1.6/jackson-coreutils-1.6.jar:/home/aristo/.m2/repository/com/github/fge/msg-simple/1.1/msg-simple-1.1.jar:/home/aristo/.m2/repository/com/github/fge/btf/1.2/btf-1.2.jar:/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.4.2/jackson-databind-2.13.4.2.jar:/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.4/jackson-annotations-2.13.4.jar:/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.4/jackson-core-2.13.4.jar:/home/aristo/.m2/repository/io/jsonwebtoken/jjwt/0.9.0/jjwt-0.9.0.jar:/home/aristo/.m2/repository/org/quartz-scheduler/quartz/2.3.2/quartz-2.3.2.jar:/home/aristo/.m2/repository/com/mchange/c3p0/0.9.5.4/c3p0-0.9.5.4.jar:/home/aristo/.m2/repository/com/mchange/mchange-commons-java/0.2.15/mchange-commons-java-0.2.15.jar:/home/aristo/.m2/repository/com/zaxxer/HikariCP-java7/2.4.13/HikariCP-java7-2.4.13.jar:/home/aristo/.m2/repository/org/quartz-scheduler/quartz-jobs/2.3.2/quartz-jobs-2.3.2.jar:/home/aristo/.m2/repository/org/springframework/spring-core/4.3.29.RELEASE/spring-core-4.3.29.RELEASE.jar:/home/aristo/.m2/repository/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar:/home/aristo/.m2/repository/org/slf4j/slf4j-api/1.6.6/slf4j-api-1.6.6.jar:/home/aristo/.m2/repository/org/springframework/spring-jms/4.1.5.RELEASE/spring-jms-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-messaging/4.1.5.RELEASE/spring-messaging-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-context/4.1.5.RELEASE/spring-context-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-expression/4.1.5.RELEASE/spring-expression-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-tx/4.1.5.RELEASE/spring-tx-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-beans/4.1.5.RELEASE/spring-beans-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/org/springframework/spring-aop/4.1.5.RELEASE/spring-aop-4.1.5.RELEASE.jar:/home/aristo/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/home/aristo/.m2/repository/javax/mail/mail/1.4.7/mail-1.4.7.jar:/home/aristo/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/aristo/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar:/home/aristo/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar:/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/target/classes
+-inpath
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar
+-d
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/target/classes
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/springframework/util/ClassUtils.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apm/APMUtil.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/security/WorkflowHttpAuthProcessingFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/security/WorkflowAuthenticationProvider.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/AuditTrialJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/DirectoryJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/WorkflowJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/WorkflowRssController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/XpdlImageWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/workflow/controller/WorkflowJavaScriptController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/SetupServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/JsonResponseFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/ExpireFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/ScriptRunner.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/GitRequestFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/SessionListener.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/ApiServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/ThreadCleaner.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/ContextListener.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/LocalLocaleResolver.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/web/PluginResourceServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/AppWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/FormBuilderWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/ConsoleWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/PluginJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/MobileUserviewWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/ProcessBuilderWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/DatalistBuilderWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/UserviewWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/DependencyController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/PropertyJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/FormListDataJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/UserviewBuilderWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/LoginWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/app/controller/CustomBuilderWebController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/ext/ConsoleWebPlugin.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/displaytag/export/CustomCsvViewer.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/displaytag/export/CustomPdfViewer.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/displaytag/export/CustomExcelHssfView.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/apps/displaytag/export/CustomXmlViewer.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/web/presence/PresenceServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/web/presence/PresenceListener.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/web/presence/PresenceManager.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/logs/LogViewerAppender.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/logs/ServletAwareConfigurator.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/logs/LogViewerEndpoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/logs/LogViewerThread.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/commons/spring/web/CustomContextLoaderListener.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/commons/spring/web/CustomDispatcherServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/joget/commons/spring/web/CustomDelegatingFilterProxy.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/security/WorkflowApiAuthenticationEntryPoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/security/WorkflowJwtAuthProcessingFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/json/controller/PluginAdministrationJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/json/controller/DataJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/json/controller/AuthenticationJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/webapi/json/controller/WorkflowAdministrationJsonController.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/route/CamelRouteManager.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/route/FileCopyRouteBuilder.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/route/IncomingEmailRouteBuilder.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/route/EmailProcessorRouteBuilder.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/email/EmailProcessor.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/workflow/security/JwtAuthSuccessHandler.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/workflow/security/JwtTokenAuthenticationProvider.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/workflow/security/JwtAuthenticationToken.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/workflow/security/JwtTokenMissingException.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/websocket/WebSocketPluginEndpoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/websocket/AbstractWebSocketPluginEndpoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/websocket/WebSocketPluginApplicationEndpoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/websocket/WebSocketHttpSessionConfigurator.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/websocket/WebSocketPluginPublishedAppEndpoint.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/directory/service/TokenAuthenticationService.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/kecak/apps/app/web/WebSocketFilter.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/enhydra/shark/xpdl/XPDLEntityResolver.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/owasp/csrfguard/CsrfGuard.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/owasp/csrfguard/servlet/JavaScriptServlet.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/displaytag/properties/TableProperties.java
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/apache/commons/lang/SystemUtils.java
+---- Full Classpath ---
+/usr/lib/jvm/java-11-openjdk-amd64/lib/jrt-fs.jar(106259 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar(1524647 bytes)
+/home/aristo/.m2/repository/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar(2513563 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar(1524647 bytes)
+/home/aristo/.m2/repository/junit/junit/4.12/junit-4.12.jar(314932 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-test/4.3.29.RELEASE/spring-test-4.3.29.RELEASE.jar(604560 bytes)
+/home/aristo/.m2/repository/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar(95505 bytes)
+/home/aristo/.m2/repository/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar(50493 bytes)
+/home/aristo/.m2/repository/javax/servlet/jstl/1.2/jstl-1.2.jar(414240 bytes)
+/home/aristo/.m2/repository/org/apache/taglibs/taglibs-standard-impl/1.2.5/taglibs-standard-impl-1.2.5.jar(206430 bytes)
+/home/aristo/.m2/repository/org/json/json/20080701/json-20080701.jar(37875 bytes)
+/home/aristo/.m2/repository/commons-fileupload/commons-fileupload/1.3.3/commons-fileupload-1.3.3.jar(70604 bytes)
+/home/aristo/.m2/repository/commons-codec/commons-codec/1.15/commons-codec-1.15.jar(353793 bytes)
+/home/aristo/.m2/repository/org/w3c/jigsaw/jigsaw/2.2.6/jigsaw-2.2.6.jar(2693001 bytes)
+/home/aristo/.m2/repository/javax/cache/cache-api/1.0.0/cache-api-1.0.0.jar(49789 bytes)
+/home/aristo/.m2/repository/org/aspectj/aspectjrt/1.9.1/aspectjrt-1.9.1.jar(119892 bytes)
+/home/aristo/.m2/repository/javax/websocket/javax.websocket-api/1.1/javax.websocket-api-1.1.jar(36710 bytes)
+/home/aristo/.m2/repository/org/apache/camel/camel-core/2.15.1/camel-core-2.15.1.jar(3128381 bytes)
+/home/aristo/.m2/repository/org/apache/camel/camel-stream/2.15.1/camel-stream-2.15.1.jar(30440 bytes)
+/home/aristo/.m2/repository/org/apache/camel/camel-jms/2.15.1/camel-jms-2.15.1.jar(151554 bytes)
+/home/aristo/.m2/repository/org/apache/camel/camel-spring/2.15.1/camel-spring-2.15.1.jar(304155 bytes)
+/home/aristo/.m2/repository/org/apache/camel/camel-mail/2.15.1/camel-mail-2.15.1.jar(112884 bytes)
+/home/aristo/.m2/repository/com/kinnarastudio/kinnara-commons/3.0.0/kinnara-commons-3.0.0.jar(30325 bytes)
+/home/aristo/.m2/repository/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar(254858 bytes)
+/home/aristo/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar(128076 bytes)
+/home/aristo/.m2/repository/com/sun/xml/bind/jaxb-impl/2.3.1/jaxb-impl-2.3.1.jar(1099204 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-wfengine/target/wflow-wfengine-7.0-SNAPSHOT.jar(216656 bytes)
+/home/aristo/.m2/repository/xerces/xercesImpl/2.12.2/xercesImpl-2.12.2.jar(1446149 bytes)
+/home/aristo/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar(220536 bytes)
+/home/aristo/.m2/repository/EnhydraShark/shark-maven/2.0.1/shark-maven-2.0.1.jar(3018 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkadminapi/2.0.1/sharkadminapi-2.0.1.jar(2988 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkassignment-historyrelated/2.0.1/sharkassignment-historyrelated-2.0.1.jar(6090 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkassignment-standard/2.0.1/sharkassignment-standard-2.0.1.jar(4323 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkassignment-xpdlstraightparticipantmapping/2.0.1/sharkassignment-xpdlstraightparticipantmapping-2.0.1.jar(2081 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkclientapi/2.0.1/sharkclientapi-2.0.1.jar(123055 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkcommonapi/2.0.1/sharkcommonapi-2.0.1.jar(16728 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkcorbaclientapi/2.0.1/sharkcorbaclientapi-2.0.1.jar(446848 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkinternalapi/2.0.1/sharkinternalapi-2.0.1.jar(54106 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkkernel-standard/2.0.1/sharkkernel-standard-2.0.1.jar(337419 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkutilities-misc/2.0.1/sharkutilities-misc-2.0.1.jar(9045 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkutilities-wmentity/2.0.1/sharkutilities-wmentity-2.0.1.jar(4515 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkutilities-xpil/2.0.1/sharkutilities-xpil-2.0.1.jar(1806681 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkwebservice-asapapi/2.0.1/sharkwebservice-asapapi-2.0.1.jar(104310 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkwebservice-wfxmlapi/2.0.1/sharkwebservice-wfxmlapi-2.0.1.jar(99543 bytes)
+/home/aristo/.m2/repository/TogetherRelationalObjects/tro-localcontext/7.1-1-professional/tro-localcontext-7.1-1-professional.jar(10778 bytes)
+/home/aristo/.m2/repository/EnhydraShark/twexpdl/2.0.1/twexpdl-2.0.1.jar(190421 bytes)
+/home/aristo/.m2/repository/TogetherApplicationFramework/util/7.1-1-community/util-7.1-1-community.jar(115097 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkscripting-standard/2.0.1/sharkscripting-standard-2.0.1.jar(8793 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkclientutilities-misc/2.0.1/sharkclientutilities-misc-2.0.1.jar(19071 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkinstancepersistence-dods/2.0.1/sharkinstancepersistence-dods-2.0.1.jar(37061 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkinstancepersistence-dodslayer/2.0.1/sharkinstancepersistence-dodslayer-2.0.1.jar(926437 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkrepositorypersistence-dods/2.0.1/sharkrepositorypersistence-dods-2.0.1.jar(8249 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharkrepositorypersistence-dodslayer/2.0.1/sharkrepositorypersistence-dodslayer-2.0.1.jar(284103 bytes)
+/home/aristo/.m2/repository/EnhydraShark/sharklogging-standard/2.0.1/sharklogging-standard-2.0.1.jar(2803 bytes)
+/home/aristo/.m2/repository/TogetherRelationalObjects/dbmanager/7.1-1-professional/dbmanager-7.1-1-professional.jar(229182 bytes)
+/home/aristo/.m2/repository/TogetherApplicationFramework/eaf-api/7.1-1-community/eaf-api-7.1-1-community.jar(82003 bytes)
+/home/aristo/.m2/repository/TogetherApplicationFramework/eafconfreader/7.1-1-community/eafconfreader-7.1-1-community.jar(13626 bytes)
+/home/aristo/.m2/repository/org/apache-extras/beanshell/bsh/2.0b6/bsh-2.0b6.jar(389033 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-commons/target/wflow-commons-7.0-SNAPSHOT.jar(113002 bytes)
+/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar(1790452 bytes)
+/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar(301872 bytes)
+/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-1.2-api/2.17.1/log4j-1.2-api-2.17.1.jar(208006 bytes)
+/home/aristo/.m2/repository/org/apache/logging/log4j/log4j-slf4j-impl/2.17.1/log4j-slf4j-impl-2.17.1.jar(24279 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-orm/4.3.29.RELEASE/spring-orm-4.3.29.RELEASE.jar(478518 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-jdbc/4.3.29.RELEASE/spring-jdbc-4.3.29.RELEASE.jar(431555 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-context-support/4.3.29.RELEASE/spring-context-support-4.3.29.RELEASE.jar(187642 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-aspects/4.3.29.RELEASE/spring-aspects-4.3.29.RELEASE.jar(58919 bytes)
+/home/aristo/.m2/repository/org/aspectj/aspectjweaver/1.9.1/aspectjweaver-1.9.1.jar(2033490 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-webmvc/4.3.29.RELEASE/spring-webmvc-4.3.29.RELEASE.jar(922879 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-web/4.3.29.RELEASE/spring-web-4.3.29.RELEASE.jar(829768 bytes)
+/home/aristo/.m2/repository/org/springmodules/spring-modules-validation/0.8/spring-modules-validation-0.8.jar(459893 bytes)
+/home/aristo/.m2/repository/commons-digester/commons-digester/1.7/commons-digester-1.7.jar(139966 bytes)
+/home/aristo/.m2/repository/antlr/antlr/2.7.6/antlr-2.7.6.jar(443432 bytes)
+/home/aristo/.m2/repository/commons-validator/commons-validator/1.5.1/commons-validator-1.5.1.jar(178967 bytes)
+/home/aristo/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar(588337 bytes)
+/home/aristo/.m2/repository/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.jar(246918 bytes)
+/home/aristo/.m2/repository/org/springframework/security/spring-security-acl/4.1.5.RELEASE/spring-security-acl-4.1.5.RELEASE.jar(84992 bytes)
+/home/aristo/.m2/repository/org/springframework/security/spring-security-core/4.1.5.RELEASE/spring-security-core-4.1.5.RELEASE.jar(376795 bytes)
+/home/aristo/.m2/repository/org/springframework/security/spring-security-web/4.1.5.RELEASE/spring-security-web-4.1.5.RELEASE.jar(363932 bytes)
+/home/aristo/.m2/repository/org/springframework/security/spring-security-config/4.1.5.RELEASE/spring-security-config-4.1.5.RELEASE.jar(546483 bytes)
+/home/aristo/.m2/repository/org/hibernate/hibernate-core/4.3.11.Final/hibernate-core-4.3.11.Final.jar(5283651 bytes)
+/home/aristo/.m2/repository/org/jboss/logging/jboss-logging-annotations/1.2.0.Beta1/jboss-logging-annotations-1.2.0.Beta1.jar(11558 bytes)
+/home/aristo/.m2/repository/org/jboss/spec/javax/transaction/jboss-transaction-api_1.2_spec/1.0.0.Final/jboss-transaction-api_1.2_spec-1.0.0.Final.jar(27717 bytes)
+/home/aristo/.m2/repository/org/hibernate/common/hibernate-commons-annotations/4.0.5.Final/hibernate-commons-annotations-4.0.5.Final.jar(75324 bytes)
+/home/aristo/.m2/repository/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar(113371 bytes)
+/home/aristo/.m2/repository/org/jboss/jandex/1.1.0.Final/jandex-1.1.0.Final.jar(76551 bytes)
+/home/aristo/.m2/repository/org/hibernate/hibernate-entitymanager/4.3.11.Final/hibernate-entitymanager-4.3.11.Final.jar(648087 bytes)
+/home/aristo/.m2/repository/org/javassist/javassist/3.28.0-GA/javassist-3.28.0-GA.jar(851531 bytes)
+/home/aristo/.m2/repository/org/jboss/logging/jboss-logging/3.1.4.GA/jboss-logging-3.1.4.GA.jar(57193 bytes)
+/home/aristo/.m2/repository/org/dom4j/dom4j/2.1.3/dom4j-2.1.3.jar(323630 bytes)
+/home/aristo/.m2/repository/javax/transaction/jta/1.1/jta-1.1.jar(15071 bytes)
+/home/aristo/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.36/jcl-over-slf4j-1.7.36.jar(16555 bytes)
+/home/aristo/.m2/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar(160519 bytes)
+/home/aristo/.m2/repository/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4.jar(96221 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-dbcp2/2.1.1/commons-dbcp2-2.1.1.jar(174167 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar(111969 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-email/1.5/commons-email-1.5.jar(54495 bytes)
+/home/aristo/.m2/repository/commons-io/commons-io/2.7/commons-io-2.7.jar(276413 bytes)
+/home/aristo/.m2/repository/org/codehaus/btm/btm/2.1.4/btm-2.1.4.jar(297092 bytes)
+/home/aristo/.m2/repository/org/apache/tomcat/tomcat-jdbc/8.5.76/tomcat-jdbc-8.5.76.jar(149103 bytes)
+/home/aristo/.m2/repository/org/apache/tomcat/tomcat-juli/8.5.76/tomcat-juli-8.5.76.jar(51379 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-jdbc/target/wflow-jdbc-7.0-SNAPSHOT.jar(1797 bytes)
+/home/aristo/.m2/repository/org/mariadb/jdbc/mariadb-java-client/2.5.0/mariadb-java-client-2.5.0.jar(617287 bytes)
+/home/aristo/.m2/repository/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar(16046 bytes)
+/home/aristo/.m2/repository/net/sf/ehcache/ehcache-core/2.6.10/ehcache-core-2.6.10.jar(1347500 bytes)
+/home/aristo/.m2/repository/org/jsoup/jsoup/1.15.3/jsoup-1.15.3.jar(438018 bytes)
+/home/aristo/.m2/repository/org/owasp/csrfguard/3.1.0/csrfguard-3.1.0.jar(172044 bytes)
+/home/aristo/.m2/repository/com/atomikos/transactions-jta/3.8.0/transactions-jta-3.8.0.jar(111414 bytes)
+/home/aristo/.m2/repository/com/atomikos/transactions/3.8.0/transactions-3.8.0.jar(156337 bytes)
+/home/aristo/.m2/repository/com/atomikos/transactions-api/3.8.0/transactions-api-3.8.0.jar(27177 bytes)
+/home/aristo/.m2/repository/com/atomikos/atomikos-util/3.8.0/atomikos-util-3.8.0.jar(90268 bytes)
+/home/aristo/.m2/repository/org/mockito/mockito-all/1.9.0/mockito-all-1.9.0.jar(1495219 bytes)
+/home/aristo/.m2/repository/com/drewnoakes/metadata-extractor/2.18.0/metadata-extractor-2.18.0.jar(732543 bytes)
+/home/aristo/.m2/repository/com/adobe/xmp/xmpcore/6.1.11/xmpcore-6.1.11.jar(142953 bytes)
+/home/aristo/.m2/repository/org/jasypt/jasypt/1.9.2/jasypt-1.9.2.jar(129265 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-directory/target/wflow-directory-7.0-SNAPSHOT.jar(82117 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-plugin-base/target/wflow-plugin-base-7.0-SNAPSHOT.jar(46464 bytes)
+/home/aristo/.m2/repository/org/apache/felix/org.apache.felix.main/6.0.2/org.apache.felix.main-6.0.2.jar(738648 bytes)
+/home/aristo/.m2/repository/org/apache/felix/org.apache.felix.framework/6.0.2/org.apache.felix.framework-6.0.2.jar(726279 bytes)
+/home/aristo/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.9/animal-sniffer-annotations-1.9.jar(3409 bytes)
+/home/aristo/.m2/repository/org/freemarker/freemarker/2.3.31/freemarker-2.3.31.jar(1715750 bytes)
+/home/aristo/.m2/repository/net/sf/opencsv/opencsv/1.8/opencsv-1.8.jar(8717 bytes)
+/home/aristo/.m2/repository/com/carrotsearch/thirdparty/simple-xml-safe/2.7.1/simple-xml-safe-2.7.1.jar(417640 bytes)
+/home/aristo/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar(780321 bytes)
+/home/aristo/.m2/repository/org/apache/httpcomponents/httpcore/4.4.13/httpcore-4.4.13.jar(328593 bytes)
+/home/aristo/.m2/repository/org/apache/httpcomponents/httpmime/4.5.1/httpmime-4.5.1.jar(40698 bytes)
+/home/aristo/.m2/repository/javax/annotation/javax.annotation-api/1.3.1/javax.annotation-api-1.3.1.jar(26529 bytes)
+/home/aristo/.m2/repository/net/sf/json-lib/json-lib/2.4/json-lib-2.4-jdk15.jar(159123 bytes)
+/home/aristo/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5.jar(279193 bytes)
+/home/aristo/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar(60686 bytes)
+/home/aristo/.m2/repository/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar(86487 bytes)
+/home/aristo/.m2/repository/displaytag/displaytag/1.2/displaytag-1.2.jar(219132 bytes)
+/home/aristo/.m2/repository/com/github/librepdf/openpdf/1.2.10/openpdf-1.2.10.jar(1806391 bytes)
+/home/aristo/.m2/repository/com/github/albfernandez/juniversalchardet/2.3.0/juniversalchardet-2.3.0.jar(223097 bytes)
+/home/aristo/.m2/repository/org/bouncycastle/bcmail-jdk15on/1.60/bcmail-jdk15on-1.60.jar(108233 bytes)
+/home/aristo/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.67/bcprov-jdk15on-1.67.jar(5961136 bytes)
+/home/aristo/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.60/bcpkix-jdk15on-1.60.jar(796532 bytes)
+/home/aristo/.m2/repository/org/xhtmlrenderer/flying-saucer-pdf-openpdf/9.1.16/flying-saucer-pdf-openpdf-9.1.16.jar(153982 bytes)
+/home/aristo/.m2/repository/org/xhtmlrenderer/flying-saucer-core/9.1.16/flying-saucer-core-9.1.16.jar(1250809 bytes)
+/home/aristo/.m2/repository/nl/martijndwars/web-push/3.1.1/web-push-3.1.1.jar(22594 bytes)
+/home/aristo/.m2/repository/com/beust/jcommander/1.72/jcommander-1.72.jar(69254 bytes)
+/home/aristo/.m2/repository/org/apache/httpcomponents/httpasyncclient/4.1.3/httpasyncclient-4.1.3.jar(179335 bytes)
+/home/aristo/.m2/repository/org/apache/httpcomponents/httpcore-nio/4.4.6/httpcore-nio-4.4.6.jar(356644 bytes)
+/home/aristo/.m2/repository/org/bitbucket/b_c/jose4j/0.7.11/jose4j-0.7.11.jar(276849 bytes)
+/home/aristo/.m2/repository/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar(2862361 bytes)
+/home/aristo/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar(4617 bytes)
+/home/aristo/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar(2199 bytes)
+/home/aristo/.m2/repository/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar(214381 bytes)
+/home/aristo/.m2/repository/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar(13879 bytes)
+/home/aristo/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar(8781 bytes)
+/home/aristo/.m2/repository/org/directwebremoting/dwr/2.0.11-RELEASE/dwr-2.0.11-RELEASE.jar(532786 bytes)
+/home/aristo/.m2/repository/de/bripkens/gravatar4java/1.2/gravatar4java-1.2.jar(6638 bytes)
+/home/aristo/.m2/repository/com/asual/lesscss/lesscss-engine/1.5.1/lesscss-engine-1.5.1.jar(99708 bytes)
+/home/aristo/.m2/repository/org/mozilla/rhino/1.7R4/rhino-1.7R4.jar(1134765 bytes)
+/home/aristo/.m2/repository/org/apache/poi/poi/4.1.2/poi-4.1.2.jar(2915337 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar(751914 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar(2213560 bytes)
+/home/aristo/.m2/repository/com/zaxxer/SparseBitSet/1.2/SparseBitSet-1.2.jar(24510 bytes)
+/home/aristo/.m2/repository/org/apache/poi/poi-ooxml/4.1.2/poi-ooxml-4.1.2.jar(1888231 bytes)
+/home/aristo/.m2/repository/org/apache/poi/poi-ooxml-schemas/4.1.2/poi-ooxml-schemas-4.1.2.jar(7912488 bytes)
+/home/aristo/.m2/repository/org/apache/xmlbeans/xmlbeans/3.1.0/xmlbeans-3.1.0.jar(2579738 bytes)
+/home/aristo/.m2/repository/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar(111875 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-compress/1.21/commons-compress-1.21.jar(1018316 bytes)
+/home/aristo/.m2/repository/org/mnode/ical4j/ical4j/3.0.7/ical4j-3.0.7.jar(1269684 bytes)
+/home/aristo/.m2/repository/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2.jar(659031 bytes)
+/home/aristo/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar(62983 bytes)
+/home/aristo/.m2/repository/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar(249277 bytes)
+/home/aristo/.m2/repository/org/tensorflow/tensorflow/1.15.0/tensorflow-1.15.0.jar(1825 bytes)
+/home/aristo/.m2/repository/org/tensorflow/libtensorflow/1.15.0/libtensorflow-1.15.0.jar(2103016 bytes)
+/home/aristo/.m2/repository/org/tensorflow/libtensorflow_jni/1.15.0/libtensorflow_jni-1.15.0.jar(141714774 bytes)
+/home/aristo/.m2/repository/org/tensorflow/proto/1.15.0/proto-1.15.0.jar(2882802 bytes)
+/home/aristo/.m2/repository/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar(1681869 bytes)
+/home/aristo/.m2/repository/org/eclipse/jgit/org.eclipse.jgit/4.11.0.201803080745-r/org.eclipse.jgit-4.11.0.201803080745-r.jar(2677686 bytes)
+/home/aristo/.m2/repository/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar(280515 bytes)
+/home/aristo/.m2/repository/com/jcraft/jzlib/1.1.1/jzlib-1.1.1.jar(69578 bytes)
+/home/aristo/.m2/repository/com/googlecode/javaewah/JavaEWAH/1.1.6/JavaEWAH-1.1.6.jar(165868 bytes)
+/home/aristo/.m2/repository/com/github/wendykierp/JTransforms/3.1/JTransforms-3.1-with-dependencies.jar(1501730 bytes)
+/home/aristo/.m2/repository/pl/edu/icm/JLargeArrays/1.5/JLargeArrays-1.5.jar(232470 bytes)
+/home/aristo/.m2/repository/com/github/fge/json-patch/1.9/json-patch-1.9.jar(42392 bytes)
+/home/aristo/.m2/repository/com/github/fge/jackson-coreutils/1.6/jackson-coreutils-1.6.jar(30716 bytes)
+/home/aristo/.m2/repository/com/github/fge/msg-simple/1.1/msg-simple-1.1.jar(36868 bytes)
+/home/aristo/.m2/repository/com/github/fge/btf/1.2/btf-1.2.jar(8929 bytes)
+/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.4.2/jackson-databind-2.13.4.2.jar(1531681 bytes)
+/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.4/jackson-annotations-2.13.4.jar(75717 bytes)
+/home/aristo/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.4/jackson-core-2.13.4.jar(374895 bytes)
+/home/aristo/.m2/repository/io/jsonwebtoken/jjwt/0.9.0/jjwt-0.9.0.jar(113202 bytes)
+/home/aristo/.m2/repository/org/quartz-scheduler/quartz/2.3.2/quartz-2.3.2.jar(693050 bytes)
+/home/aristo/.m2/repository/com/mchange/c3p0/0.9.5.4/c3p0-0.9.5.4.jar(499844 bytes)
+/home/aristo/.m2/repository/com/mchange/mchange-commons-java/0.2.15/mchange-commons-java-0.2.15.jar(624036 bytes)
+/home/aristo/.m2/repository/com/zaxxer/HikariCP-java7/2.4.13/HikariCP-java7-2.4.13.jar(134017 bytes)
+/home/aristo/.m2/repository/org/quartz-scheduler/quartz-jobs/2.3.2/quartz-jobs-2.3.2.jar(33908 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-core/4.3.29.RELEASE/spring-core-4.3.29.RELEASE.jar(1131321 bytes)
+/home/aristo/.m2/repository/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar(97693 bytes)
+/home/aristo/.m2/repository/org/slf4j/slf4j-api/1.6.6/slf4j-api-1.6.6.jar(26176 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-jms/4.1.5.RELEASE/spring-jms-4.1.5.RELEASE.jar(269295 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-messaging/4.1.5.RELEASE/spring-messaging-4.1.5.RELEASE.jar(285895 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-context/4.1.5.RELEASE/spring-context-4.1.5.RELEASE.jar(1026511 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-expression/4.1.5.RELEASE/spring-expression-4.1.5.RELEASE.jar(259071 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-tx/4.1.5.RELEASE/spring-tx-4.1.5.RELEASE.jar(252583 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-beans/4.1.5.RELEASE/spring-beans-4.1.5.RELEASE.jar(708507 bytes)
+/home/aristo/.m2/repository/org/springframework/spring-aop/4.1.5.RELEASE/spring-aop-4.1.5.RELEASE.jar(359098 bytes)
+/home/aristo/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar(4467 bytes)
+/home/aristo/.m2/repository/javax/mail/mail/1.4.7/mail-1.4.7.jar(521157 bytes)
+/home/aristo/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar(19936 bytes)
+/home/aristo/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar(434678 bytes)
+/home/aristo/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar(56674 bytes)
+/home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/target/classes(98 entries)
+---- Compiler Messages ---
+info Pipelining compilation
+warning Processing Log4j annotations
+warning Annotations processed
+warning Processing Log4j annotations
+warning No elements to process
+info compiling /home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/springframework/util/ClassUtils.java
+info weaver operating in reweavable mode.  Need to verify any required types exist.
+info woven aspect org.joget.apps.form.service.FormOptionsCacheAspect (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.springframework.util.ClassUtils (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-consoleweb/src/main/java/org/springframework/util/ClassUtils.java)
+info woven class org.hibernate.tool.hbm2ddl.SchemaUpdate (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.hibernate.tool.hbm2ddl.DatabaseExporter (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.hibernate.internal.util.ReflectHelper (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.UniversalInboxMenu (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.XadminTheme (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.ProgressiveTheme$Color (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.UniversalTheme$Color (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.ProgressiveTheme (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.UniversalTheme (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.CorporatiTheme (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.plugin.enterprise.UserProfileMenu (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowUtil$1 (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowPlugin (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFValueLabelPostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFImageDetectionBoxesPostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFFileBytesInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFImageInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFTextInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFBeanShellInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFLabelsPostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFEuclideanDistancePostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFNumbersInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFBeanShellPostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFBooleanInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.lib.TFAudioMelSpectrogramInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowElement (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowPostProcessing (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowInput (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowUtil (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.TensorFlowUtil$GraphBuilder (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.ai.audio.Audio (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.service.ReportManager (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportWorkflowPackage (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportWorkflowActivityInstance (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportApp (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportWorkflowActivity (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportRow (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportWorkflowProcess (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.model.ReportWorkflowProcessInstance (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowPackageDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportAppDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowActivityInstanceDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowActivityDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowActivityDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportAppDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowActivityInstanceDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowProcessDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowPackageDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowProcessInstanceDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowProcessDao (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.report.dao.ReportWorkflowProcessInstanceDaoImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.util.ThreadLocalSecurityContextHolderStrategy (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.util.JogetSecurityContextImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormOptionsCacheAspect$1 (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormOptionsCacheTask (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.CustomFormDataTableUtil (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormServiceImpl (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormService (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.CustomITexResourceLoaderUserAgent (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormPdfUtil (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormUtil$1 (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FormUtil (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+info woven class org.joget.apps.form.service.FileUtil (from /home/aristo/Developments/Java/kecak-workflow-v3/wflow-core/target/wflow-core-7.0-SNAPSHOT.jar)
+abort ABORT -- (BCException) Unable to find Asm for stackmap generation (Looking for 'aj.org.objectweb.asm.ClassReader'). Stackmap generation for woven code is required to avoid verify errors on a Java 1.7 or higher runtime
+when weaving type org.joget.apps.form.lib.BeanShellFormBinder
+when weaving classes 
+when weaving 
+when batch building BuildConfig[null] #Files=77 AopXmls=#0
+
+Unable to find Asm for stackmap generation (Looking for 'aj.org.objectweb.asm.ClassReader'). Stackmap generation for woven code is required to avoid verify errors on a Java 1.7 or higher runtime
+when weaving type org.joget.apps.form.lib.BeanShellFormBinder
+when weaving classes 
+when weaving 
+when batch building BuildConfig[null] #Files=77 AopXmls=#0
+
+org.aspectj.weaver.BCException: Unable to find Asm for stackmap generation (Looking for 'aj.org.objectweb.asm.ClassReader'). Stackmap generation for woven code is required to avoid verify errors on a Java 1.7 or higher runtime
+when weaving type org.joget.apps.form.lib.BeanShellFormBinder
+when weaving classes 
+when weaving 
+when batch building BuildConfig[null] #Files=77 AopXmls=#0
+
+	at org.aspectj.weaver.bcel.LazyClassGen.getJavaClassBytesIncludingReweavable(LazyClassGen.java:757)
+	at org.aspectj.weaver.bcel.BcelWeaver.getClassFilesFor(BcelWeaver.java:1457)
+	at org.aspectj.weaver.bcel.BcelWeaver.weaveAndNotify(BcelWeaver.java:1419)
+	at org.aspectj.weaver.bcel.BcelWeaver.weave(BcelWeaver.java:1196)
+	at org.aspectj.ajdt.internal.compiler.AjPipeliningCompilerAdapter.weaveQueuedEntries(AjPipeliningCompilerAdapter.java:514)
+	at org.aspectj.ajdt.internal.compiler.AjPipeliningCompilerAdapter.queueForWeaving(AjPipeliningCompilerAdapter.java:447)
+	at org.aspectj.ajdt.internal.compiler.AjPipeliningCompilerAdapter.afterProcessing(AjPipeliningCompilerAdapter.java:432)
+	at org.aspectj.ajdt.internal.compiler.CompilerAdapter.ajc$after$org_aspectj_ajdt_internal_compiler_CompilerAdapter$5$6b855184(CompilerAdapter.aj:104)
+	at org.aspectj.org.eclipse.jdt.internal.compiler.Compiler.process(Compiler.java:930)
+	at org.aspectj.org.eclipse.jdt.internal.compiler.Compiler.processCompiledUnits(Compiler.java:573)
+	at org.aspectj.org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:473)
+	at org.aspectj.org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:424)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.performCompilation(AjBuildManager.java:1107)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.performBuild(AjBuildManager.java:276)
+	at org.aspectj.ajdt.internal.core.builder.AjBuildManager.batchBuild(AjBuildManager.java:189)
+	at org.aspectj.ajdt.ajc.AjdtCommand.doCommand(AjdtCommand.java:114)
+	at org.aspectj.ajdt.ajc.AjdtCommand.runCommand(AjdtCommand.java:60)
+	at org.aspectj.tools.ajc.Main.run(Main.java:371)
+	at org.aspectj.tools.ajc.Main.runMain(Main.java:248)
+	at org.codehaus.mojo.aspectj.AbstractAjcCompiler.execute(AbstractAjcCompiler.java:544)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:903)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:280)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:203)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+	at org.codehaus.classworlds.Launcher.main(Launcher.java:41)
+

@@ -11,7 +11,7 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
     <context:annotation-config/>
-    <context:component-scan base-package="org.joget.apps.app.service,org.joget.apps.form.service,org.joget.apps.userview"/>
+    <context:component-scan base-package="org.joget.apps.app.service,org.joget.apps.form.service,org.joget.apps.userview, org.kecak.apps.app.service,org.kecak.apps.form.service,org.kecak.apps.userview"/>
     
     <import resource="classpath:appsApplicationContext.xml" />
 

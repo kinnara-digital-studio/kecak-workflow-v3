@@ -1,0 +1,14 @@
+[
+  {
+    "title": "@@datalist.fileUploadFormatter.title@@",
+    "properties": [
+      {
+        "name":"formDefId",
+        "label": "@@datalist.fileUploadFormatter.formDefId@@",
+        "type" : "selectbox",
+        "options_ajax" : "[CONTEXT_PATH]/web/json/console/app[APP_PATH]/forms/options",
+        "required": "true"
+      }
+    ]
+  }
+]
