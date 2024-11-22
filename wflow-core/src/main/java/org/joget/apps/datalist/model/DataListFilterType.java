@@ -26,4 +26,20 @@ public interface DataListFilterType extends PropertyEditable {
      * @return 
      */
     public DataListFilterQueryObject getQueryObject(DataList datalist, String name);
+
+    /**
+     *
+     * @param value
+     */
+    default void setDefaultValue(String value) {
+        setProperty("defaultValue", value);
+    };
+
+    /**
+     *
+     * @return
+     */
+    default String getDefaultValue() {
+        return getPropertyString("defaultValue");
+    }
 }

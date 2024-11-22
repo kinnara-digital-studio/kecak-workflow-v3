@@ -43,14 +43,14 @@ public class TextFieldDataListFilterType extends DataListFilterTypeDefault imple
         Map dataModel = new HashMap();
         dataModel.put("name", datalist.getDataListEncodedParamName(DataList.PARAMETER_FILTER_PREFIX+name));
         dataModel.put("label", label);
-        dataModel.put("value", getValue(datalist, name, getPropertyString("defaultValue")));
+        dataModel.put("value", getValue(datalist, name, getDefaultValue()));
         dataModel.put("contextPath", WorkflowUtil.getHttpServletRequest().getContextPath());
         return pluginManager.getPluginFreeMarkerTemplate(dataModel, getClassName(), "/templates/textFieldDataListFilterType.ftl", null);
     }
 
     public DataListFilterQueryObject getQueryObject(DataList datalist, String name) {
         DataListFilterQueryObject queryObject = new DataListFilterQueryObject();
-        String value = getValue(datalist, name, getPropertyString("defaultValue"));
+        String value = getValue(datalist, name, getDefaultValue());
         if (datalist != null && datalist.getBinder() != null && value != null && !value.isEmpty()) {
             String cname = datalist.getBinder().getColumnName(name);
             

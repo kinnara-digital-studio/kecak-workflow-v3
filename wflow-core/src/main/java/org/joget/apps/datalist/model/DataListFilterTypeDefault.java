@@ -25,7 +25,7 @@ public abstract class DataListFilterTypeDefault extends ExtDefaultPlugin impleme
      * @return
      */
     public String getValue(DataList datalist, String name) {
-        return getValue(datalist, name, null);
+        return getValue(datalist, name, getDefaultValue());
     }
 
     /**
@@ -36,7 +36,7 @@ public abstract class DataListFilterTypeDefault extends ExtDefaultPlugin impleme
      * @return 
      */
     public String[] getValues(DataList datalist, String name) {
-        return getValues(datalist, name, null);
+        return getValues(datalist, name, getDefaultValue());
     }
     
     /**

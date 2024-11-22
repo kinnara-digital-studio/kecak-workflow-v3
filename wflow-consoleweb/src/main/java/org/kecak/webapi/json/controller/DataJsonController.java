@@ -3182,7 +3182,7 @@ public class DataJsonController implements Declutter {
                     String[] values = requestParameters.get(filterName);
 
                     DataListFilterType filterType = filter.getType();
-                    filterType.setProperty("defaultValue", String.join(";", values));
+                    filterType.setDefaultValue(String.join(";", values));
                 });
 
         dataList.getFilterQueryObjects();
