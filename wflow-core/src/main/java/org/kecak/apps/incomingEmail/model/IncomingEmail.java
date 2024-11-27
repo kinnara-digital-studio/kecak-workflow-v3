@@ -14,6 +14,8 @@ public class IncomingEmail implements Serializable {
 
     private String modifiedBy;
 
+    private String identifier;
+
     private String username;
 
     private String password;
@@ -126,5 +128,13 @@ public class IncomingEmail implements Serializable {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 }

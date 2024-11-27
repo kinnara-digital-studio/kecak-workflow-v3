@@ -6154,6 +6154,11 @@ public class ConsoleWebController {
     @RequestMapping("/console/setting/incomingEmail/create")
     public String consoleSettingIncomingEmailCreate(ModelMap map) {
         final IncomingEmail incomingEmail = new IncomingEmail();
+        incomingEmail.setProtocol("imaps");
+        incomingEmail.setHost("imap.gmail.com");
+        incomingEmail.setPort(993);
+        incomingEmail.setFolder("INBOX");
+        incomingEmail.setActive(true);
         map.addAttribute("incomingEmail", incomingEmail);
         return "console/setting/incomingEmailCreate";
     }

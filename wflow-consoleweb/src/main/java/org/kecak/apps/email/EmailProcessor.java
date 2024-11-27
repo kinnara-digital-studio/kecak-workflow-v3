@@ -50,7 +50,7 @@ public class EmailProcessor {
         // get sender email address
         final String from = exchange.getIn().getHeader(FROM).toString();
         final String fromEmail = from.replaceAll("^.*<|>.*$", "");
-        final String userAccount = exchange.getIn().getHeader("deliver-to").toString();
+        final Optional<String> optUserAccount = Optional.ofNullable(String.valueOf(exchange.getIn().getHeader("deliver-to")));
         final Set<String> usernames = getUsername(fromEmail);
 
         final String subject = exchange.getIn().getHeader(SUBJECT).toString().replace("\t", "__").replace("\n", "__").replace(" ", "__");
@@ -77,7 +77,9 @@ public class EmailProcessor {
 
                                     Map<String, Object> parameterProperties = new HashMap<>(pluginProperties);
                                     parameterProperties.put(EmailProcessorPlugin.PROPERTY_APP_DEFINITION, appDefinition);
-                                    parameterProperties.put(EmailProcessorPlugin.PROPERTY_ACCOUNT, userAccount);
+
+                                    optUserAccount.ifPresent(s -> parameterProperties.put(EmailProcessorPlugin.PROPERTY_ACCOUNT, optUserAccount));
+
                                     parameterProperties.put(EmailProcessorPlugin.PROPERTY_FROM, fromEmail);
                                     parameterProperties.put(EmailProcessorPlugin.PROPERTY_SUBJECT, subject);
                                     parameterProperties.put(EmailProcessorPlugin.PROPERTY_BODY, body);
