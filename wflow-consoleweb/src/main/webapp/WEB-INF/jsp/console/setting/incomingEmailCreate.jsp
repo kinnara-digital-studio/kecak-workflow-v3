@@ -44,7 +44,7 @@
                 </div>
                 <div class="form-row">
                     <label for="active"><fmt:message key="console.setting.incomingEmail.common.label.active"/></label>
-                    <span class="form-input"><form:checkbox path="active" cssErrorClass="form-input-error"  size="30" value="true" checked /></span>
+                    <span class="form-input"><form:checkbox path="active" cssErrorClass="form-input-error"  size="30" value="true" checked="checked" /></span>
                 </div>
             </fieldset>
             <div class="form-buttons">

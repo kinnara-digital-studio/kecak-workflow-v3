@@ -48,8 +48,8 @@ public class CamelRouteManager implements CamelContextAware {
 		final Collection<IncomingEmail> incomingEmails = incomingEmailDao.find(null, null, null, null, null, null);
 
 		return Optional.ofNullable(incomingEmails)
-				.map(Collection::stream)
-				.orElseGet(Stream::empty)
+				.stream()
+				.flatMap(Collection::stream)
 				.filter(IncomingEmail::getActive)
 				.map(IncomingEmail::getId)
 				.allMatch(this::startContext);

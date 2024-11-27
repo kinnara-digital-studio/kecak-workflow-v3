@@ -56,15 +56,15 @@ public class EmailProcessor {
         final String subject = exchange.getIn().getHeader(SUBJECT).toString().replace("\t", "__").replace("\n", "__").replace(" ", "__");
 
         Optional.ofNullable(appDefinitionDao.findPublishedApps(null, null, null, null))
-                .map(Collection::stream)
-                .orElse(Stream.empty())
+                .stream()
+                .flatMap(Collection::stream)
 
                 // set current app definition
                 .peek(AppUtil::setCurrentAppDefinition)
 
                 .forEach(appDefinition -> Optional.ofNullable(appDefinition.getPluginDefaultPropertiesList())
-                        .map(Collection::stream)
-                        .orElse(Stream.empty())
+                        .stream()
+                        .flatMap(Collection::stream)
 
                         // process every plugin default property
                         .forEach(pluginDefaultProperty -> Stream.of(pluginDefaultProperty)

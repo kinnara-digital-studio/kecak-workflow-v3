@@ -38,7 +38,6 @@
 			jsonData="data"
 			rowsPerPage="10" 
 			width="100%" 
-			sort="priority" desc="false"
 			href="${pageContext.request.contextPath}/web/console/setting/incomingEmail/edit"
 			hrefParam="id" 
 			hrefQuery="false" 

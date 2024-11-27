@@ -6243,7 +6243,6 @@ public class ConsoleWebController {
             final String url = contextPath + "/web/console/setting/incomingEmail";
             map.addAttribute("url", url);
 
-
             camelRouteManager.stopContext();
             camelRouteManager.startContext();
 
