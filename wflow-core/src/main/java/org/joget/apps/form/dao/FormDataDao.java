@@ -99,6 +99,35 @@ public interface FormDataDao extends org.kecak.apps.form.dao.FormDataDao {
     public FormRowSet find(String formDefId, String tableName, final String condition, final Object[] params, final String sort, final Boolean desc, final Integer start, final Integer rows);
 
     /**
+     *
+     * @param form
+     * @param condition
+     * @param params
+     * @param sort
+     * @param desc
+     * @param start
+     * @param rows
+     * @param loadSoftDeleted
+     * @return
+     */
+    public FormRowSet findAnyOrg(Form form, final String condition, final Object[] params, final String sort, final String sortAs, final Boolean desc, final Integer start, final Integer rows, final Boolean loadSoftDeleted);
+
+    /**
+     *
+     * @param formDefId
+     * @param tableName
+     * @param condition
+     * @param params
+     * @param sort
+     * @param desc
+     * @param start
+     * @param rows
+     * @param loadSoftDeleted
+     * @return
+     */
+    public FormRowSet findAnyOrg(String formDefId, String tableName, final String condition, final Object[] params, final String sort, final String sortAs, final Boolean desc, final Integer start, final Integer rows, final Boolean loadSoftDeleted);
+
+    /**
      * Custom Select Query to find a list of matching form rows.
      * @param form
      * @param fields

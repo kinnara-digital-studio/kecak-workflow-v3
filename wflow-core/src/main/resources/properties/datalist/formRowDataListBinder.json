@@ -7,4 +7,23 @@
         rows : '5',
         cols : '50'
     }]
+}, {
+    'title':'@@datalist.formrowdatalistbinder.advance@@',
+    'properties': [{
+      'name' : 'crossOrganization',
+      'type' : 'checkbox',
+      'label' : '@@datalist.formrowdatalistbinder.deleted@@',
+      'options': [{
+        'value': 'true',
+        'label': ''
+      }]
+    },{
+      'name' : 'crossOrganization',
+      'type' : 'checkbox',
+      'label' : '@@datalist.formrowdatalistbinder.crossOrganization@@',
+      'options': [{
+        'value': 'true',
+        'label': ''
+        }]
+    }]
 }]

@@ -149,8 +149,13 @@ public class FormRowDataListBinder extends DataListBinderDefault {
             DataListFilterQueryObject criteria = getCriteria(properties, filterQueryObjects);
 
             final String sortAs = getSortAs(dataList, sort);
-            final boolean loadSoftDeleted = getLoadSoftDeleted();
-            FormRowSet rowSet = formDataDao.find(formDefId, tableName, criteria.getQuery(), criteria.getValues(), sort, sortAs, desc, start, rows, loadSoftDeleted);
+            final boolean loadSoftDeleted = getDeleted();
+            FormRowSet rowSet;
+            if(isCrossOrg()) {
+                rowSet = formDataDao.findAnyOrg(formDefId, tableName, criteria.getQuery(), criteria.getValues(), sort, sortAs, desc, start, rows, loadSoftDeleted);
+            } else {
+                rowSet = formDataDao.find(formDefId, tableName, criteria.getQuery(), criteria.getValues(), sort, sortAs, desc, start, rows, loadSoftDeleted);
+            }
             resultList.addAll(rowSet);
         }
 
@@ -168,7 +173,7 @@ public class FormRowDataListBinder extends DataListBinderDefault {
             FormDataDao formDataDao = (FormDataDao) AppUtil.getApplicationContext().getBean("formDataDao");
             DataListFilterQueryObject criteria = getCriteria(properties, filterQueryObjects);
 
-            final boolean loadSoftDeleted = getLoadSoftDeleted();
+            final boolean loadSoftDeleted = getDeleted();
             Long rowCount = formDataDao.count(formDefId, tableName, criteria.getQuery(), criteria.getValues(), loadSoftDeleted);
             count = rowCount.intValue();
         }
@@ -344,7 +349,11 @@ public class FormRowDataListBinder extends DataListBinderDefault {
                 || FormUtil.PROPERTY_DATE_MODIFIED.equals(columnName) ? "timestamp" : "string";
     }
 
-    protected boolean getLoadSoftDeleted() {
-        return "true".equalsIgnoreCase(getPropertyString("loadSoftDeleted"));
+    protected boolean getDeleted() {
+        return "true".equalsIgnoreCase(getPropertyString("deleted"));
+    }
+
+    protected boolean isCrossOrg() {
+        return "true".equalsIgnoreCase(getPropertyString("crossOrganization"));
     }
 }
