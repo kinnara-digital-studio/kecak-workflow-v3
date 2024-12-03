@@ -30,6 +30,7 @@ import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.w3c.dom.Element;
 import org.w3c.dom.*;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -321,7 +322,7 @@ public class FormDataDaoImpl extends HibernateDaoSupport implements FormDataDao 
      * @param rows
      * @return
      */
-    protected FormRowSet internalFind(String orgId, final String entityName, final String tableName, final String condition, final Object[] params, final String sort, String sortAs, final Boolean desc, final Integer start, final Integer rows, final Boolean loadSoftDeleted) {
+    protected FormRowSet internalFind(@Nullable String orgId, final String entityName, final String tableName, final String condition, final Object[] params, final String sort, String sortAs, final Boolean desc, final Integer start, final Integer rows, final Boolean loadSoftDeleted) {
         // get hibernate template
         Session session = getHibernateSession(tableName, tableName, null, ACTION_TYPE_LOAD);
 
@@ -332,7 +333,7 @@ public class FormDataDaoImpl extends HibernateDaoSupport implements FormDataDao 
 
             String query = "SELECT e FROM " + tableName + " e ";
             query += (condition != null && !condition.isEmpty() ? (condition + " AND ") : " WHERE ")
-                    + ("(" + ((FORM_ANY_ORG_ID.equals(orgId) ? "1 == 1" : "1 <> 1") + " OR " + FormUtil.PROPERTY_ORG_ID + " IS NULL OR " + FormUtil.PROPERTY_ORG_ID + " in ('" + FORM_ANY_ORG_ID + "', ?)") + ") ")
+                    + ("(" + ((FORM_ANY_ORG_ID.equals(orgId) ? "1 = 1" : "1 <> 1") + " OR " + FormUtil.PROPERTY_ORG_ID + " IS NULL OR " + FormUtil.PROPERTY_ORG_ID + " in ('" + FORM_ANY_ORG_ID + "', ?)") + ") ")
                     + " AND "
                     + ("( " + (loadSoftDeleted != null && loadSoftDeleted ? " 1 = 1 " : " 1 <> 1 ") + " OR " + FormUtil.PROPERTY_DELETED + " = false )");
 

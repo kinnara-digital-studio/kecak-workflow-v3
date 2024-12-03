@@ -10,7 +10,7 @@
 }, {
     'title':'@@datalist.formrowdatalistbinder.advance@@',
     'properties': [{
-      'name' : 'crossOrganization',
+      'name' : 'deleted',
       'type' : 'checkbox',
       'label' : '@@datalist.formrowdatalistbinder.deleted@@',
       'options': [{
