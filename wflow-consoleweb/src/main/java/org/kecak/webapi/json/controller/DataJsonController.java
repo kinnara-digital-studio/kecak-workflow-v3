@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -704,7 +705,7 @@ public class DataJsonController implements Declutter {
             }
 
             // construct response
-            JSONObject jsonData = getData(form, formData, asOptions);
+            JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(form), asOptions);
 
             String currentDigest = getDigest(jsonData);
 
@@ -780,7 +781,7 @@ public class DataJsonController implements Declutter {
             if (minify) {
                 jsonData = getMinifiedData(formData);
             } else {
-                jsonData = getData(form, formData, false);
+                jsonData = getData(form, formData, formData.getLoadBinderData(form), false);
             }
 
             String currentDigest = getDigest(jsonData);
@@ -866,8 +867,10 @@ public class DataJsonController implements Declutter {
                 FormUtil.setReadOnlyProperty(form, true, true);
             }
 
+            Element element = FormUtil.findElement(elementId, form, formData);
+
             // construct response
-            JSONObject jsonData = getData(form, formData, asOptions);
+            JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(element), asOptions);
             Object fieldData = JSONStream.of(jsonData, JSONObject::opt)
                     .filter(e -> elementId.equals(e.getKey()))
                     .findFirst()
@@ -1371,7 +1374,7 @@ public class DataJsonController implements Declutter {
 
                             return Optional.of(form)
                                     .filter(f -> isAuthorize(f, formData))
-                                    .map(Try.onFunction(f -> getData(f, formData, asOptions), (Exception e) -> null))
+                                    .map(Try.onFunction(f -> getData(f, formData, formData.getLoadBinderData(f), asOptions), (Exception e) -> null))
                                     .orElse(null);
 
                         }))
@@ -1968,7 +1971,7 @@ public class DataJsonController implements Declutter {
 
             try {
                 // construct response
-                JSONObject jsonData = getData(form, formData, asOptions);
+                JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(form), asOptions);
 
                 String currentDigest = getDigest(jsonData);
 
@@ -2042,7 +2045,7 @@ public class DataJsonController implements Declutter {
 
             try {
                 // construct response
-                JSONObject jsonData = getData(form, formData, asOptions);
+                JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(form), asOptions);
 
                 String currentDigest = getDigest(jsonData);
 
@@ -2267,11 +2270,12 @@ public class DataJsonController implements Declutter {
 
             Map.Entry<Form, FormData> result = internalDeleteAssignmentData(assignment, terminate, statusField);
             JSONObject jsonData;
+            FormData formData = result.getValue();
             if (minify) {
                 jsonData = new JSONObject();
-                jsonData.put("_" + FormUtil.PROPERTY_ID, result.getValue().getPrimaryKeyValue());
+                jsonData.put("_" + FormUtil.PROPERTY_ID, formData.getPrimaryKeyValue());
             } else {
-                jsonData = getData(result.getKey(), result.getValue(), false);
+                jsonData = getData(result.getKey(), result.getValue(), formData.getLoadBinderData(result.getKey()), false);
             }
 
             try {
@@ -2344,7 +2348,7 @@ public class DataJsonController implements Declutter {
                             return formData.getPrimaryKeyValue();
                         } else {
                             Form form = p.getKey();
-                            JSONObject jsonData = getData(form, formData, false);
+                            JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(form), false);
 
                             // return as array of JSONObject
                             return jsonData;
@@ -2784,7 +2788,7 @@ public class DataJsonController implements Declutter {
             FormUtil.setReadOnlyProperty(form, true, true);
         }
 
-        JSONObject jsonData = getData(form, formData, asOptions);
+        JSONObject jsonData = getData(form, formData, formData.getLoadBinderData(form), asOptions);
         return jsonData;
     }
 
@@ -3479,24 +3483,20 @@ public class DataJsonController implements Declutter {
      * @param formData
      */
     @Nonnull
-    protected JSONObject getData(@Nonnull final Form form, @Nonnull final FormData formData, final Boolean asOptions) throws ApiException {
+    protected JSONObject getData(@Nonnull final Form form, @Nonnull final FormData formData, @Nullable final FormRowSet rowSet, final Boolean asOptions) throws ApiException {
         boolean retrieveOptionsData = Optional.ofNullable(asOptions).orElse(false);
         if (retrieveOptionsData) {
             formData.addRequestParameterValues(DataJsonControllerHandler.PARAMETER_AS_OPTIONS, new String[]{"true"});
         }
 
         // check result size
-        Optional.of(form)
-                .map(formData::getLoadBinderData)
-                .map(FormRowSet::size)
-                .filter(i -> i > 0)
+        Optional.ofNullable(rowSet)
+                .filter(Predicate.not(FormRowSet::isEmpty))
                 .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_FOUND, "Data [" + formData.getPrimaryKeyValue() + "] in form [" + form.getPropertyString(FormUtil.PROPERTY_ID) + "] not found"));
 
         final JSONObject parentJson = new JSONObject();
-        Optional.of(formData)
-                .map(fd -> FormDataUtil.elementStream(form, fd))
-                .orElseGet(Stream::empty)
-                .filter(e -> !(e instanceof FormContainer) && formData.getLoadBinderData(e) != null)
+        FormDataUtil.elementStream(form, formData)
+                .filter(Predicate.not(e -> e instanceof FormContainer || formData.getLoadBinderData(e) == null))
                 .forEach(Try.onConsumer(e -> {
                     final String elementId = e.getPropertyString("id");
                     Object value = e.handleElementValueResponse(e, formData);
@@ -3504,7 +3504,7 @@ public class DataJsonController implements Declutter {
                 }));
 
         // get form data metadata
-        FormDataUtil.collectRowMetaData(form, formData, parentJson);
+        FormDataUtil.collectRowMetaData(form, formData, rowSet, parentJson);
 
         // get process metadata
         FormDataUtil.collectProcessMetaData(formData, parentJson);
@@ -3932,8 +3932,9 @@ public class DataJsonController implements Declutter {
             if (minify) {
                 jsonData = getMinifiedData(formData);
             } else {
-                FormUtil.executeLoadBinders(form, formData);
-                jsonData = getData(form, formData, false);
+                FormStoreBinder storeBinder = FormUtil.findStoreBinder(form);
+                FormRowSet rowSet = formData.getStoreBinderData(storeBinder);
+                jsonData = getData(form, formData, rowSet, false);
             }
 
             Optional<String> optProcessId;

@@ -149,10 +149,10 @@ public class FormDataUtil implements ApplicationContextAware  {
      * @param formData   FormData
      * @param jsonObject I/O JSONObject
      */
-    public static void collectRowMetaData(@Nonnull final Form form, @Nonnull FormData formData, @Nonnull final JSONObject jsonObject) {
-        Optional.ofNullable(formData.getLoadBinderData(form))
-                .map(Collection::stream)
-                .orElseGet(Stream::empty)
+    public static void collectRowMetaData(@Nonnull final Form form, @Nonnull FormData formData, FormRowSet rowSet, @Nonnull final JSONObject jsonObject) {
+        Optional.ofNullable(rowSet)
+                .stream()
+                .flatMap(Collection::stream)
                 .findFirst()
                 .ifPresent(r -> collectRowMetaData(r, jsonObject));
     }
