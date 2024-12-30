@@ -411,7 +411,7 @@ public class DataJsonController implements Declutter {
      * @param formData
      */
     protected JSONObject postTempFileUpload(Form form, FormData formData) throws ApiException {
-        final JSONObject jsonData = FormDataUtil.elementStream(form, formData)
+        final JSONObject jsonData = FormUtil.elementStream(form, formData)
                 .filter(e -> e instanceof FileDownloadSecurity)
                 .collect(JSONCollectors.toJSONObject(e -> e.getPropertyString(FormUtil.PROPERTY_ID), e -> {
                     String elementId = e.getPropertyString(FormUtil.PROPERTY_ID);
@@ -2866,7 +2866,7 @@ public class DataJsonController implements Declutter {
         }
 
         // fill request parameter using fields
-        FormDataUtil.elementStream(form, formData)
+        FormUtil.elementStream(form, formData)
                 .filter(e -> !(e instanceof FormContainer) && !FormUtil.isReadonly(e, formData))
                 .forEach(Try.onConsumer(e -> {
                     String parameterName = FormUtil.getElementParameterName(e);
@@ -3486,15 +3486,13 @@ public class DataJsonController implements Declutter {
         }
 
         // check result size
-        Optional.of(form)
+        final FormRowSet optLoadBinderData = Optional.of(form)
                 .map(formData::getLoadBinderData)
-                .map(FormRowSet::size)
-                .filter(i -> i > 0)
                 .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_FOUND, "Data [" + formData.getPrimaryKeyValue() + "] in form [" + form.getPropertyString(FormUtil.PROPERTY_ID) + "] not found"));
 
         final JSONObject parentJson = new JSONObject();
         Optional.of(formData)
-                .map(fd -> FormDataUtil.elementStream(form, fd))
+                .map(fd -> FormUtil.elementStream(form, fd))
                 .orElseGet(Stream::empty)
                 .filter(e -> !(e instanceof FormContainer) && formData.getLoadBinderData(e) != null)
                 .forEach(Try.onConsumer(e -> {
@@ -3637,7 +3635,7 @@ public class DataJsonController implements Declutter {
 
     @Nonnull
     protected Form setReadonly(@Nonnull Form form, FormData formData) {
-        FormDataUtil.elementStream(form, formData)
+        FormUtil.elementStream(form, formData)
                 .filter(e -> !(e instanceof FormContainer))
                 .forEach(FormUtil::setReadOnlyProperty);
         return form;
@@ -3863,7 +3861,7 @@ public class DataJsonController implements Declutter {
 
         final Map<String, MultipartFile[]> fileMap = FileStore.getFileMap();
 
-        FormDataUtil.elementStream(form, formData)
+        FormUtil.elementStream(form, formData)
                 .filter(e -> !(e instanceof FormContainer))
                 .forEach(e -> {
                     String parameterName = FormUtil.getElementParameterName(e);

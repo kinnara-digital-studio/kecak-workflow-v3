@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joget.apps.app.model.MobileElement;
@@ -2641,5 +2643,24 @@ public class FormUtil implements ApplicationContextAware {
             }
         }
         return true;
+    }
+
+    /**
+     *
+     * @param element
+     * @param formData
+     * @return
+     */
+    @Nonnull
+    public static Stream<Element> elementStream(@Nonnull Element element, FormData formData) {
+        if (!element.isAuthorize(formData)) {
+            return Stream.empty();
+        }
+
+        Stream<Element> stream = Stream.of(element);
+        for (Element child : element.getChildren()) {
+            stream = Stream.concat(stream, elementStream(child, formData));
+        }
+        return stream;
     }
 }

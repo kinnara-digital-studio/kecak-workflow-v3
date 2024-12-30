@@ -151,8 +151,8 @@ public class FormDataUtil implements ApplicationContextAware  {
      */
     public static void collectRowMetaData(@Nonnull final Form form, @Nonnull FormData formData, @Nonnull final JSONObject jsonObject) {
         Optional.ofNullable(formData.getLoadBinderData(form))
-                .map(Collection::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Collection::stream)
                 .findFirst()
                 .ifPresent(r -> collectRowMetaData(r, jsonObject));
     }
@@ -276,7 +276,7 @@ public class FormDataUtil implements ApplicationContextAware  {
     public static JSONObject collectContainerElement(@Nonnull final FormContainer containerElement, @Nonnull final FormData formData, @Nonnull final FormRow row) {
         assert containerElement instanceof Element;
 
-        final JSONObject jsonObject = elementStream((Element) containerElement, formData)
+        final JSONObject jsonObject = FormUtil.elementStream((Element) containerElement, formData)
                 .filter(e -> !(e instanceof FormContainer))
                 .collect(JSONCollectors.toJSONObject(e -> e.getPropertyString(FormUtil.PROPERTY_ID),
                         e -> FormUtil.getElementPropertyValue(e, formData)));
@@ -304,22 +304,17 @@ public class FormDataUtil implements ApplicationContextAware  {
     }
 
     /**
+     * Deprecated use {@link FormUtil#elementStream(Element, FormData)}
+     * 
      * Stream element children
      *
      * @param element
      * @return
      */
+    @Deprecated
     @Nonnull
     public static Stream<Element> elementStream(@Nonnull Element element, FormData formData) {
-        if (!element.isAuthorize(formData)) {
-            return Stream.empty();
-        }
-
-        Stream<Element> stream = Stream.of(element);
-        for (Element child : element.getChildren()) {
-            stream = Stream.concat(stream, elementStream(child, formData));
-        }
-        return stream;
+        return FormUtil.elementStream(element, formData);
     }
 
     static ApplicationContext appContext;
