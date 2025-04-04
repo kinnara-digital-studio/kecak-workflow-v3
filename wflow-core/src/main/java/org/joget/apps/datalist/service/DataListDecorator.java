@@ -333,6 +333,10 @@ public class DataListDecorator extends CheckboxTableDecorator {
     }
     
     protected boolean isRowActionVisible(DataListAction rowAction) {
+        if(!rowAction.isPermitted()) {
+            return false;
+        }
+
         boolean visible = true;
         
         Object[] rules = (Object[]) rowAction.getProperty("rules");

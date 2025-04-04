@@ -2498,8 +2498,8 @@ public class DataJsonController implements Declutter {
                 addFilterById(dataList, originalPids);
 
                 JSONArray jsonData = Optional.ofNullable((DataListCollection<Map<String, Object>>) dataList.getRows(pageSize, rowStart))
-                        .orElse(new DataListCollection<>())
                         .stream()
+                        .flatMap(Collection::stream)
 
                         // reformat content value
                         .map(row -> formatRow(dataList, row))
@@ -3539,7 +3539,7 @@ public class DataJsonController implements Declutter {
         DataList dataList = Optional.of(datalistDefinition)
                 .map(DatalistDefinition::getJson)
                 .map(it -> AppUtil.processHashVariable(it, null, null, null))
-                .map(it -> dataListService.fromJson(it))
+                .map(dataListService::fromJson)
                 .orElseThrow(() -> new ApiException(HttpServletResponse.SC_BAD_REQUEST, "Error generating dataList [" + dataListId + "]"));
 
         // check permission
@@ -3560,8 +3560,8 @@ public class DataJsonController implements Declutter {
         Optional.of(formData)
                 .map(FormData::getRequestParams)
                 .map(Map::entrySet)
-                .map(Collection::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Collection::stream)
                 .map(e -> FormUtil.findElement(e.getKey(), form, formData, true))
                 .filter(Objects::nonNull)
                 .forEach(e -> FormUtil.executeValidators(e, formData));
@@ -3889,8 +3889,8 @@ public class DataJsonController implements Declutter {
     protected String[] getTempFilePath(String elementId) {
         return Optional.of(elementId)
                 .map(Try.onFunction(FileStore::getFiles))
-                .map(Arrays::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Arrays::stream)
                 .map(FileManager::storeFile)
                 .toArray(String[]::new);
     }
