@@ -81,7 +81,5 @@ public interface DataJsonControllerHandler {
                 .map(r -> r.getProperty(elementId))
                 .map(String::valueOf)
                 .collect(Collectors.joining(";"));
-//        String[] values = FormUtil.getElementPropertyValues(element, formData);
-//        return String.join(";", values);
     }
 }
