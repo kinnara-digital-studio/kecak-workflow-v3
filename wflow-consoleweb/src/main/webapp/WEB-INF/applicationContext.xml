@@ -125,6 +125,12 @@
         <!-- Data JSON Controller -->
         <security:intercept-url pattern="/web/json/data/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
 
+        <!-- Directory Profile JSON Controller -->
+        <security:intercept-url pattern="/web/json/directory/profile/picture/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
+        <security:intercept-url pattern="/web/json/directory/profile/app/**/picture/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER, ROLE_ANONYMOUS"/>
+        <security:intercept-url pattern="/web/json/directory/profile/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER"/>
+        <security:intercept-url pattern="/web/json/directory/profile/app/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER"/>
+
         <!-- Authentication JSON Controller -->
         <security:intercept-url pattern="/web/json/authentication/**" access="ROLE_ADMIN, ROLE_APPADMIN, ROLE_USER"/>
 

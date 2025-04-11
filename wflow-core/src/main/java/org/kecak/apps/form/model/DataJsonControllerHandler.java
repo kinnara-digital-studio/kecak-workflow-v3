@@ -5,6 +5,7 @@ import com.kinnarastudio.commons.jsonstream.JSONStream;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormData;
+import org.joget.apps.form.model.FormRowSet;
 import org.joget.apps.form.service.FormUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +13,10 @@ import org.json.JSONException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Handler for DataJsonController, this interface will be called
@@ -68,7 +73,15 @@ public interface DataJsonControllerHandler {
      * @value that will be shown as response
      */
     default Object handleElementValueResponse(@Nonnull Element element, @Nonnull FormData formData) throws JSONException {
-        String[] values = FormUtil.getElementPropertyValues(element, formData);
-        return String.join(";", values);
+        final String elementId = element.getPropertyString("id");
+        return Optional.of(element)
+                .map(formData::getLoadBinderData)
+                .map(FormRowSet::stream)
+                .orElseGet(Stream::empty)
+                .map(r -> r.getProperty(elementId))
+                .map(String::valueOf)
+                .collect(Collectors.joining(";"));
+//        String[] values = FormUtil.getElementPropertyValues(element, formData);
+//        return String.join(";", values);
     }
 }

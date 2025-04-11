@@ -19,12 +19,17 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.joget.apps.app.dao.AppDefinitionDao;
 import org.joget.apps.app.dao.DatalistDefinitionDao;
 import org.joget.apps.app.dao.PackageDefinitionDao;
+import org.joget.apps.app.dao.UserviewDefinitionDao;
+import org.joget.apps.app.model.AppDefinition;
+import org.joget.apps.app.model.UserviewDefinition;
 import org.joget.apps.app.service.AppService;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.app.service.AuditTrailManager;
 import org.joget.apps.datalist.service.DataListService;
 import org.joget.apps.form.dao.FormDataDao;
 import org.joget.apps.form.service.FormService;
+import org.joget.apps.userview.model.UserviewSetting;
+import org.joget.apps.userview.service.UserviewService;
 import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.SetupManager;
 import org.joget.directory.dao.UserDao;
@@ -60,7 +65,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Controller
@@ -96,34 +103,29 @@ public class DirectoryProfileJsonController implements Declutter {
     private SetupManager setupManager;
     @Autowired
     private PackageDefinitionDao packageDefinitionDao;
+    @Autowired
+    private UserviewDefinitionDao userviewDefinitionDao;
+    @Autowired
+    private UserviewService userviewService;
 
-    /**
-     * Get Current Profile
-     * <p>
-     * Deprecated, please use /json/directory/profile instead
-     *
-     * @param request  HTTP Request
-     * @param response HTTP Response
-     * @throws ApiException
-     */
-    @Deprecated
-    @RequestMapping(value = "/json/data/profile/current", method = RequestMethod.GET)
-    public void getCurrentProfile(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        getProfile(request, response);
-    }
 
-    /**
-     * Get profile picture
-     *
-     * @param request
-     * @param response
-     * @throws IOException
-     */
-    @RequestMapping(value = "/json/directory/profile/picture/(*:username)", method = RequestMethod.GET)
+    @RequestMapping(value = "/json/directory/profile/app/(~:appId)/(~:appVersion)/picture/(*:username)", method = RequestMethod.GET)
     public void getProfilePicture(final HttpServletRequest request, final HttpServletResponse response,
+                                  @RequestParam(value="appId", required = false) final String appId,
+                                  @RequestParam(value = "appVersion", required = false, defaultValue = "0") Long appVersion,
                                   @RequestParam("username") final String username) throws IOException {
+
         LogUtil.info(getClass().getName(), "Executing JSON Rest API [" + request.getRequestURI() + "] in method [" + request.getMethod() + "] as [" + WorkflowUtil.getCurrentUsername() + "]");
+
         try {
+
+            final AppDefinition appDefinition = getApplicationDefinition(appId, Optional.ofNullable(appVersion).orElse(0L));
+            final UserviewDefinition userviewDefinition = Optional.ofNullable(userviewDefinitionDao.getList(appDefinition, null, null, null, 1))
+                    .stream()
+                    .flatMap(Collection::stream)
+                    .findFirst()
+                    .orElseGet(userviewService::getDefaultUserview);
+
             User user = userDao.getUser(username);
             if (user == null) {
                 throw new ApiException(HttpServletResponse.SC_NOT_FOUND, "User not found");
@@ -156,6 +158,24 @@ public class DirectoryProfileJsonController implements Declutter {
             LogUtil.error(getClass().getName(), e, e.getMessage());
             response.sendError(e.getErrorCode(), e.getMessage());
         }
+
+    }
+
+    /**
+     * Get profile picture
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @RequestMapping(value = "/json/directory/profile/picture/(*:username)", method = RequestMethod.GET)
+    public void getProfilePicture(final HttpServletRequest request, final HttpServletResponse response,
+                                  @RequestParam("username") final String username) throws IOException {
+
+        final String appId = "appcenter";
+        final Long appVersion = 0L;
+        getProfilePicture(request, response, appId, appVersion, username);
+
     }
 
     /**
@@ -468,5 +488,25 @@ public class DirectoryProfileJsonController implements Declutter {
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             throw new ApiException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         }
+    }
+
+    /**
+     * Get application definition and set default application definition
+     *
+     * @param appId
+     * @param version 0 for published version
+     * @return
+     * @throws ApiException
+     */
+    @Nonnull
+    protected AppDefinition getApplicationDefinition(@Nonnull String appId, long version) throws ApiException {
+        return Optional.ofNullable(appDefinitionDao.getPublishedVersion(appId))
+                .map(it -> version == 0 ? it : version)
+                .map(it -> appDefinitionDao.loadVersion(appId, it))
+
+                // set current app definition
+                .map(peekMap(AppUtil::setCurrentAppDefinition))
+
+                .orElseThrow(() -> new ApiException(HttpServletResponse.SC_NOT_FOUND, "Application [" + appId + "] version [" + version + "] not found"));
     }
 }
