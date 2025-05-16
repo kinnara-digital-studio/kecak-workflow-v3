@@ -3,6 +3,9 @@ package org.kecak.webapi.json.controller;
 
 import com.kinnarastudio.commons.Declutter;
 import com.kinnarastudio.commons.Try;
+import com.kinnarastudio.commons.jsonstream.JSONObjectEntry;
+import com.kinnarastudio.commons.jsonstream.JSONStream;
+import org.joget.apps.app.service.AppUtil;
 import org.kecak.apps.app.service.AuthTokenService;
 import org.joget.commons.util.LogUtil;
 import org.joget.directory.model.User;
@@ -11,6 +14,8 @@ import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.device.dao.DeviceRegistrationDao;
+import org.kecak.apps.device.model.DeviceRegistration;
 import org.kecak.apps.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,10 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,6 +52,8 @@ public class AuthenticationJsonController implements Declutter {
                                         final HttpServletResponse response) throws IOException {
 
         LogUtil.info(getClass().getName(), "Executing Authentication Rest API [" + request.getRequestURI() + "] in method [" + request.getMethod() + "] contentType [" + request.getContentType() + "] as [" + WorkflowUtil.getCurrentUsername() + "]");
+
+        final DeviceRegistrationDao deviceRegistrationDao = (DeviceRegistrationDao) AppUtil.getApplicationContext().getBean("deviceRegistrationDao");
 
         final JSONObject jsonResponse = new JSONObject();
         String header = request.getHeader(loginHeader);
@@ -81,6 +85,14 @@ public class AuthenticationJsonController implements Declutter {
 
             Map<String, Object> claim = parseClaimFromRequestPayload(requestPayload);
             String jwtToken = authTokenService.generateToken(username, claim);
+
+            if(claim.containsKey("deviceId")) {
+                DeviceRegistration deviceRegistration = new DeviceRegistration() {{
+                    setUsername(username);
+                    setDeviceId(String.valueOf(claim.get("deviceId")));
+                }};
+                deviceRegistrationDao.saveOrUpdate(deviceRegistration);
+            }
 
             jsonResponse.put("status", HttpServletResponse.SC_OK);
             jsonResponse.put("message", MESSAGE_SUCCESS);
@@ -147,8 +159,8 @@ public class AuthenticationJsonController implements Declutter {
     }
 
     private Map<String, Object> parseClaimFromRequestPayload(JSONObject requestPayload) {
-        return jsonStream(requestPayload)
-                .collect(Collectors.toMap(k -> k, Try.onFunction(requestPayload::get)));
+        return JSONStream.of(requestPayload, Try.onBiFunction(JSONObject::get))
+                .collect(Collectors.toMap(JSONObjectEntry::getKey, JSONObjectEntry::getValue));
     }
 
     @RequestMapping(value = "json/authentication/refresh", method = RequestMethod.POST)

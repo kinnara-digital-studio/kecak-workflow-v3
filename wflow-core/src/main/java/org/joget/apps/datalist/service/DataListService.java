@@ -20,7 +20,6 @@ import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.StringUtil;
 import org.joget.commons.util.TimeZoneUtil;
 import org.joget.directory.model.User;
-import org.joget.directory.model.service.DirectoryManager;
 import org.joget.directory.model.service.ExtDirectoryManager;
 import org.joget.plugin.base.HiddenPlugin;
 import org.joget.plugin.base.Plugin;
@@ -73,7 +72,7 @@ public class DataListService {
 
         // check column permission
         if (dataList != null) {
-            if(!dataList.isIsAuthorized()) {
+            if(!dataList.isAuthorized()) {
                 final User user = directoryManager.getUserByUsername(WorkflowUtil.getCurrentUsername());
                 LogUtil.warn(getClass().getName(), "User [" + user.getUsername() + "] is unauthorized to access datalist [" + dataList.getId() + "]");
                 return null;
@@ -298,13 +297,13 @@ public class DataListService {
     public boolean isAuthorize(DataList dataList) {
         return Optional.ofNullable(dataList)
                 .map(DataList::getPermission)
-                .map(userviewPermission -> {
+                .map(permission -> {
                     User user = Optional.of(workflowUserManager.getCurrentUsername())
                             .map(directoryManager::getUserByUsername)
                             .orElse(null);
 
-                    userviewPermission.setCurrentUser(user);
-                    return userviewPermission.isAuthorize();
+                    permission.setCurrentUser(user);
+                    return permission.isAuthorize();
                 })
                 .orElse(true);
     }

@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.displaytag.util.LookupUtil;
 import org.joget.apps.app.model.DatalistDefinition;
 import org.joget.apps.app.service.AppUtil;
-import org.joget.apps.userview.model.UserviewPermission;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.joget.apps.datalist.model.DataList;
@@ -211,7 +210,7 @@ public class JsonUtil {
                 }
             }
             
-            object.setIsAuthorized(hasPermission);
+            object.setAuthorized(hasPermission);
             if (obj.has("noPermissionMessage") && !obj.optString("noPermissionMessage").isEmpty()) {
                 object.setUnauthorizedMsg(obj.optString("noPermissionMessage"));
             }

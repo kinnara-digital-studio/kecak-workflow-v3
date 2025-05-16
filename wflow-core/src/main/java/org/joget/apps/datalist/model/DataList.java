@@ -11,7 +11,6 @@ import org.displaytag.util.ParamEncoder;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.apps.datalist.service.DataListDecorator;
 import org.joget.apps.userview.model.Permission;
-import org.joget.apps.userview.model.UserviewPermission;
 import org.joget.apps.userview.model.UserviewTheme;
 import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.ResourceBundleUtil;
@@ -81,7 +80,7 @@ public class DataList {
     private String responsiveJson = "";
     private Boolean considerFilterWhenGetTotal = null;
     private Map<String, String[]> requestParamMap = null;
-    private boolean isAuthorized = true;
+    private boolean authorized = true;
     private String unauthorizedMsg = null;
 
     private Permission permission = null;
@@ -937,12 +936,12 @@ public class DataList {
         dataListFilterQueryObjectList = new ArrayList<DataListFilterQueryObject>();
     }
 
-    public boolean isIsAuthorized() {
-        return isAuthorized;
+    public boolean isAuthorized() {
+        return authorized;
     }
 
-    public void setIsAuthorized(boolean isAuthorized) {
-        this.isAuthorized = isAuthorized;
+    public void setAuthorized(boolean authorized) {
+        this.authorized = authorized;
     }
 
     public String getUnauthorizedMsg() {
