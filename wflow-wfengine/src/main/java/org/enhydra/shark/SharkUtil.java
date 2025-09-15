@@ -22,6 +22,7 @@ import org.enhydra.shark.xpdl.elements.WorkflowProcess;
 import org.joget.commons.util.LogUtil;
 import org.joget.workflow.model.WorkflowActivity;
 import org.joget.workflow.model.WorkflowAssignment;
+import org.joget.workflow.model.service.ClosableSharkConnection;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
 
@@ -73,11 +74,9 @@ public class SharkUtil {
      * @return 
      */
     public static Collection<WorkflowActivity> getNextActivities(String processDefId, String activityDefId, String processId, String activityId, boolean includeTools, Collection<WorkflowActivity> activities) {
-        SharkConnection sc = null;
         Collection<WorkflowActivity> nextActivities = (activities != null) ? activities : new ArrayList<WorkflowActivity>();
 
-        try {
-            sc = connect();
+        try(ClosableSharkConnection sc = new ClosableSharkConnection(connect())) {
             Shark shark = Shark.getInstance();
             AdminMisc admin = shark.getAdminMisc();
             WMSessionHandle sessionHandle = sc.getSessionHandle();
@@ -114,12 +113,6 @@ public class SharkUtil {
             }
         } catch (Exception ex) {
             LogUtil.error(SharkUtil.class.getName(), ex, "Error getting next activities");
-        } finally {
-            try {
-                disconnect(sc);
-            } catch (Exception e) {
-                LogUtil.error(SharkUtil.class.getName(), e, "Error closing Shark connection");
-            }
         }
         return nextActivities;
     }    

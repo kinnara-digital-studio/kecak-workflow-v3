@@ -73,7 +73,7 @@ public class DataListService {
 
         // check column permission
         if (dataList != null) {
-            if(!dataList.isIsAuthorized()) {
+            if(!ignorePermission && !dataList.isIsAuthorized()) {
                 final User user = directoryManager.getUserByUsername(WorkflowUtil.getCurrentUsername());
                 LogUtil.warn(getClass().getName(), "User [" + user.getUsername() + "] is unauthorized to access datalist [" + dataList.getId() + "]");
                 return null;
@@ -81,9 +81,9 @@ public class DataListService {
 
             DataListColumn[] columns = Optional.of(dataList)
                     .map(DataList::getColumns)
-                    .map(Arrays::stream)
-                    .orElseGet(Stream::empty)
-                    .filter(dataListColumn -> dataListColumn.isPermitted())
+                    .stream()
+                    .flatMap(Arrays::stream)
+                    .filter(DataListColumn::isPermitted)
                     .toArray(DataListColumn[]::new);
 
             dataList.setColumns(columns);

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.*;
+import java.util.function.Predicate;
 
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -646,7 +647,7 @@ public class WorkflowJsonController {
             WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
             Optional.ofNullable(process)
                     .map(WorkflowProcess::getRecordId)
-                    .filter(s -> !s.isEmpty())
+                    .filter(Predicate.not(String::isEmpty))
                     .ifPresent(s -> data.put("recordId", s));
 
             jsonObject.accumulate("data", data);
