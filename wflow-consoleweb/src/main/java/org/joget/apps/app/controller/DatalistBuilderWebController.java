@@ -150,7 +150,7 @@ public class DatalistBuilderWebController {
                     }
                 }
                 
-                dataList = dataListService.fromJson(AppUtil.processHashVariable(tempJson, null, StringUtil.TYPE_JSON, null));
+                dataList = dataListService.fromJson(AppUtil.processHashVariable(tempJson, null, StringUtil.TYPE_JSON, null), null, true);
                 dataList.setUseSession(false);
                 map.addAttribute("json", json);
             } else {
@@ -335,7 +335,7 @@ public class DatalistBuilderWebController {
                     }
                 }
                 
-                dataList = dataListService.fromJson(AppUtil.processHashVariable(tempJson, null, null, null));
+                dataList = dataListService.fromJson(AppUtil.processHashVariable(tempJson, null, null, null), null, true);
                 dataList.setId(id);
             } catch (Exception ex) {
                 map.addAttribute("dataListError", ex.toString());
@@ -384,7 +384,7 @@ public class DatalistBuilderWebController {
         
         String json = datalistDefinition.getJson();
         String escapedJson = StringEscapeUtils.escapeJavaScript(json);
-        DataList dataList = dataListService.fromJson(json);
+        DataList dataList = dataListService.fromJson(json, null, true);
         dataList.setSelectionType(selectionType);
         
         if (buttonLabel.isEmpty()) {
