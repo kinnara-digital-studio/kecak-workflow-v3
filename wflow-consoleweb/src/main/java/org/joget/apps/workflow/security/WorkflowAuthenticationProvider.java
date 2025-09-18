@@ -107,6 +107,10 @@ public class WorkflowAuthenticationProvider implements AuthenticationProvider, M
 
         // return result
         User user = directoryManager.getUserByUsername(username);
+        if(user == null) {
+            throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
+
         UserDetails details = new WorkflowUserDetails(user);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, gaList);
         token.setDetails(details);
