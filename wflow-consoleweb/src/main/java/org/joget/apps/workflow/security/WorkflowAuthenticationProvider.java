@@ -1,9 +1,5 @@
 package org.joget.apps.workflow.security;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.commons.util.HostManager;
 import org.joget.commons.util.LogUtil;
@@ -27,15 +23,19 @@ import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class WorkflowAuthenticationProvider implements AuthenticationProvider, MessageSourceAware {
 
     public static final int PASSWORD_MAX_LENGTH = 512;
-    
+    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
     transient
     @Autowired
     @Qualifier("main")
     private DirectoryManager directoryManager;
-    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
     public DirectoryManager getDirectoryManager() {
         return directoryManager;
@@ -48,15 +48,17 @@ public class WorkflowAuthenticationProvider implements AuthenticationProvider, M
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // reset profile and set hostname
         HostManager.initHost();
-            
+
         // Determine username
         String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
         String password = authentication.getCredentials().toString();
-        
+
         String ip = "";
         HttpServletRequest request = WorkflowUtil.getHttpServletRequest();
+        String loginAs = null;
         if (request != null) {
             ip = AppUtil.getClientIp(request);
+            loginAs = request.getParameter("loginAs");
         }
 
         // check credentials
@@ -71,19 +73,30 @@ public class WorkflowAuthenticationProvider implements AuthenticationProvider, M
             throw new BadCredentialsException(e.getMessage());
         }
         if (!validLogin) {
-            LogUtil.info(getClass().getName(), "Authentication for user " + username + " ("+ip+") : " + false);
+            LogUtil.info(getClass().getName(), "Authentication for user " + username + " (" + ip + ") : " + false);
             WorkflowHelper workflowHelper = (WorkflowHelper) AppUtil.getApplicationContext().getBean("workflowHelper");
-            workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + " ("+ip+") : " + false, new Class[]{String.class}, new Object[]{username}, false);
+            workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + " (" + ip + ") : " + false, new Class[]{String.class}, new Object[]{username}, false);
             throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
         // add audit trail
-        LogUtil.info(getClass().getName(), "Authentication for user " + username + " ("+ip+") : " + true);
+        LogUtil.info(getClass().getName(), "Authentication for user " + username + " (" + ip + ") : " + true);
         WorkflowHelper workflowHelper = (WorkflowHelper) AppUtil.getApplicationContext().getBean("workflowHelper");
-        workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + " ("+ip+") : " + true, new Class[]{String.class}, new Object[]{username}, true);
+        workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + " (" + ip + ") : " + true, new Class[]{String.class}, new Object[]{username}, true);
+
 
         // get authorities
         Collection<Role> roles = directoryManager.getUserRoles(username);
+
+        // check if current user is a system admin
+        if (loginAs != null && roles != null && roles.stream().map(Role::getId).anyMatch(WorkflowUtil.ROLE_ADMIN::equals)) {
+            LogUtil.info(getClass().getName(), "User [" + username + "] login as [" + loginAs + "]");
+            username = loginAs;
+
+            // rewrite authorities
+            roles = directoryManager.getUserRoles(username);
+        }
+
         List<GrantedAuthority> gaList = new ArrayList<GrantedAuthority>();
         if (roles != null && !roles.isEmpty()) {
             for (Role role : roles) {
@@ -97,6 +110,7 @@ public class WorkflowAuthenticationProvider implements AuthenticationProvider, M
         UserDetails details = new WorkflowUserDetails(user);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, gaList);
         token.setDetails(details);
+
         Authentication result = new AuthenticationTokenWrapper(token);
         return result;
     }
