@@ -1,34 +1,7 @@
 package org.joget.apps.workflow.controller;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-
 import com.kinnarastudio.commons.Try;
-import org.joget.apps.app.model.PackageActivityForm;
-import org.joget.apps.app.model.PackageDefinition;
-import org.joget.commons.util.DynamicDataSourceManager;
-import org.joget.commons.util.LogUtil;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.util.*;
-import java.util.function.Predicate;
-
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.joget.workflow.model.WorkflowActivity;
-import org.joget.workflow.model.WorkflowAssignment;
-import org.joget.workflow.model.WorkflowProcess;
-import org.joget.workflow.model.WorkflowVariable;
-import org.joget.commons.util.PagedList;
-import org.joget.directory.model.service.DirectoryManager;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.kinnarastudio.commons.jsonstream.JSONStream;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -38,28 +11,43 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.joget.apps.app.model.AppDefinition;
+import org.joget.apps.app.model.PackageActivityForm;
+import org.joget.apps.app.model.PackageDefinition;
 import org.joget.apps.app.model.UserviewDefinition;
 import org.joget.apps.app.service.AppService;
 import org.joget.apps.app.service.AppUtil;
-import org.joget.commons.util.ResourceBundleUtil;
-import org.joget.commons.util.StringUtil;
-import org.joget.commons.util.TimeZoneUtil;
+import org.joget.commons.util.*;
+import org.joget.directory.model.service.DirectoryManager;
 import org.joget.plugin.base.PluginManager;
-import org.joget.workflow.model.WorkflowPackage;
 import org.joget.report.model.ReportRow;
 import org.joget.report.service.ReportManager;
-import org.joget.workflow.model.WorkflowProcessResult;
+import org.joget.workflow.model.*;
 import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.exception.ApiException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Controller
 public class WorkflowJsonController {
@@ -162,7 +150,7 @@ public class WorkflowJsonController {
         }
 
         JSONObject jsonObject = new JSONObject();
-        for (Iterator i = processMap.keySet().iterator(); i.hasNext();) {
+        for (Iterator i = processMap.keySet().iterator(); i.hasNext(); ) {
             String processName = (String) i.next();
             Map data = (Map) processMap.get(processName);
             jsonObject.accumulate("data", data);
@@ -366,17 +354,17 @@ public class WorkflowJsonController {
         AppUtil.writeJson(writer, jsonObject, callback);
     }
 
-    
+
     @RequestMapping("/json/monitoring/process/view/(*:processId)")
     public void processMonitorView(Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam("processId") String processId) throws JSONException, IOException {
         WorkflowProcess process = workflowManager.getRunningProcessById(processId);
         if (process == null || process.getId() == null) {
             return;
         }
-        
+
         double serviceLevelMonitor = workflowManager.getServiceLevelMonitorForRunningProcess(processId);
         WorkflowProcess trackWflowProcess = workflowManager.getRunningProcessInfo(processId);
-        
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.accumulate("processDefId", process.getId());
         jsonObject.accumulate("processId", process.getInstanceId());
@@ -386,7 +374,7 @@ public class WorkflowJsonController {
         jsonObject.accumulate("version", process.getVersion());
         jsonObject.accumulate("states", process.getState());
         jsonObject.accumulate("serviceLevelMonitor", WorkflowUtil.getServiceLevelIndicator(serviceLevelMonitor));
-        
+
         jsonObject.accumulate("requester", process.getRequesterId());
         jsonObject.accumulate("states", process.getState());
         jsonObject.accumulate("startedTime", TimeZoneUtil.convertToTimeZone(trackWflowProcess.getCreatedTime(), null, AppUtil.getAppDateFormat()));
@@ -395,10 +383,10 @@ public class WorkflowJsonController {
         jsonObject.accumulate("delay", trackWflowProcess.getDelay());
         jsonObject.accumulate("finishTime", TimeZoneUtil.convertToTimeZone(trackWflowProcess.getFinishTime(), null, AppUtil.getAppDateFormat()));
         jsonObject.accumulate("timeConsumingFromDateStarted", trackWflowProcess.getTimeConsumingFromDateCreated());
-        
+
         AppUtil.writeJson(writer, jsonObject, callback);
     }
-    
+
     @RequestMapping("/json/monitoring/activity/view/(*:activityId)")
     public void activityView(Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam("activityId") String activityId) throws JSONException, IOException {
         WorkflowActivity activity = workflowManager.getActivityById(activityId);
@@ -408,7 +396,7 @@ public class WorkflowJsonController {
         WorkflowActivity activityInfo = workflowManager.getRunningActivityInfo(activityId);
         double serviceLevelMonitor = workflowManager.getServiceLevelMonitorForRunningActivity(activityId);
         WorkflowActivity trackWflowActivity = workflowManager.getRunningActivityInfo(activityId);
-        
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.accumulate("activityId", activity.getId());
         jsonObject.accumulate("activityDefId", activity.getActivityDefId());
@@ -420,7 +408,7 @@ public class WorkflowJsonController {
         jsonObject.accumulate("description", activity.getDescription());
         jsonObject.accumulate("participant", activityInfo.getPerformer());
         jsonObject.accumulate("acceptedUser", activityInfo.getNameOfAcceptedUser());
-        
+
         //new added attribute
         jsonObject.accumulate("serviceLevelMonitor", WorkflowUtil.getServiceLevelIndicator(serviceLevelMonitor));
         jsonObject.accumulate("state", activityInfo.getState());
@@ -430,7 +418,7 @@ public class WorkflowJsonController {
         jsonObject.accumulate("delay", trackWflowActivity.getDelay());
         jsonObject.accumulate("finishTime", TimeZoneUtil.convertToTimeZone(trackWflowActivity.getFinishTime(), null, AppUtil.getAppDateFormat()));
         jsonObject.accumulate("timeConsumingFromDateCreated", trackWflowActivity.getTimeConsumingFromDateCreated());
-        
+
         String[] assignmentUsers = activityInfo.getAssignmentUsers();
         for (String user : assignmentUsers) {
             jsonObject.accumulate("assignee", user);
@@ -438,7 +426,7 @@ public class WorkflowJsonController {
         Collection<WorkflowVariable> variableList = workflowManager.getActivityVariableList(activityId);
         for (WorkflowVariable variable : variableList) {
             JSONObject variableObj = new JSONObject();
-            variableObj.accumulate(variable.getId(), (variable.getVal()!=null)?variable.getVal():"");
+            variableObj.accumulate(variable.getId(), (variable.getVal() != null) ? variable.getVal() : "");
             jsonObject.accumulate("variable", variableObj);
         }
 
@@ -449,7 +437,7 @@ public class WorkflowJsonController {
     public void getProcessVariable(Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam("processId") String processId, @RequestParam("variable") String variable) throws JSONException, IOException {
         String variableValue = workflowManager.getProcessVariable(processId, variable);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.accumulate("variableValue", (variableValue!=null)?variableValue:"");
+        jsonObject.accumulate("variableValue", (variableValue != null) ? variableValue : "");
 
         AppUtil.writeJson(writer, jsonObject, callback);
     }
@@ -517,7 +505,7 @@ public class WorkflowJsonController {
     }
 
     @RequestMapping(value = "/json/workflow/process/start/(*:processDefId)", method = RequestMethod.POST)
-    public void processStart(Writer writer, ModelMap map, HttpServletRequest request, @RequestParam(value = "callback", required = false) String callback, @RequestParam("processDefId") String processDefId, @RequestParam(value = "processInstanceId", required = false) String processInstanceId, @RequestParam(value = "recordId", required = false) String recordId) throws JSONException, IOException {
+    public void processStart(Writer writer, ModelMap map, HttpServletRequest request, @RequestParam(value = "callback", required = false) String callback, @RequestParam("processDefId") String processDefId, @RequestParam(value = "processInstanceId", required = false) String processInstanceId, @RequestParam(value = "recordId", required = false) String recordId) throws JSONException, IOException, ApiException {
         JSONObject jsonObject = new JSONObject();
         String processId = "";
         String activityId = "";
@@ -538,6 +526,11 @@ public class WorkflowJsonController {
             }
         }
 
+        JSONObject requestBody = getRequestPayload(request);
+        JSONStream.of(requestBody, JSONObject::optString)
+                .filter(Objects::nonNull)
+                .forEach(e -> variables.put(e.getKey(), e.getValue()));
+
         if (workflowManager.isUserInWhiteList(processDefId)) {
             WorkflowProcessResult result;
             appService.getAppDefinitionWithProcessDefId(processDefId);
@@ -548,7 +541,7 @@ public class WorkflowJsonController {
                 WorkflowProcess processStarted = result.getProcess();
                 if (processStarted != null) {
                     processId = processStarted.getInstanceId();
-                    
+
                     // check for automatic continuation
                     String packageId = WorkflowUtil.getProcessDefPackageId(processStarted.getId());
                     String packageVersion = WorkflowUtil.getProcessDefVersion(processStarted.getId());
@@ -641,7 +634,7 @@ public class WorkflowJsonController {
             PackageActivityForm activityForm = packageDef.getPackageActivityForm(processDefIdWithoutVersion, activityDefId);
             if (activityForm != null && PackageActivityForm.ACTIVITY_FORM_TYPE_EXTERNAL.equals(activityForm.getType())) {
                 String formUrl = activityForm.getFormUrl();
-                data.put("externalFormUrl", AppUtil.processHashVariable(formUrl, assignment, null,  null, appDef));
+                data.put("externalFormUrl", AppUtil.processHashVariable(formUrl, assignment, null, null, appDef));
             }
 
             WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
@@ -759,7 +752,7 @@ public class WorkflowJsonController {
 
 
         JSONObject jsonObject = new JSONObject();
-        for (Iterator i = processMap.keySet().iterator(); i.hasNext();) {
+        for (Iterator i = processMap.keySet().iterator(); i.hasNext(); ) {
             String processName = (String) i.next();
             Map data = (Map) processMap.get(processName);
             jsonObject.accumulate("data", data);
@@ -795,7 +788,7 @@ public class WorkflowJsonController {
         }
 
         JSONObject jsonObject = new JSONObject();
-        for (Iterator i = processMap.keySet().iterator(); i.hasNext();) {
+        for (Iterator i = processMap.keySet().iterator(); i.hasNext(); ) {
             String processName = (String) i.next();
             Map data = (Map) processMap.get(processName);
             jsonObject.accumulate("data", data);
@@ -831,7 +824,7 @@ public class WorkflowJsonController {
         Collection<WorkflowVariable> variableList = workflowManager.getActivityVariableList(activityId);
         for (WorkflowVariable variable : variableList) {
             JSONObject variableObj = new JSONObject();
-            variableObj.accumulate(variable.getId(), (variable.getVal()!=null)?variable.getVal():"");
+            variableObj.accumulate(variable.getId(), (variable.getVal() != null) ? variable.getVal() : "");
             jsonObject.accumulate("variable", variableObj);
         }
 
@@ -882,7 +875,7 @@ public class WorkflowJsonController {
         Collection<WorkflowVariable> variableList = workflowManager.getActivityVariableList(assignment.getActivityId());
         for (WorkflowVariable variable : variableList) {
             JSONObject variableObj = new JSONObject();
-            variableObj.accumulate(variable.getId(), (variable.getVal()!=null)?variable.getVal():"");
+            variableObj.accumulate(variable.getId(), (variable.getVal() != null) ? variable.getVal() : "");
             jsonObject.accumulate("variable", variableObj);
         }
 
@@ -899,7 +892,7 @@ public class WorkflowJsonController {
 
         for (WorkflowVariable variable : variableList) {
             JSONObject variableObj = new JSONObject();
-            variableObj.accumulate(variable.getId(), (variable.getVal()!=null)?variable.getVal():"");
+            variableObj.accumulate(variable.getId(), (variable.getVal() != null) ? variable.getVal() : "");
             jsonObject.accumulate("variable", variableObj);
         }
 
@@ -912,7 +905,7 @@ public class WorkflowJsonController {
         if (assignment == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
         }
-        
+
         appService.getAppDefinitionForWorkflowActivity(activityId);
         workflowManager.assignmentAccept(activityId);
         LogUtil.info(getClass().getName(), "Assignment " + activityId + " accepted");
@@ -929,7 +922,7 @@ public class WorkflowJsonController {
         if (assignment == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
         }
-        
+
         appService.getAppDefinitionForWorkflowActivity(activityId);
         workflowManager.assignmentWithdraw(activityId);
         LogUtil.info(getClass().getName(), "Assignment " + activityId + " withdrawn");
@@ -946,7 +939,7 @@ public class WorkflowJsonController {
         if (assignment == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
         }
-        
+
         appService.getAppDefinitionForWorkflowActivity(activityId);
         workflowManager.assignmentVariable(activityId, variable, value);
         LogUtil.info(getClass().getName(), "Assignment variable " + variable + " set to " + value);
@@ -957,7 +950,7 @@ public class WorkflowJsonController {
     }
 
     @RequestMapping(value = "/json/workflow/assignment/completeWithVariable/(*:activityId)", method = RequestMethod.POST)
-    public void assignmentCompleteWithVariable(HttpServletRequest request, HttpServletResponse response, Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam("activityId") String activityId) throws JSONException, IOException {
+    public void assignmentCompleteWithVariable(HttpServletRequest request, HttpServletResponse response, Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam("activityId") String activityId) throws JSONException, IOException, ApiException {
         final String key = activityId.intern();
         synchronized (key) {
             WorkflowAssignment assignment = workflowManager.getAssignment(activityId);
@@ -973,6 +966,12 @@ public class WorkflowJsonController {
             }
 
             Map<String, String> workflowVariableMap = AppUtil.retrieveVariableDataFromRequest(request);
+
+            JSONObject requestBody = getRequestPayload(request);
+            JSONStream.of(requestBody, JSONObject::optString)
+                    .filter(Objects::nonNull)
+                    .forEach(e -> workflowVariableMap.put(e.getKey(), e.getValue()));
+
             workflowManager.assignmentComplete(activityId, workflowVariableMap);
             LogUtil.info(getClass().getName(), "Assignment " + activityId + " completed");
             JSONObject jsonObject = new JSONObject();
@@ -1051,7 +1050,7 @@ public class WorkflowJsonController {
         if (DynamicDataSourceManager.SECURE_VALUE.equals(password)) {
             password = DynamicDataSourceManager.getProperty(DynamicDataSourceManager.SECURE_FIELD);
         }
-        
+
         boolean success = DynamicDataSourceManager.testConnection(driver, url, user, password);
 
         JSONObject jsonObject = new JSONObject();
@@ -1059,7 +1058,7 @@ public class WorkflowJsonController {
         jsonObject.accumulate("success", success);
         AppUtil.writeJson(writer, jsonObject, callback);
     }
-    
+
     @RequestMapping(value = "/json/monitoring/activity/reassign", method = RequestMethod.POST)
     public void activityReassign(Writer writer, HttpServletResponse response, @RequestParam(value = "callback", required = false) String callback, @RequestParam("username") String username, @RequestParam("replaceUser") String replaceUser, @RequestParam("activityId") String activityId) throws IOException, JSONException {
         WorkflowActivity assignment = workflowManager.getActivityById(activityId);
@@ -1067,7 +1066,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
             return;
         }
-        
+
         workflowManager.assignmentReassign(null, null, activityId, username, replaceUser);
         JSONObject jsonObject = new JSONObject();
         jsonObject.accumulate("activityId", activityId);
@@ -1083,7 +1082,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
             return;
         }
-        
+
         appService.getAppDefinitionForWorkflowActivity(activityId);
         workflowManager.assignmentReassign(processDefId, processId, activityId, username, replaceUser);
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -1096,7 +1095,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment does not exist.");
             return;
         }
-        
+
         if (WorkflowActivity.TYPE_TOOL.equals(assignment.getType())) {
             workflowManager.activityForceComplete(processDefId, processId, activityId);
         } else {
@@ -1106,24 +1105,24 @@ public class WorkflowJsonController {
         }
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
-    
+
     @RequestMapping("/json/apps/published/userviews")
     public void publishedApps(Writer writer, @RequestParam(value = "callback", required = false) String callback, @RequestParam(value = "appId", required = false) String appId, @RequestParam(value = "appCenter", required = false) Boolean isAppCenter) throws JSONException, IOException {
         Collection<AppDefinition> appDefinitionList = appService.getPublishedApps(appId);
         JSONObject root = new JSONObject();
         JSONArray apps = new JSONArray();
-        for (AppDefinition appDef: appDefinitionList) {
+        for (AppDefinition appDef : appDefinitionList) {
             JSONObject app = new JSONObject();
             app.accumulate("id", appDef.getAppId());
             app.accumulate("name", StringUtil.stripAllHtmlTag(appDef.getName()));
             app.accumulate("version", appDef.getVersion());
             JSONArray userviews = new JSONArray();
-            for (UserviewDefinition userviewDef: appDef.getUserviewDefinitionList()) {
+            for (UserviewDefinition userviewDef : appDef.getUserviewDefinitionList()) {
                 if (isAppCenter != null && isAppCenter &&
                         (userviewDef.getJson().contains("\"hideThisUserviewInAppCenter\":\"true\"") || userviewDef.getJson().contains("\"hideThisUserviewInAppCenter\": \"true\""))) {
                     continue;
                 }
-                
+
                 JSONObject userview = new JSONObject();
                 userview.accumulate("id", userviewDef.getId());
                 userview.accumulate("name", StringUtil.stripAllHtmlTag(userviewDef.getName()));
@@ -1149,7 +1148,7 @@ public class WorkflowJsonController {
         Map<AppDefinition, Collection<WorkflowProcess>> appProcessMap = appService.getPublishedProcesses(appId);
         JSONObject root = new JSONObject();
         JSONArray apps = new JSONArray();
-        for (Iterator<AppDefinition> i=appProcessMap.keySet().iterator(); i.hasNext();) {
+        for (Iterator<AppDefinition> i = appProcessMap.keySet().iterator(); i.hasNext(); ) {
             AppDefinition appDef = i.next();
             Collection<WorkflowProcess> processList = appProcessMap.get(appDef);
             JSONObject app = new JSONObject();
@@ -1157,7 +1156,7 @@ public class WorkflowJsonController {
             app.accumulate("name", appDef.getName());
             app.accumulate("version", appDef.getVersion());
             JSONArray processes = new JSONArray();
-            for (WorkflowProcess processDef: processList) {
+            for (WorkflowProcess processDef : processList) {
                 JSONObject process = new JSONObject();
                 process.accumulate("id", processDef.getId());
                 process.accumulate("idWithoutVersion", processDef.getIdWithoutVersion());
@@ -1178,14 +1177,14 @@ public class WorkflowJsonController {
     @RequestMapping(value = "/json/apps/install", method = RequestMethod.POST)
     public void installMarketplaceApp(Writer writer, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "callback", required = false) String callback, @RequestParam("url") final String url) throws IOException, JSONException {
         JSONObject jsonObject = new JSONObject();
-        
+
         // validate trusted URL
         boolean trusted = validateTrustedUrl(url);
         if (!trusted) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Untrusted URL");
             return;
         }
-        
+
         // get URL InputStream
         HttpClientBuilder builder = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy());
         CloseableHttpClient client = builder.build();
@@ -1212,11 +1211,11 @@ public class WorkflowJsonController {
                 } else {
                     // read InputStream
                     byte[] fileContent = readInputStream(in);
-                
+
                     // import app
                     final AppDefinition appDef = appService.importApp(fileContent);
                     if (appDef != null) {
-                        TransactionTemplate transactionTemplate = (TransactionTemplate)AppUtil.getApplicationContext().getBean("transactionTemplate");
+                        TransactionTemplate transactionTemplate = (TransactionTemplate) AppUtil.getApplicationContext().getBean("transactionTemplate");
                         transactionTemplate.execute(new TransactionCallback<Object>() {
                             public Object doInTransaction(TransactionStatus ts) {
                                 appService.publishApp(appDef.getId(), null);
@@ -1232,22 +1231,23 @@ public class WorkflowJsonController {
         } finally {
             try {
                 in.close();
-            } catch(IOException e) {
+            } catch (IOException e) {
             }
             try {
                 client.close();
-            } catch(IOException e) {
+            } catch (IOException e) {
             }
         }
-        
+
         AppUtil.writeJson(writer, jsonObject, callback);
     }
-    
+
     /**
      * Reads a specified InputStream, returning its contents in a byte array
+     *
      * @param in
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     protected byte[] readInputStream(InputStream in) throws IOException {
         byte[] fileContent;
@@ -1275,8 +1275,8 @@ public class WorkflowJsonController {
                 LogUtil.error(getClass().getName(), ex, ex.getMessage());
             }
         }
-    }    
-    
+    }
+
     @RequestMapping(value = "/json/apps/verify", method = RequestMethod.HEAD)
     public void verifyUrl(Writer writer, HttpServletRequest request, HttpServletResponse response, @RequestParam("url") String url) throws IOException {
         boolean trusted = validateTrustedUrl(url);
@@ -1284,7 +1284,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Untrusted URL");
             return;
         }
-        
+
         CloseableHttpClient client = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy()).build();
         try {
             HttpHead head = new HttpHead(url);
@@ -1320,7 +1320,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Activity not found.");
             return;
         }
-        for (Iterator<WorkflowActivity> i=activities.iterator(); i.hasNext();) {
+        for (Iterator<WorkflowActivity> i = activities.iterator(); i.hasNext(); ) {
             WorkflowActivity activity = i.next();
             String prevActivityId = activity.getId();
             WorkflowActivity activityInfo = workflowManager.getRunningActivityInfo(prevActivityId);
@@ -1369,7 +1369,7 @@ public class WorkflowJsonController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Activity not found.");
             return;
         }
-        for (Iterator<WorkflowActivity> i=activities.iterator(); i.hasNext();) {
+        for (Iterator<WorkflowActivity> i = activities.iterator(); i.hasNext(); ) {
             WorkflowActivity activity = i.next();
             // formulate JSON result
             JSONObject jsonObject = new JSONObject();
@@ -1385,7 +1385,7 @@ public class WorkflowJsonController {
             jsonObject.accumulate("participant", activity.getPerformer());
             String[] assignmentUsers = activity.getAssignmentUsers();
             if (assignmentUsers != null) {
-                for (String user: assignmentUsers) {
+                for (String user : assignmentUsers) {
                     jsonObject.accumulate("assignee", user);
                 }
             }
@@ -1399,6 +1399,7 @@ public class WorkflowJsonController {
      * POST /json/console/app/(*:appId)/(*:appVersion)/publish
      * curl -v -X POST -d "j_username=admin&j_password=admin" http://localhost:8080/jw/web/json/console/app/crm/1/publish
      * curl -v --header "Authorization: Basic YWRtaW46YWRtaW4=" http://localhost:8080/jw/web/json/console/app/crm/1/publish
+     *
      * @param writer
      * @param request
      * @param response
@@ -1406,9 +1407,9 @@ public class WorkflowJsonController {
      * @param appVersion use "latest" to specify the latest version
      * @param callback
      * @throws IOException
-     * @throws JSONException 
+     * @throws JSONException
      */
-    @RequestMapping(value="/json/console/app/(*:appId)/(*:appVersion)/publish", method=RequestMethod.POST)
+    @RequestMapping(value = "/json/console/app/(*:appId)/(*:appVersion)/publish", method = RequestMethod.POST)
     @Transactional
     public void appPublish(Writer writer, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "appId", required = true) String appId, @RequestParam(value = "appVersion", required = true) String appVersion, @RequestParam(value = "callback", required = false) String callback) throws IOException, JSONException {
         JSONObject jsonObject = new JSONObject();
@@ -1416,22 +1417,23 @@ public class WorkflowJsonController {
         appDef = appService.publishApp(appId, appVersion);
         jsonObject.accumulate("status", appDef != null);
         AppUtil.writeJson(writer, jsonObject, callback);
-    }    
-    
+    }
+
     /**
      * Unpublish an app version
      * POST /json/console/app/(*:appId)/unpublish
      * curl -v -X POST -d "j_username=admin&j_password=admin" http://localhost:8080/jw/web/json/console/app/crm/unpublish
      * curl -v --header "Authorization: Basic YWRtaW46YWRtaW4=" http://localhost:8080/jw/web/json/console/app/crm/unpublish
+     *
      * @param writer
      * @param request
      * @param response
      * @param appId
      * @param callback
      * @throws IOException
-     * @throws JSONException 
+     * @throws JSONException
      */
-    @RequestMapping(value="/json/console/app/(*:appId)/unpublish", method=RequestMethod.POST)
+    @RequestMapping(value = "/json/console/app/(*:appId)/unpublish", method = RequestMethod.POST)
     @Transactional
     public void appUnpublish(Writer writer, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "appId", required = true) String appId, @RequestParam(value = "callback", required = false) String callback) throws IOException, JSONException {
         JSONObject jsonObject = new JSONObject();
@@ -1439,5 +1441,21 @@ public class WorkflowJsonController {
         appDef = appService.unpublishApp(appId);
         jsonObject.accumulate("status", appDef != null);
         AppUtil.writeJson(writer, jsonObject, callback);
-    }    
+    }
+
+    /**
+     * Generate request body as JSONObject
+     *
+     * @param request
+     * @return
+     */
+    @Nonnull
+    protected JSONObject getRequestPayload(HttpServletRequest request) throws ApiException {
+        try {
+            String payload = request.getReader().lines().collect(Collectors.joining());
+            return new JSONObject(payload.isEmpty() ? "{}" : payload);
+        } catch (IOException | JSONException e) {
+            throw new ApiException(HttpServletResponse.SC_BAD_REQUEST, e);
+        }
+    }
 }
