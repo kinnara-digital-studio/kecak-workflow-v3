@@ -7,10 +7,10 @@ import org.enhydra.shark.api.client.wfservice.SharkConnection;
 import org.enhydra.shark.api.client.wfservice.WfProcessMgrIterator;
 import org.enhydra.shark.api.client.wfservice.WfResourceIterator;
 
-public class ClosableSharkConnection implements SharkConnection, AutoCloseable {
+public class CloseableSharkConnection implements SharkConnection, AutoCloseable {
     private final SharkConnection sharkConnection;
 
-    public ClosableSharkConnection(SharkConnection sharkConnection) {
+    public CloseableSharkConnection(SharkConnection sharkConnection) {
         this.sharkConnection = sharkConnection;
     }
 
