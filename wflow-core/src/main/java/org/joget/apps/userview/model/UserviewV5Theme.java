@@ -248,6 +248,8 @@ public abstract class UserviewV5Theme extends UserviewTheme {
                 data.put("login_form_after", this.userview.getSetting().getPropertyString("loginPageBottom"));
             }
         }
+
+        data.put("redirectUrl", data.get("base_link"));
         return UserviewUtil.getTemplate(this, data, "/templates/userview/login.ftl");
     }
 

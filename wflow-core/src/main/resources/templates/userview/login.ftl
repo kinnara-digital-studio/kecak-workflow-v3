@@ -8,7 +8,7 @@
     ${login_error_after!}
 </#if>
 ${login_form_before!}
-<form id="loginForm" name="loginForm" action="${context_path!}/j_spring_security_check" method="POST">
+<form id="loginForm" name="loginForm" action="${context_path!}/j_spring_security_check?redirect=${redirectUrl!}" method="POST">
     ${login_form_inner_before!}
     <table align="center">
         <tr><td><label>@@ubuilder.login.username@@: </label></td><td><input type='text' id='j_username' name='j_username'/></td></tr>

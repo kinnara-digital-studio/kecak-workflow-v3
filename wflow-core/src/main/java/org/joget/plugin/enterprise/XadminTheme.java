@@ -582,6 +582,7 @@ public class XadminTheme extends UniversalTheme {
                 data.put("login_form_after", this.userview.getSetting().getPropertyString("loginPageBottom"));
             }
         }
+        data.put("redirectUrl", data.get("base_link"));
         return UserviewUtil.getTemplate(this, data, "/templates/xadmin/login.ftl");
     }
     
