@@ -606,6 +606,7 @@ public class WorkflowJsonController {
         JSONObject jsonObject = new JSONObject();
 
         String format = AppUtil.getAppDateFormat();
+        JSONArray arrData = new JSONArray();
         for (WorkflowAssignment assignment : assignmentList) {
             Map data = new HashMap();
             data.put("processId", assignment.getProcessId());
@@ -643,8 +644,10 @@ public class WorkflowJsonController {
                     .filter(Predicate.not(String::isEmpty))
                     .ifPresent(s -> data.put("recordId", s));
 
-            jsonObject.accumulate("data", data);
+            arrData.put(data);
         }
+
+        jsonObject.put("data", arrData);
 
         jsonObject.accumulate("total", total);
         jsonObject.accumulate("start", start);
