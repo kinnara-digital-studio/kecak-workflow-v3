@@ -3199,21 +3199,20 @@ public class DataJsonController implements Declutter {
      */
     @Nonnull
     protected Object formatValue(@Nonnull final DataList dataList, @Nonnull final Map<String, Object> row, String field) {
-        String value = Optional.of(field)
+        Object value = Optional.of(field)
                 .map(row::get)
-                .map(String::valueOf)
                 .orElse("");
 
         return Optional.of(dataList)
                 .map(DataList::getColumns)
-                .map(Arrays::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Arrays::stream)
                 .filter(c -> field.equals(c.getName()))
                 .findFirst()
                 .flatMap(column -> Optional.of(column)
                         .map(DataListColumn::getFormats)
-                        .map(Collection::stream)
-                        .orElseGet(Stream::empty)
+                        .stream()
+                        .flatMap(Collection::stream)
                         .filter(Objects::nonNull)
                         .findFirst()
                         .map(Try.<DataListColumnFormat, Object, JSONException>onFunction(f -> f.handleColumnValueResponse(dataList, column, f, row, value))))
@@ -3224,8 +3223,8 @@ public class DataJsonController implements Declutter {
     protected Map<String, Object> formatRow(@Nonnull DataList dataList, @Nonnull Map<String, Object> row) {
         Map<String, Object> formattedRow = Optional.of(dataList)
                 .map(DataList::getColumns)
-                .map(Arrays::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Arrays::stream)
                 .filter(Objects::nonNull)
                 .map(DataListColumn::getName)
                 .filter(Objects::nonNull)

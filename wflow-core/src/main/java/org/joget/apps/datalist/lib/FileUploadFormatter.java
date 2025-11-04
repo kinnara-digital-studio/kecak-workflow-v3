@@ -65,7 +65,7 @@ public class FileUploadFormatter extends DataListColumnFormatDefault {
     }
 
     @Override
-    public Object handleColumnValueResponse(@Nonnull DataList dataList, @Nonnull DataListColumn column, DataListColumnFormat formatter, Map<String, Object> row, String value) throws JSONException {
+    public Object handleColumnValueResponse(@Nonnull DataList dataList, @Nonnull DataListColumn column, DataListColumnFormat formatter, Map<String, Object> row, Object value) throws JSONException {
         final String primaryKeyColumn = Optional.of(dataList)
                 .map(DataList::getBinder)
                 .map(DataListBinder::getPrimaryKeyColumnName)
@@ -73,6 +73,7 @@ public class FileUploadFormatter extends DataListColumnFormatDefault {
 
         final String primaryKey = String.valueOf(row.get(primaryKeyColumn));
         return Optional.ofNullable(value)
+                .map(String::valueOf)
                 .stream()
                 .map(s -> s.split(";"))
                 .flatMap(Arrays::stream)

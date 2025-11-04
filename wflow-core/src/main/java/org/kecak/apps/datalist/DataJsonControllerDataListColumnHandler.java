@@ -16,10 +16,9 @@ import java.util.Optional;
  * Implement in {@link DataListColumnFormat}. How the formatter will handle json data
  */
 public interface DataJsonControllerDataListColumnHandler {
-    default Object handleColumnValueResponse(@Nonnull DataList dataList, @Nonnull DataListColumn column, DataListColumnFormat formatter, Map<String, Object> row, String value) throws JSONException {
-        return Optional.of(formatter)
-                .map(f -> f.format(dataList, column, row, value))
-                .map(s -> s.replaceAll("<[^>]*>", ""))
+    default Object handleColumnValueResponse(@Nonnull DataList dataList, @Nonnull DataListColumn column, @Nonnull DataListColumnFormat formatter, Map<String, Object> row, Object value) throws JSONException {
+        return Optional.ofNullable(formatter.format(dataList, column, row, value))
+                .map(s -> (Object) s.replaceAll("<[^>]*>", ""))
                 .orElse(value);
     }
 }
