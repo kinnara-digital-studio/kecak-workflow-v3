@@ -1,12 +1,10 @@
 package org.joget.apps.app.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.joget.apps.app.dao.AuditTrailDao;
 import org.joget.apps.app.model.AppDefinition;
 import org.joget.apps.app.model.AuditTrail;
@@ -23,6 +21,8 @@ import org.joget.workflow.model.service.WorkflowUserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
+
+import javax.annotation.RegEx;
 
 /**
  * Service methods used to add audit trail and trigger audit trail event.
@@ -97,20 +97,26 @@ public class AuditTrailManagerImpl implements AuditTrailManager {
             auditTrail.setAppId(appDef.getId());
             auditTrail.setAppVersion(appDef.getVersion().toString());
         }
-        
-        if (dbLog(auditTrail)) {
+
+
+        if (dbLog(auditTrail, "org.kecak", "com.kinnarastudio")) {
             auditTrailDao.addAuditTrail(auditTrail);
         }
         executePlugin(auditTrail);
     }
     
-    protected boolean dbLog(AuditTrail auditTrail) {
+    protected boolean dbLog(AuditTrail auditTrail, String... classWhitelists) {
         String c = auditTrail.getClazz();
         String m = auditTrail.getMethod();
         
         if (c != null && m != null) {
+            boolean isInWhiteLists = Optional.ofNullable(classWhitelists)
+                    .stream()
+                    .flatMap(Arrays::stream)
+                    .anyMatch(c::contains);
+
             //login info
-            if (m.equals("authenticate") || m.equals("logout") || c.startsWith("org.joget.apps.app.") || c.startsWith("org.joget.directory.dao.") || c.endsWith("WorkflowManagerImpl") || c.endsWith("WorkflowToolActivityHandler") || c.endsWith("WorkflowAssignmentManager") || c.endsWith("PluginManager")) {
+            if (isInWhiteLists || m.equals("authenticate") || m.equals("logout") || c.startsWith("org.joget.apps.app.") || c.startsWith("org.joget.directory.dao.") || c.endsWith("WorkflowManagerImpl") || c.endsWith("WorkflowToolActivityHandler") || c.endsWith("WorkflowAssignmentManager") || c.endsWith("PluginManager")) {
                 return true;
             }
         }

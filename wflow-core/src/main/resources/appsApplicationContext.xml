@@ -42,6 +42,11 @@
     <bean id="formColumnCache" class="org.joget.apps.form.model.FormColumnCache">
         <property name="cache" ref="formColumnCacheBean"/>
     </bean>
+
+    <bean id="externalDataCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="cacheName" value="org.kecak.cache.EXTERNAL_DATA_CACHE"/>
+    </bean>
     
     <bean id="formSessionFactoryCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
         <property name="cacheManager" ref="cacheManager"/>
