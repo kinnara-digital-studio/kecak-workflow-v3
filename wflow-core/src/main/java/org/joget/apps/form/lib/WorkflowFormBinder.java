@@ -6,14 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.joget.apps.app.service.AppUtil;
-import org.joget.apps.form.model.Element;
-import org.joget.apps.form.model.Form;
-import org.joget.apps.form.model.FormData;
-import org.joget.apps.form.model.FormDataDeletableBinder;
-import org.joget.apps.form.model.FormLoadElementBinder;
-import org.joget.apps.form.model.FormRow;
-import org.joget.apps.form.model.FormRowSet;
-import org.joget.apps.form.model.FormStoreElementBinder;
+import org.joget.apps.form.dao.FormDataDao;
+import org.joget.apps.form.model.*;
 import org.joget.apps.form.service.FormUtil;
 import org.joget.workflow.model.WorkflowVariable;
 import org.joget.workflow.model.service.WorkflowManager;
@@ -22,7 +16,7 @@ import org.joget.workflow.util.WorkflowUtil;
 /**
  * Data binder that loads/stores data from the form database and also workflow variables.
  */
-public class WorkflowFormBinder extends DefaultFormBinder implements FormLoadElementBinder, FormStoreElementBinder, FormDataDeletableBinder {
+public class WorkflowFormBinder extends DefaultFormBinder implements FormLoadElementBinder, FormStoreElementBinder, FormDataDeletableBinder, FormDeleteBinder {
 
     @Override
     public String getName() {
@@ -165,13 +159,24 @@ public class WorkflowFormBinder extends DefaultFormBinder implements FormLoadEle
         return variableMap;
     }
 
+    @Override
     public String getFormId() {
         Form form = FormUtil.findRootForm(getElement());
         return form.getPropertyString(FormUtil.PROPERTY_ID);
     }
 
+    @Override
     public String getTableName() {
         Form form = FormUtil.findRootForm(getElement());
         return form.getPropertyString(FormUtil.PROPERTY_TABLE_NAME);
+    }
+
+    @Override
+    public void delete(Element element, FormRowSet rows, FormData formData, boolean deleteGrid, boolean deleteSubform, boolean abortProcess, boolean deleteFiles, boolean hardDelete) {
+        if (element.getLoadBinder() != null && element.getLoadBinder() instanceof FormDataDeletableBinder) {
+            FormDataDeletableBinder binder = (FormDataDeletableBinder) element.getLoadBinder();
+            FormDataDao formDataDao = (FormDataDao) FormUtil.getApplicationContext().getBean("formDataDao");
+            formDataDao.delete(binder.getFormId(), binder.getTableName(), rows, hardDelete);
+        }
     }
 }
