@@ -76,7 +76,6 @@ public class SchedulerPluginJob implements Job {
                                     parameterProperties.put(SchedulerPlugin.PROPERTY_APP_DEFINITION, appDefinition);
                                     parameterProperties.put(SchedulerPlugin.PROPERTY_PLUGIN_MANAGER, pluginManager);
 
-                                    LogUtil.info(getClass().getName(), "["+plugin.getClass().getName()+"] ["+plugin.hashCode()+"]");
                                     try {
                                         if (((SchedulerPlugin) plugin).filter(context, parameterProperties) || manualTrigger) {
                                             ((SchedulerPlugin) plugin).jobRun(context, parameterProperties);
