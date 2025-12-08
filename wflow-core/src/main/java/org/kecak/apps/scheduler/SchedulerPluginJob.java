@@ -1,9 +1,14 @@
 package org.kecak.apps.scheduler;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 import org.joget.apps.app.dao.AppDefinitionDao;
+import org.joget.apps.app.model.AppDefinition;
 import org.joget.apps.app.service.AppUtil;
 import org.joget.commons.util.LogUtil;
+import org.joget.commons.util.StringUtil;
 import org.joget.plugin.base.ExtDefaultPlugin;
+import org.joget.plugin.base.Plugin;
 import org.joget.plugin.base.PluginManager;
 import org.joget.plugin.property.service.PropertyUtil;
 import org.kecak.apps.app.model.SchedulerPlugin;
@@ -13,22 +18,20 @@ import org.quartz.JobExecutionException;
 import org.quartz.SimpleTrigger;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Kecak Exclusive
  *
  * @author aristo
- *
+ * <p>
  * Job for Scheduler Plugin
  */
 public class SchedulerPluginJob implements Job {
     /**
      * Execute
+     *
      * @param context
      * @throws JobExecutionException
      */
@@ -40,36 +43,79 @@ public class SchedulerPluginJob implements Job {
         final boolean manualTrigger = context.getTrigger() instanceof SimpleTrigger; // Triggered from "Fire Now"
 
         Optional.ofNullable(appDefinitionDao.findPublishedApps(null, null, null, null))
-                .map(Collection::stream)
-                .orElseGet(Stream::empty)
+                .stream()
+                .flatMap(Collection::stream)
 
                 // set current app definition
                 .peek(AppUtil::setCurrentAppDefinition)
 
-                .forEach(appDefinition -> Optional.ofNullable(appDefinition.getPluginDefaultPropertiesList())
-                        .map(Collection::stream)
-                        .orElse(Stream.empty())
-                        .forEach(pluginDefaultProperty -> Stream.of(pluginDefaultProperty)
-                            .map(p -> pluginManager.getPlugin(p.getId()))
-                            .filter(p -> p instanceof SchedulerPlugin && p instanceof ExtDefaultPlugin)
-                            .map(p -> (ExtDefaultPlugin)p)
-                            .forEach(plugin -> {
-                                Map<String, Object> pluginProperties = PropertyUtil.getPropertiesValueFromJson(pluginDefaultProperty.getPluginProperties());
-                                plugin.setProperties(pluginProperties);
+                .forEach(appDefinition -> Optional.of(appDefinition)
+                        .map(AppDefinition::getPluginDefaultPropertiesList)
+                        .stream()
+                        .flatMap(Collection::stream)
+                        .forEach(pluginDefaultProperty -> Optional.of(pluginDefaultProperty)
+                                .map(p -> {
+                                    String name = p.getId();
+                                    String pluginProperties = p.getPluginProperties();
+                                    String cacheKey = String.join("#", appDefinition.getAppId(), String.valueOf(appDefinition.getVersion()), name, StringUtil.md5(pluginProperties));
+                                    return getFromCache(cacheKey, () -> {
+                                        Plugin plugin = pluginManager.getPlugin(name);
 
-                                Map<String, Object> parameterProperties = new HashMap<>(pluginProperties);
-                                parameterProperties.put(SchedulerPlugin.PROPERTY_APP_DEFINITION, appDefinition);
-                                parameterProperties.put(SchedulerPlugin.PROPERTY_PLUGIN_MANAGER, pluginManager);
+                                        if(plugin instanceof ExtDefaultPlugin) {
+                                            Map<String, Object> props = PropertyUtil.getPropertiesValueFromJson(pluginProperties);
+                                            ((ExtDefaultPlugin)plugin).setProperties(props);
+                                        }
 
-                                try {
-                                    if (((SchedulerPlugin) plugin).filter(context, parameterProperties) || manualTrigger) {
-                                        ((SchedulerPlugin) plugin).jobRun(context, parameterProperties);
-                                    } else {
-                                        LogUtil.debug(getClass().getName(), "Skipping Scheduler Job Plugin [" + plugin.getName() + "] : Not meeting filter condition");
+                                        return plugin;
+                                    });
+                                })
+                                .filter(p -> p instanceof SchedulerPlugin && p instanceof ExtDefaultPlugin)
+                                .map(p -> (ExtDefaultPlugin) p)
+                                .ifPresent(plugin -> {
+                                    Map<String, Object> parameterProperties = plugin.getProperties();
+                                    parameterProperties.put(SchedulerPlugin.PROPERTY_APP_DEFINITION, appDefinition);
+                                    parameterProperties.put(SchedulerPlugin.PROPERTY_PLUGIN_MANAGER, pluginManager);
+
+                                    LogUtil.info(getClass().getName(), "["+plugin.getClass().getName()+"] ["+plugin.hashCode()+"]");
+                                    try {
+                                        if (((SchedulerPlugin) plugin).filter(context, parameterProperties) || manualTrigger) {
+                                            ((SchedulerPlugin) plugin).jobRun(context, parameterProperties);
+                                        } else {
+                                            LogUtil.debug(getClass().getName(), "Skipping Scheduler Job Plugin [" + plugin.getName() + "] : Not meeting filter condition");
+                                        }
+                                    } catch (Exception e) {
+                                        ((SchedulerPlugin) plugin).onJobError(context, parameterProperties, e);
                                     }
-                                } catch (Exception e) {
-                                    ((SchedulerPlugin) plugin).onJobError(context, parameterProperties, e);
-                                }
-                            })));
+                                })));
+    }
+
+    /**
+     * Get From Cache
+     *
+     * @param key
+     * @param whenMissing
+     * @return
+     * @param <T>
+     */
+    protected <T> T getFromCache(String key, Supplier<T> whenMissing) {
+        assert Objects.nonNull(key);
+        assert Objects.nonNull(whenMissing);
+
+        Cache cache = (Cache) AppUtil.getApplicationContext().getBean("schedulerPluginCache");
+        Element cached = cache.get(key);
+        if (cached != null) {
+            T value = (T) cached.getObjectValue();
+            LogUtil.debug(getClass().getName(), "Hitting cache [" + cache.getName() + "] key [" + key + "] value [" + value + "]");
+            return value;
+        }
+
+        LogUtil.debug(getClass().getName(), "Missing cache [" + cache.getName() + "] key [" + key + "]");
+
+        T value = whenMissing.get();
+        if(value != null) {
+            cache.put(new Element(key, value));
+        }
+
+        return value;
     }
 }

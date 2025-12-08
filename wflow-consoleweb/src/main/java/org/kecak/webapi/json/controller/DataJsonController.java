@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,6 +72,8 @@ public class DataJsonController implements Declutter {
     private final static String FIELD_DIGEST = "digest";
     private final static String FIELD_TOTAL = "total";
     private final static String FIELD_COUNT = "count";
+
+    private final static String VALUE_INDICATOR = "$value";
 
     private final static String MESSAGE_VALIDATION_ERROR = "Validation Error";
     private final static String MESSAGE_SUCCESS = "Success";
@@ -3200,8 +3203,13 @@ public class DataJsonController implements Declutter {
     @Nonnull
     protected Object formatValue(@Nonnull final DataList dataList, @Nonnull final Map<String, Object> row, String field) {
         Object value = Optional.of(field)
+                .map(s -> s.replace(VALUE_INDICATOR, ""))
                 .map(row::get)
                 .orElse("");
+
+        if(field.contains(VALUE_INDICATOR)) {
+            return value;
+        }
 
         return Optional.of(dataList)
                 .map(DataList::getColumns)
@@ -3226,13 +3234,27 @@ public class DataJsonController implements Declutter {
                 .stream()
                 .flatMap(Arrays::stream)
                 .filter(Objects::nonNull)
-                .map(DataListColumn::getName)
+                .filter(Predicate.not(col -> col.getName().isEmpty()))
+                .flatMap(col -> {
+                    final boolean isFormatted = Optional.of(col)
+                            .map(DataListColumn::getFormats)
+                            .stream()
+                            .flatMap(Collection::stream)
+                            .anyMatch(Objects::nonNull);
+                    if (isFormatted) {
+                        return Stream.of(col.getName(), col.getName() + VALUE_INDICATOR);
+                    } else {
+                        return Stream.of(col.getName());
+                    }
+
+                })
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toMap(s -> s, s -> formatValue(dataList, row, s)));
 
         String primaryKeyColumn = getPrimaryKeyColumn(dataList);
         formattedRow.putIfAbsent("_" + FormUtil.PROPERTY_ID, row.get(primaryKeyColumn));
+        formattedRow.putIfAbsent(VALUE_INDICATOR, row.get(primaryKeyColumn));
 
         return formattedRow;
     }
@@ -3513,6 +3535,7 @@ public class DataJsonController implements Declutter {
         try {
             JSONObject data = new JSONObject();
             data.put("_" + FormUtil.PROPERTY_ID, formData.getPrimaryKeyValue());
+
             return data;
         } catch (JSONException e) {
             throw new ApiException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);

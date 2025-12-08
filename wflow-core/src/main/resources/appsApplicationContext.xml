@@ -47,6 +47,11 @@
         <property name="cacheManager" ref="cacheManager"/>
         <property name="cacheName" value="org.kecak.cache.EXTERNAL_DATA_CACHE"/>
     </bean>
+
+    <bean id="schedulerPluginCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="cacheName" value="org.kecak.cache.SCHEDULER_PLUGIN_CACHE"/>
+    </bean>
     
     <bean id="formSessionFactoryCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
         <property name="cacheManager" ref="cacheManager"/>
