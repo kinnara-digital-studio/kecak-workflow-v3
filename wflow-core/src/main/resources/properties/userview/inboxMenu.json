@@ -41,7 +41,21 @@
         "control_use_regex": "false",
         "required" : "true",
         "options_ajax" : "[CONTEXT_PATH]/web/json/app/%s/%s/plugin/org.joget.apps.userview.lib.InboxMenu/service?action=getProcesses"
-    }]
+    },
+        {
+            "name" : "showProcessFilter",
+            "label" : "@@userview.inboxmenu.showProcessFilter@@",
+            "type" : "checkbox",
+            "options": [{
+                "value": "true",
+                "label": ""
+            }],
+            "control_field": "appFilter",
+            "control_value": "process",
+            "control_use_regex": "false"
+        }
+
+    ]
 },
 {
     "title" : "@@userview.inboxmenu.ui.list@@",

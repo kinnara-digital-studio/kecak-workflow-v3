@@ -620,8 +620,10 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
 
     protected JSONArray getFiltersProperty() {
         String appFilter = getPropertyString(PROPERTY_FILTER);
+        boolean showProcessFilter = "true".equalsIgnoreCase(getPropertyString("showProcessFilter"));
 
-        if (!PROPERTY_FILTER_ALL.equals(appFilter)) {
+
+        if (!PROPERTY_FILTER_ALL.equals(appFilter) || !showProcessFilter) {
             return new JSONArray();
         }
 
@@ -641,7 +643,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                                     .map(p -> new JSONObject() {{
                                         try {
                                             put("value", p.getIdWithoutVersion());
-                                            put("label", p.getName() + " (" + p.getIdWithoutVersion() + ")");
+                                            put("label", p.getName());
                                         } catch (JSONException ignored) {
                                         }
                                     }})
