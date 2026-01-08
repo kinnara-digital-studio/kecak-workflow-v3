@@ -1,15 +1,6 @@
 package org.joget.apps.userview.lib;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.kinnarastudio.commons.jsonstream.JSONCollectors;
 import org.joget.apps.app.model.AppDefinition;
 import org.joget.apps.app.model.PackageActivityForm;
 import org.joget.apps.app.model.PackageDefinition;
@@ -40,15 +31,25 @@ import org.joget.workflow.model.service.WorkflowManager;
 import org.joget.workflow.model.service.WorkflowUserManager;
 import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.kecak.apps.datalist.lib.SelectBoxDataListFilterType;
 import org.springframework.context.ApplicationContext;
 
-public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation {
-    private DataList cacheDataList = null;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
 
+public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation {
     public static final String PREFIX_SELECTED = "selected_";
     public static final String PROPERTY_FILTER = "appFilter";
     public static final String PROPERTY_FILTER_ALL = "all";
     public static final String PROPERTY_FILTER_PROCESS = "process";
+    private DataList cacheDataList = null;
 
     @Override
     public String getClassName() {
@@ -174,7 +175,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                     }
                 }
             }
-            
+
             // set data list
             setProperty("dataList", dataList);
         } catch (Exception ex) {
@@ -196,7 +197,15 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             if ("true".equalsIgnoreCase(getPropertyString("showPopup"))) {
                 target = "popup";
             }
-            String json = AppUtil.readPluginResource(getClass().getName(), "/properties/userview/inboxMenuListJson.json", new String[]{target}, true, "message/userview/inboxMenu");
+
+            JSONArray jsonFilter = getFiltersProperty();
+
+            String[] arguments = new String[]{
+                    jsonFilter.toString(),
+                    target
+            };
+
+            String json = AppUtil.readPluginResource(getClass().getName(), "/properties/userview/inboxMenuListJson.json", arguments, true, "message/userview/inboxMenu");
             cacheDataList = dataListService.fromJson(json);
         }
         return cacheDataList;
@@ -210,6 +219,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             String packageId = null;
             String processDefId = null;
             String appFilter = getPropertyString(PROPERTY_FILTER);
+
             if (PROPERTY_FILTER_ALL.equals(appFilter)) {
                 AppDefinition appDef = AppUtil.getCurrentAppDefinition();
                 if (appDef != null) {
@@ -217,7 +227,21 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                     if (packageDef != null) {
                         packageId = packageDef.getId();
                     }
+
+
+                    ApplicationContext ac = AppUtil.getApplicationContext();
+                    AppService appService = (AppService) ac.getBean("appService");
+                    String[] paramProcessId = dataList.getDataListParam(DataList.PARAMETER_FILTER_PREFIX + "processDefId");
+                    processDefId = Optional.ofNullable(paramProcessId)
+                            .stream()
+                            .flatMap(Arrays::stream)
+                            .filter(s -> !s.isEmpty())
+                            .findFirst()
+                            .map(pid -> appService.getWorkflowProcessForApp(appDef.getId(), appDef.getVersion().toString(), pid))
+                            .map(WorkflowProcess::getId)
+                            .orElse(null);
                 }
+
             } else if (PROPERTY_FILTER_PROCESS.equals(appFilter)) {
                 String processId = getPropertyString("processId");
                 AppDefinition appDef = AppUtil.getCurrentAppDefinition();
@@ -231,7 +255,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
 
             if (packageId != null || processDefId != null) {
                 DataListQueryParam param = dataList.getQueryParam(null, null);
-                               
+
                 // get assignments
                 WorkflowManager workflowManager = (WorkflowManager) WorkflowUtil.getApplicationContext().getBean("workflowManager");
                 Collection<WorkflowAssignment> assignmentList = workflowManager.getAssignmentListLite(packageId, processDefId, null, null, param.getSort(), param.getDesc(), param.getStart(), param.getSize());
@@ -254,7 +278,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                     resultList.add(data);
                 }
             }
-            
+
             return resultList;
         } catch (Exception e) {
             return null;
@@ -273,7 +297,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                 PackageDefinition packageDef = appDef.getPackageDefinition();
                 if (packageDef != null) {
                     packageId = packageDef.getId();
-                } 
+                }
             }
         } else if (PROPERTY_FILTER_PROCESS.equals(appFilter)) {
             String processId = getPropertyString("processId");
@@ -285,12 +309,13 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                 processDefId = process.getId();
             }
         }
+
         int count = 0;
-        
+
         if (packageId != null || processDefId != null) {
             count = workflowManager.getAssignmentSize(packageId, processDefId, null);
         }
-        
+
         return count;
     }
 
@@ -302,7 +327,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             if (request != null && !"POST".equalsIgnoreCase(request.getMethod())) {
                 return "userview/plugin/unauthorized.jsp";
             }
-            
+
             // submit form
             submitForm();
         } else {
@@ -362,7 +387,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
         String formUrl = addParamToUrl(getUrl(), "_action", "submit");
         formUrl = addParamToUrl(formUrl, "_mode", "assignment");
         formUrl = addParamToUrl(formUrl, "activityId", activityId);
-        
+
         String cancelUrl = getUrl();
         if ("true".equalsIgnoreCase(getPropertyString("showPopup"))) {
             cancelUrl = "SCRIPT_CLOSE_POPUP";
@@ -373,10 +398,10 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
         appService = (AppService) ac.getBean("appService");
         AppDefinition appDef = appService.getAppDefinitionForWorkflowActivity(activityId);
         FormService formService = (FormService) ac.getBean("formService");
-        
+
         formData = formService.retrieveFormDataFromRequestMap(formData, getRequestParameters());
         formData.setActivityId(assignment.getActivityId());
-        
+
         PackageActivityForm activityForm = appService.viewAssignmentForm(appDef, assignment, formData, formUrl, cancelUrl);
         return activityForm;
     }
@@ -421,7 +446,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                 formHtml = formService.generateElementErrorHtml(form, formData);
                 errorCount = errors.size();
             }
-            
+
             if (formData.getStay()) {
                 setAlertMessage("");
                 setRedirectUrl("");
@@ -463,7 +488,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
 
         // submit form
         formData = formService.executeFormActions(currentForm, formData);
-        
+
         setProperty("submitted", Boolean.TRUE);
         setProperty("redirectUrlAfterComplete", getUrl());
         setRedirectUrl(getUrl());
@@ -479,13 +504,13 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             // complete assignment
             Map<String, String> variableMap = AppUtil.retrieveVariableDataFromMap(getRequestParameters());
             formData = appService.completeAssignmentForm(currentForm, assignment, formData, variableMap);
-            
+
             Map<String, String> errors = formData.getFormErrors();
-            
+
             if (!formData.getStay() && (errors == null || errors.isEmpty()) && activityForm.isAutoContinue()) {
                 // redirect to next activity if available
                 WorkflowAssignment nextActivity = workflowManager.getNextAssignmentByCurrentAssignment(assignment);
-                if (nextActivity != null) { 
+                if (nextActivity != null) {
                     String redirectUrl = getUrl() + "?_mode=assignment&activityId=" + nextActivity.getActivityId();
                     setProperty("messageShowAfterComplete", "");
                     setProperty("redirectUrlAfterComplete", redirectUrl);
@@ -516,7 +541,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        
+
         String action = request.getParameter("action");
 
         if ("getProcesses".equals(action)) {
@@ -525,13 +550,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             try {
                 JSONArray jsonArray = new JSONArray();
 
-                ApplicationContext ac = AppUtil.getApplicationContext();
-                AppService appService = (AppService) ac.getBean("appService");
-                WorkflowManager workflowManager = (WorkflowManager) ac.getBean("workflowManager");
-                AppDefinition appDef = appService.getAppDefinition(appId, appVersion);
-                PackageDefinition packageDefinition = appDef.getPackageDefinition();
-                Long packageVersion = (packageDefinition != null) ? packageDefinition.getVersion() : new Long(1);
-                Collection<WorkflowProcess> processList = workflowManager.getProcessList(appId, packageVersion.toString());
+                Collection<WorkflowProcess> processList = getProcessList(appId, appVersion);
 
                 Map<String, String> empty = new HashMap<String, String>();
                 empty.put("value", "");
@@ -557,35 +576,94 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
     protected String addParamToUrl(String url, String name, String value) {
         return StringUtil.addParamsToUrl(url, name, value);
     }
-    
+
     @Override
     public String getOfflineOptions() {
         String options = super.getOfflineOptions();
         options += ", {name : 'cacheAllLinks', label : '@@userview.offline.cacheList@@', type : 'checkbox', options : [{value : 'true', label : ''}]}";
-        
+
         return options;
     }
-    
+
     @Override
     public Set<String> getOfflineCacheUrls() {
         if ("true".equalsIgnoreCase(getPropertyString("enableOffline"))) {
             Set<String> urls = super.getOfflineCacheUrls();
-            
+
             if ("true".equalsIgnoreCase(getPropertyString("cacheAllLinks"))) {
                 DataList dataList = getDataList();
                 dataList.setRows(getRows(dataList));
                 urls.addAll(UserviewUtil.getDatalistCacheUrls(dataList, false, "true".equalsIgnoreCase(getPropertyString("cacheAllLinks"))));
             }
-            
+
             return urls;
         }
         return null;
     }
-    
+
     @Override
     public Map<WARNING_TYPE, String[]> validation() {
         Map<WARNING_TYPE, String[]> warning = new HashMap<WARNING_TYPE, String[]>();
         warning.put(WARNING_TYPE.READONLY, new String[]{ResourceBundleUtil.getMessage("pwa.process")});
         return warning;
+    }
+
+    protected Collection<WorkflowProcess> getProcessList(String appId, String appVersion) {
+        ApplicationContext ac = AppUtil.getApplicationContext();
+        AppService appService = (AppService) ac.getBean("appService");
+        WorkflowManager workflowManager = (WorkflowManager) ac.getBean("workflowManager");
+        AppDefinition appDef = appService.getAppDefinition(appId, appVersion);
+        PackageDefinition packageDefinition = appDef.getPackageDefinition();
+        Long packageVersion = (packageDefinition != null) ? packageDefinition.getVersion() : new Long(1);
+        return workflowManager.getProcessList(appId, packageVersion.toString());
+    }
+
+    protected JSONArray getFiltersProperty() {
+        String appFilter = getPropertyString(PROPERTY_FILTER);
+
+        if (!PROPERTY_FILTER_ALL.equals(appFilter)) {
+            return new JSONArray();
+        }
+
+        AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
+        return new JSONArray() {{
+            put(new JSONObject() {{
+                try {
+                    put("id", "filter_0");
+                    put("name", "processDefId");
+                    put("label", "Process");
+                    put("type", new JSONObject() {{
+                        put("className", SelectBoxDataListFilterType.class.getName());
+                        put("properties", new JSONObject() {{
+                            JSONArray jsonProcesses = Optional.ofNullable(getProcessList(appDefinition.getAppId(), appDefinition.getVersion().toString()))
+                                    .stream()
+                                    .flatMap(Collection::stream)
+                                    .map(p -> new JSONObject() {{
+                                        try {
+                                            put("value", p.getIdWithoutVersion());
+                                            put("label", p.getName() + " (" + p.getIdWithoutVersion() + ")");
+                                        } catch (JSONException ignored) {
+                                        }
+                                    }})
+                                    .collect(JSONCollectors.toJSONArray(() -> new JSONArray() {{
+                                        try {
+                                            put(new JSONObject() {{
+                                                put("value", "");
+                                                put("label", "");
+                                            }});
+                                        } catch (JSONException ignored) {
+                                        }
+                                    }}));
+
+                            put("options", jsonProcesses);
+
+                            put("defaultValue", "");
+                        }});
+                    }});
+                } catch (JSONException ignored) {
+                }
+            }});
+        }};
+
     }
 }

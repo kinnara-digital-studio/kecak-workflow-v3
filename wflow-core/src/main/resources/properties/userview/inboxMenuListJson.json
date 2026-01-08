@@ -6,7 +6,7 @@
     "orderBy" : "dateCreated",
     "actions" : [],
     "rowActions" : [],
-    "filters" : [],
+    "filters" : %s,
     "binder" : {
         "className" : "",
         "properties" : {}

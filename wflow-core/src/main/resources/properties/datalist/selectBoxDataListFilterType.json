@@ -1,0 +1,36 @@
+[{
+    "title" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.editSelectBox@@",
+    "properties" : [{
+	        "name" : "defaultValue",
+	        "label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.defaultValue@@",
+	        "type" : "textfield"
+    	},
+    	{
+	        "name" : "options",
+	        "label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.options@@",
+	        "type" : "grid",
+	        "columns" : [{
+	            "key" : "value",
+	            "label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.value@@"
+	        },
+	        {
+	            "key" : "label",
+	            "label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.label@@"
+	        }]
+    	},
+    	{
+	        "name" : "optionsBinder",
+	        "label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.chooseOptionsBinder@@",
+	        "type" : "elementselect",
+	        "options_ajax" : "[CONTEXT_PATH]/web/property/json/getElements?classname=org.joget.apps.form.model.FormAjaxOptionsBinder",
+	        "url" : "[CONTEXT_PATH]/web/property/json[APP_PATH]/getPropertyOptions"
+	    },
+		{
+			"name" : "size",
+			"label" : "@@org.kecak.apps.datalist.lib.SelectBoxDatalistFilterType.size@@",
+			"type" : "textfield",
+			"regex_validation" : "^[0-9]+$"
+		}]
+}]
+
+	    
