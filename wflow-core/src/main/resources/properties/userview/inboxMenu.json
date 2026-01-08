@@ -51,7 +51,7 @@
                 "label": ""
             }],
             "control_field": "appFilter",
-            "control_value": "process",
+            "control_value": "all",
             "control_use_regex": "false"
         }
 
