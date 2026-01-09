@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOfflineValidation {
     public static final String PREFIX_SELECTED = "selected_";
@@ -628,6 +629,9 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
         }
 
         AppDefinition appDefinition = AppUtil.getCurrentAppDefinition();
+
+        Collection<String> processFilter = getProcessFilter();
+
         return new JSONArray() {{
             put(new JSONObject() {{
                 try {
@@ -640,6 +644,7 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                             JSONArray jsonProcesses = Optional.ofNullable(getProcessList(appDefinition.getAppId(), appDefinition.getVersion().toString()))
                                     .stream()
                                     .flatMap(Collection::stream)
+                                    .filter(p -> processFilter.isEmpty() || processFilter.contains(p.getIdWithoutVersion()))
                                     .map(p -> new JSONObject() {{
                                         try {
                                             put("value", p.getIdWithoutVersion());
@@ -667,5 +672,14 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
             }});
         }};
 
+    }
+
+    protected Collection<String> getProcessFilter() {
+        return Optional.ofNullable(getPropertyString("processFilter"))
+                .map(s -> s.split(";"))
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
     }
 }

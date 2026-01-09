@@ -41,21 +41,7 @@
         "control_use_regex": "false",
         "required" : "true",
         "options_ajax" : "[CONTEXT_PATH]/web/json/app/%s/%s/plugin/org.joget.apps.userview.lib.InboxMenu/service?action=getProcesses"
-    },
-        {
-            "name" : "showProcessFilter",
-            "label" : "@@userview.inboxmenu.showProcessFilter@@",
-            "type" : "checkbox",
-            "options": [{
-                "value": "true",
-                "label": ""
-            }],
-            "control_field": "appFilter",
-            "control_value": "all",
-            "control_use_regex": "false"
-        }
-
-    ]
+    }]
 },
 {
     "title" : "@@userview.inboxmenu.ui.list@@",
@@ -125,5 +111,32 @@
         "label" : "@@userview.inboxmenu.customFooter.ass@@",
         "type" : "codeeditor",
         "mode" : "html"
+    },{
+        "name" : "headerFilter",
+        "label" : "@@userview.inboxmenu.headerFilter@@",
+        "type" : "header",
+        "control_field": "appFilter",
+        "control_value": "all",
+        "control_use_regex": "false"
+    },{
+        "name" : "showProcessFilter",
+        "label" : "@@userview.inboxmenu.showProcessFilter@@",
+        "type" : "checkbox",
+        "options": [{
+            "value": "true",
+            "label": ""
+        }],
+        "control_field": "appFilter",
+        "control_value": "all",
+        "control_use_regex": "false"
+    },{
+        "name" : "processFilter",
+        "label" : "@@userview.inboxmenu.processFilter@@",
+        "type" : "multiselect",
+        "control_field": "showProcessFilter",
+        "control_value": "true",
+        "control_use_regex": "false",
+        "required" : "true",
+        "options_ajax" : "[CONTEXT_PATH]/web/json/app[APP_PATH]/plugin/org.joget.apps.userview.lib.InboxMenu/service?action=getProcesses"
     }]
 }]
