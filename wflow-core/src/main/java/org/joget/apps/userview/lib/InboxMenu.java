@@ -24,6 +24,8 @@ import org.joget.commons.util.LogUtil;
 import org.joget.commons.util.ResourceBundleUtil;
 import org.joget.commons.util.StringUtil;
 import org.joget.commons.util.TimeZoneUtil;
+import org.joget.directory.model.User;
+import org.joget.directory.model.service.DirectoryManager;
 import org.joget.plugin.base.PluginWebSupport;
 import org.joget.workflow.model.WorkflowAssignment;
 import org.joget.workflow.model.WorkflowProcess;
@@ -259,13 +261,32 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
 
                 // get assignments
                 WorkflowManager workflowManager = (WorkflowManager) WorkflowUtil.getApplicationContext().getBean("workflowManager");
+                DirectoryManager directoryManager = (DirectoryManager) WorkflowUtil.getApplicationContext().getBean("directoryManager");
                 Collection<WorkflowAssignment> assignmentList = workflowManager.getAssignmentListLite(packageId, processDefId, null, null, param.getSort(), param.getDesc(), param.getStart(), param.getSize());
+
+                Map<String, User> memo = new HashMap<>();
 
                 String format = AppUtil.getAppDateFormat();
                 for (WorkflowAssignment assignment : assignmentList) {
                     Map data = new HashMap();
                     data.put("processId", assignment.getProcessId());
-                    data.put("processRequesterId", assignment.getProcessRequesterId());
+
+                    if (showRequesterName()) {
+                        String username = assignment.getProcessRequesterId();
+                        User processRequester;
+                        if (memo.containsKey(username)) {
+                            processRequester = memo.get(username);
+                        } else {
+                            memo.put(username, processRequester = directoryManager.getUserByUsername(username));
+                        }
+
+                        String fullName = processRequester.getFirstName() + " " + processRequester.getLastName();
+                        data.put("processRequesterId", fullName + " (" + username + ")");
+
+                    } else {
+                        data.put("processRequesterId", assignment.getProcessRequesterId());
+                    }
+
                     data.put("activityId", assignment.getActivityId());
                     data.put("processName", assignment.getProcessName());
                     data.put("activityName", assignment.getActivityName());
@@ -681,5 +702,9 @@ public class InboxMenu extends UserviewMenu implements PluginWebSupport, PwaOffl
                 .flatMap(Arrays::stream)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toSet());
+    }
+
+    protected boolean showRequesterName() {
+        return "true".equalsIgnoreCase(getPropertyString("showRequesterName"));
     }
 }

@@ -34,6 +34,12 @@
         "name" : "processName",
         "sortable" : "true"
     },
+        {
+            "id" : "column_1",
+            "label" : "@@userview.inboxmenu.processRequesterId@@",
+            "name" : "processRequesterId",
+            "sortable" : "true"
+        },
     {
         "id" : "column_2",
         "label" : "@@userview.inboxmenu.dateCreated@@",

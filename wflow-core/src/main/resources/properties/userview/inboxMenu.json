@@ -55,6 +55,15 @@
             "label" : ""
         }]
     },{
+        "name": "showRequesterName",
+        "label" : "@@userview.inboxmenu.showRequesterName@@",
+        "type" : "checkbox",
+        "value" : "false",
+        "options" : [{
+            "value" : "true",
+            "label" : ""
+        }]
+    },{
         "name" : "buttonPosition",
         "label" : "@@userview.inboxmenu.buttonPosition@@",
         "type" : "selectbox",
