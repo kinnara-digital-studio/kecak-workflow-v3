@@ -155,7 +155,7 @@ public class Section extends Element implements FormBuilderEditable, FormContain
         return rules;
     }
     
-    protected Boolean isMatch(FormData formData) {
+    public Boolean isMatch(FormData formData) {
         if (!getRules(formData).isEmpty()) {
             boolean match = false;
             
