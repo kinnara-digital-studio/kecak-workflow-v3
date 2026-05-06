@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class entity-name="ApiKeys" lazy="false" name="org.kecak.apps.apikeys.model.ApiKey" table="app_api_key">
+		<id name="id" type="string">
+			<generator class="uuid" />
+		</id>
+		<property name="dateCreated" type="timestamp" />
+		<property name="createdBy" type="string" />
+
+		<property name="key" type="string" />
+		<property name="impersonates" type="string" />
+		<property name="remark" type="string" />
+		<property name="validUntil" type="timestamp" />
+		<property name="active" type="string" />
+	</class>
+</hibernate-mapping>
