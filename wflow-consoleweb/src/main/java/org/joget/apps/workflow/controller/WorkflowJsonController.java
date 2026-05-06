@@ -1,6 +1,7 @@
 package org.joget.apps.workflow.controller;
 
 import com.kinnarastudio.commons.Try;
+import com.kinnarastudio.commons.jsonstream.JSONCollectors;
 import com.kinnarastudio.commons.jsonstream.JSONStream;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -644,6 +645,13 @@ public class WorkflowJsonController {
                     .filter(Predicate.not(String::isEmpty))
                     .ifPresent(s -> data.put("recordId", s));
 
+            WorkflowActivity runningActivityInfo = workflowManager.getRunningActivityInfo(activityId);
+            Optional.ofNullable(runningActivityInfo)
+                    .map(WorkflowActivity::getAssignmentUsers)
+                    .filter(a -> a.length > 0)
+                    .map(Try.onFunction(JSONArray::new))
+                    .ifPresent(user -> data.put("assignee", user));
+
             arrData.put(data);
         }
 
@@ -681,6 +689,19 @@ public class WorkflowJsonController {
             data.put("label", assignment.getActivityName());
             data.put("description", assignment.getDescription());
 
+            WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
+            Optional.ofNullable(process)
+                    .map(WorkflowProcess::getRecordId)
+                    .filter(Predicate.not(String::isEmpty))
+                    .ifPresent(s -> data.put("recordId", s));
+
+            WorkflowActivity runningActivityInfo = workflowManager.getRunningActivityInfo(assignment.getActivityId());
+            Optional.ofNullable(runningActivityInfo)
+                    .map(WorkflowActivity::getAssignmentUsers)
+                    .filter(a -> a.length > 0)
+                    .map(Try.onFunction(JSONArray::new))
+                    .ifPresent(user -> data.put("assignee", user));
+
             jsonObject.accumulate("data", data);
         }
 
@@ -715,6 +736,19 @@ public class WorkflowJsonController {
             data.put("id", assignment.getActivityId());
             data.put("label", assignment.getActivityName());
             data.put("description", assignment.getDescription());
+
+            WorkflowProcess process = workflowManager.getRunningProcessById(assignment.getProcessId());
+            Optional.ofNullable(process)
+                    .map(WorkflowProcess::getRecordId)
+                    .filter(Predicate.not(String::isEmpty))
+                    .ifPresent(s -> data.put("recordId", s));
+
+            WorkflowActivity runningActivityInfo = workflowManager.getRunningActivityInfo(assignment.getActivityId());
+            Optional.ofNullable(runningActivityInfo)
+                    .map(WorkflowActivity::getAssignmentUsers)
+                    .filter(a -> a.length > 0)
+                    .map(Try.onFunction(JSONArray::new))
+                    .ifPresent(user -> data.put("assignee", user));
 
             jsonObject.accumulate("data", data);
         }
