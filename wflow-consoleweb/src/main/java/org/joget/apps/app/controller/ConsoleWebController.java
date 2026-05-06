@@ -120,6 +120,8 @@ import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kecak.apps.apikeys.dao.ApiKeyDao;
+import org.kecak.apps.apikeys.model.ApiKey;
 import org.kecak.apps.app.model.EmailProcessorPlugin;
 import org.kecak.apps.app.model.SchedulerPlugin;
 import org.kecak.apps.incomingEmail.dao.IncomingEmailDao;
@@ -230,6 +232,9 @@ public class ConsoleWebController {
 
     @Autowired
     CamelRouteManager camelRouteManager;
+
+    @Autowired
+    ApiKeyDao apiKeyDao;
 
     @RequestMapping({"/index", "/", "/home"})
     public String index() {
@@ -6254,4 +6259,10 @@ public class ConsoleWebController {
             return "console/dialogClose";
         }
     }
+
+    @RequestMapping(value = "/console/setting/apiKeys/submit", method = RequestMethod.POST)
+    public void consoleSettingIncomingEmailSubmit(ModelMap map, @ModelAttribute("apiKey") final ApiKey apiKey) {
+        apiKeyDao.save(apiKey);
+    }
+
 }
