@@ -15,13 +15,13 @@ import java.util.*;
 @Service
 public class ApiKeyService {
     @Autowired
-    ApiKeyDao apiKeyDao;
+    private ApiKeyDao apiKeyDao;
 
     @Autowired
-    WorkflowUserManager workflowUserManager;
+    private WorkflowUserManager workflowUserManager;
 
     @Autowired
-    AuthTokenService authTokenService;
+    private AuthTokenService authTokenService;
 
     public void create(ApiKey apiKey) {
         assert apiKey != null : "apiKey is null";
