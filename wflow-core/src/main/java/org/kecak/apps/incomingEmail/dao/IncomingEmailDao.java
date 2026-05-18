@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 
 @Transactional
-public class IncomingEmailDao extends AbstractSpringDao {
+public class IncomingEmailDao extends AbstractSpringDao<IncomingEmail> {
     public static final String ENTITY_NAME = "IncomingEmail";
 
     public IncomingEmail load(final String id) {

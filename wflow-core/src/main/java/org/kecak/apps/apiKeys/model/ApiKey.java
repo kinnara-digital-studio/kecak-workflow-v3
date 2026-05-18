@@ -1,13 +1,17 @@
-package org.kecak.apps.apikeys.model;
+package org.kecak.apps.apiKeys.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public class ApiKey implements Serializable {
+    public final static String PREFIX = "apiKey-";
+
     private String id;
     private Date dateCreated;
+    private Date dateModified;
     private String createdBy;
-    private String key;
+    private String modifiedBy;
+    private String apiKey;
     private String impersonates;
     private String remark;
     private Boolean active;
@@ -17,8 +21,8 @@ public class ApiKey implements Serializable {
         return id;
     }
 
-    public String getKey() {
-        return key;
+    public String getApiKey() {
+        return apiKey;
     }
 
     public String getRemark() {
@@ -57,8 +61,8 @@ public class ApiKey implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public void setImpersonates(String impersonates) {
@@ -75,5 +79,21 @@ public class ApiKey implements Serializable {
 
     public void setValidUntil(Date validUntil) {
         this.validUntil = validUntil;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 }

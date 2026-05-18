@@ -100,6 +100,10 @@ public class AuthTokenService implements Serializable {
         return doGenerateToken(Optional.ofNullable(claims).orElseGet(HashMap::new), Optional.ofNullable(username).orElse(WorkflowUserManager.ROLE_ANONYMOUS));
     }
 
+    public String generateToken(String username, Map<String, Object> claims, Date expirationDate) {
+        return doGenerateToken(Optional.ofNullable(claims).orElseGet(HashMap::new), Optional.ofNullable(username).orElse(WorkflowUserManager.ROLE_ANONYMOUS), expirationDate);
+    }
+
     public String generateToken(String username, Map<String, Object> claims, int expiresInMinutes) {
         return doGenerateToken(Optional.ofNullable(claims).orElseGet(HashMap::new), Optional.ofNullable(username).orElse(WorkflowUserManager.ROLE_ANONYMOUS), expiresInMinutes);
     }
@@ -119,6 +123,11 @@ public class AuthTokenService implements Serializable {
     protected String doGenerateToken(@Nonnull Map<String, Object> claims, @Nonnull String subject, int expiresInMinutes) {
         final Date createdDate = clock.now();
         final Date expirationDate = calculateExpirationDate(createdDate, expiresInMinutes);
+        return doGenerateToken(claims, subject, expirationDate);
+    }
+
+    protected String doGenerateToken(@Nonnull Map<String, Object> claims, @Nonnull String subject, Date expirationDate) {
+        final Date createdDate = clock.now();
         return Jwts.builder()
                 .setClaims(claims)
                 .setId(UUID.randomUUID().toString())

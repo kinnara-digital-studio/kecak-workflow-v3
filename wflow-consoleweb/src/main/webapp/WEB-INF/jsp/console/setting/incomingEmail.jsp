@@ -88,7 +88,7 @@
 </script>
 
 <script>
-	Template.init("", "#nav-setting-incomingEmailContent");
+	Template.init("", "#nav-setting-incoming-email");
 </script>
 
 <commons:footer />

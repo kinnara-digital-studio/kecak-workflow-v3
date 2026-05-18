@@ -32,4 +32,8 @@
 	<bean id="incomingEmailDao" class="org.kecak.apps.incomingEmail.dao.IncomingEmailDao">
 		<property name="sessionFactory" ref="appSessionFactory"/>
 	</bean>
+
+	<bean id="apiKeyDao" class="org.kecak.apps.apiKeys.dao.ApiKeyDao">
+		<property name="sessionFactory" ref="appSessionFactory"/>
+	</bean>
 </beans>

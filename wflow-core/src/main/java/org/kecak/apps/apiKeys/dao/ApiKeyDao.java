@@ -1,13 +1,13 @@
-package org.kecak.apps.apikeys.dao;
+package org.kecak.apps.apiKeys.dao;
 
 import org.joget.commons.spring.model.AbstractSpringDao;
-import org.kecak.apps.apikeys.model.ApiKey;
+import org.kecak.apps.apiKeys.model.ApiKey;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Optional;
 
-@Transactionalchoices
+@Transactional
 public class ApiKeyDao extends AbstractSpringDao<ApiKey> {
     public static final String ENTITY_NAME = "ApiKey";
 

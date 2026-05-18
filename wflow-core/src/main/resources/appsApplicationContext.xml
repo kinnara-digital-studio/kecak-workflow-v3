@@ -182,6 +182,7 @@
                 <value>/org/kecak/apps/scheduler/model/SchedulerLog.hbm.xml</value>
                 <value>/org/kecak/apps/scheduler/model/SchedulerDetails.hbm.xml</value>
                 <value>/org/kecak/apps/incomingEmail/model/IncomingEmail.hbm.xml</value>
+                <value>/org/kecak/apps/apiKeys/model/ApiKey.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

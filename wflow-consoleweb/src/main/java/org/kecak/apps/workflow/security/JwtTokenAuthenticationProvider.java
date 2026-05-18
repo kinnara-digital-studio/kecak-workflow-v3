@@ -2,6 +2,7 @@ package org.kecak.apps.workflow.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.kecak.apps.apiKeys.service.ApiKeyService;
 import org.kecak.apps.app.service.AuthTokenService;
 import org.joget.apps.workflow.security.WorkflowUserDetails;
 import org.joget.commons.util.HostManager;
@@ -21,15 +22,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class JwtTokenAuthenticationProvider implements AuthenticationProvider, MessageSourceAware {
 
@@ -43,6 +41,8 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
+    private ApiKeyService apiKeyService;
+
     @Override
     public void setMessageSource(MessageSource messageSource) {
         this.messages = new MessageSourceAccessor(messageSource);
@@ -50,30 +50,40 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
+        assert authentication instanceof JwtAuthenticationToken;
+
         HostManager.initHost();
 
-        JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken)authentication;
+        JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken) authentication;
         String token = jwtAuthentication.getCredentials().toString();
 
         try {
-            User user = Optional.ofNullable(token)
+            Claims claims = Optional.ofNullable(token)
                     .map(authTokenService::getClaims)
+                    .orElseThrow(() -> new BadCredentialsException("Invalid token [" + token + "]"));
+
+            Boolean validate = claims.get(ApiKeyService.class.getName(), Boolean.class);
+            if(validate != null && validate && !apiKeyService.validateToken(token)) {
+                throw new BadCredentialsException("Invalid API Key token");
+            }
+
+            User user = Optional.of(claims)
                     .map(Claims::getSubject)
                     .map(directoryManager::getUserByUsername)
-                    .orElseThrow(() -> new BadCredentialsException("Invalid token [" + token + "]"));
+                    .orElseThrow(() -> new BadCredentialsException("Invalid user token"));
 
             String username = user.getUsername();
 
             // add audit trail
-            LogUtil.info(getClass().getName(), "Authentication for user " + username + ": " + true);
-            workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Authentication for user " + username + ": " + true, new Class[]{String.class}, new Object[]{username}, true);
+            LogUtil.info(getClass().getName(), "Token authentication for user " + username + ": " + true);
+            workflowHelper.addAuditTrail(this.getClass().getName(), "authenticate", "Token authentication for user " + username + ": " + true, new Class[]{String.class}, new Object[]{username}, true);
 
             // get authorities
             Collection<Role> roles = directoryManager.getUserRoles(username);
 
             List<GrantedAuthority> gaList = Optional.ofNullable(roles)
-                    .map(Collection::stream)
-                    .orElseGet(Stream::empty)
+                    .stream()
+                    .flatMap(Collection::stream)
                     .map(Role::getId)
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
@@ -113,5 +123,9 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
 
     public void setWorkflowHelper(WorkflowHelper workflowHelper) {
         this.workflowHelper = workflowHelper;
+    }
+
+    public void setApiKeyService(ApiKeyService apiKeyService) {
+        this.apiKeyService = apiKeyService;
     }
 }

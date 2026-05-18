@@ -201,6 +201,7 @@
         <property name="authTokenService" ref="authTokenService" />
         <property name="workflowUserManager" ref="workflowUserManager" />
         <property name="workflowHelper" ref="workflowHelper" />
+        <property name="apiKeyService" ref="apiKeyService" />
     </bean>
     <!-- End of JTW -->
     

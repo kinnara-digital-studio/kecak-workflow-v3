@@ -101,7 +101,7 @@
 </script>
 
 <script>
-	Template.init("", "#nav-setting-schedulerContent");
+	Template.init("", "#nav-setting-scheduler");
 </script>
 
 <commons:footer />
