@@ -14,6 +14,7 @@
 		<property name="impersonates" type="string" />
 		<property name="remark" type="string" />
 		<property name="validUntil" type="timestamp" column="valid_until"/>
+		<property name="domainWhitelist" type="string" column="domain_whitelist"/>
 		<property name="active" type="boolean" />
 	</class>
 </hibernate-mapping>

@@ -16,6 +16,7 @@ public class ApiKey implements Serializable {
     private String remark;
     private Boolean active;
     private Date validUntil;
+    private String domainWhitelist;
 
     public String getId() {
         return id;
@@ -95,5 +96,13 @@ public class ApiKey implements Serializable {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public String getDomainWhitelist() {
+        return domainWhitelist;
+    }
+
+    public void setDomainWhitelist(String domainWhitelist) {
+        this.domainWhitelist = domainWhitelist;
     }
 }

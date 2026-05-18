@@ -35,7 +35,11 @@
                 </div>
                 <div class="form-row">
                     <label for="remark"><fmt:message key="console.setting.apiKeys.common.label.remark"/></label>
-                    <span class="form-input"><form:input path="remark" cssErrorClass="form-input-error" size="50"/></span>
+                    <span class="form-input"><form:input path="remark" cssErrorClass="form-input-error" size="50"/> *</span>
+                </div>
+                <div class="form-row">
+                    <label for="domainWhitelist"><fmt:message key="console.setting.apiKeys.common.label.domainWhitelist"/></label>
+                    <span class="form-input"><form:input path="domainWhitelist" cssErrorClass="form-input-error" size="50"/></span>
                 </div>
                 <div class="form-row">
                      <label for="validUntil"><fmt:message key="console.setting.apiKeys.common.label.validUntil"/></label>
@@ -55,7 +59,24 @@
 
     <script type="text/javascript">
         function validateField(){
-            // For edit, we don't validate the key since it's readonly
+            var validUntil = $("#validUntil").val();
+            if(validUntil && !/^\d{4}-\d{2}-\d{2}$/.test(validUntil.trim())){
+                alert("<fmt:message key="console.setting.apiKeys.common.label.validUntil"/> must be in YYYY-MM-DD format");
+                return false;
+            }
+
+            var remark = $("#remark").val();
+            if(!remark || !/^.+$/.test(remark.trim())){
+                alert("<fmt:message key="console.setting.apiKeys.common.label.remark"/> must not be empty");
+                return false;
+            }
+
+            var domainWhitelist = $("#domainWhitelist").val();
+            if(domainWhitelist && !/^[\w\.\-\*]+(,[\w\.\-\*]+)*$/.test(domainWhitelist.trim())){
+                alert("<fmt:message key="console.setting.apiKeys.common.label.domainWhitelist"/> must be a comma-separated list of domains, and can include letters, numbers, dots, dashes, and asterisks");
+                return false;
+            }
+
             $("#editApiKey").submit();
         }
 

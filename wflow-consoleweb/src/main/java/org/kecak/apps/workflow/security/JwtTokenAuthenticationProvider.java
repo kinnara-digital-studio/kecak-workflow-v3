@@ -64,7 +64,7 @@ public class JwtTokenAuthenticationProvider implements AuthenticationProvider, M
 
             Boolean validate = claims.get(ApiKeyService.class.getName(), Boolean.class);
             if(validate != null && validate && !apiKeyService.validateToken(token)) {
-                throw new BadCredentialsException("Invalid API Key token");
+                throw new BadCredentialsException("Invalid API Key");
             }
 
             User user = Optional.of(claims)

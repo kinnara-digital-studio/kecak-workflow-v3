@@ -125,7 +125,6 @@ import org.kecak.apps.apiKeys.model.ApiKey;
 import org.kecak.apps.apiKeys.service.ApiKeyService;
 import org.kecak.apps.app.model.EmailProcessorPlugin;
 import org.kecak.apps.app.model.SchedulerPlugin;
-import org.kecak.apps.app.service.AuthTokenService;
 import org.kecak.apps.incomingEmail.dao.IncomingEmailDao;
 import org.kecak.apps.incomingEmail.model.IncomingEmail;
 import org.kecak.apps.route.CamelRouteManager;
@@ -235,10 +234,10 @@ public class ConsoleWebController {
     CamelRouteManager camelRouteManager;
 
     @Autowired
-    ApiKeyDao apiKeyDao;
+    private ApiKeyDao apiKeyDao;
 
     @Autowired
-    ApiKeyService apiKeyService;
+    private ApiKeyService apiKeyService;
 
     @InitBinder("apiKey")
     public void initBinderApiKey(WebDataBinder binder) {
@@ -6384,7 +6383,7 @@ public class ConsoleWebController {
             // edit
             else if ("edit".equals(action)) {
                 try {
-                    apiKeyService.edit(apiKey.getId(), apiKey.getRemark(), apiKey.getActive());
+                    apiKeyService.edit(apiKey.getId(), apiKey.getRemark(), apiKey.getDomainWhitelist(), apiKey.getActive());
                 } catch (Exception e) {
                     invalid = true;
                     errors.add("console.app.message.error.label.exception");

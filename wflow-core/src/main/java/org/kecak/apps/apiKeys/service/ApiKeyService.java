@@ -1,6 +1,10 @@
 package org.kecak.apps.apiKeys.service;
 
+import org.joget.apps.app.service.AppUtil;
+import org.joget.commons.util.LogUtil;
+import org.joget.commons.util.SecurityUtil;
 import org.joget.workflow.model.service.WorkflowUserManager;
+import org.joget.workflow.util.WorkflowUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kecak.apps.apiKeys.dao.ApiKeyDao;
@@ -10,6 +14,7 @@ import org.kecak.apps.app.service.AuthTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
@@ -48,7 +53,7 @@ public class ApiKeyService {
         apiKeyDao.save(apiKey);
     }
 
-    public void edit(String id, String remark, Boolean active) throws ApiKeyServiceException {
+    public void edit(String id, String remark, String domainWhitelist, Boolean active) throws ApiKeyServiceException {
         assert id != null && !id.isEmpty() : "API Key ID must not be null or empty";
 
         final Date now = new Date();
@@ -59,8 +64,9 @@ public class ApiKeyService {
             oldData.setDateModified(now);
             oldData.setModifiedBy(currUsername);
 
-            if(remark != null) oldData.setRemark(remark);
-            if(active != null) oldData.setActive(active);
+            if (remark != null) oldData.setRemark(remark);
+            if (domainWhitelist != null) oldData.setDomainWhitelist(domainWhitelist);
+            if (active != null) oldData.setActive(active);
 
             apiKeyDao.save(oldData);
         } else {
@@ -69,8 +75,36 @@ public class ApiKeyService {
     }
 
     public boolean validateToken(String token) {
-        Long count = apiKeyDao.count("WHERE apiKey = ? AND active = ?", new Object[]{ token, true });
-        return count != null && count > 0;
+        HttpServletRequest httpRequest = WorkflowUtil.getHttpServletRequest();
+        Optional<ApiKey> optApiKeys = Optional.ofNullable(apiKeyDao.find("WHERE apiKey = ? AND active = ?", new Object[]{token, true}, null, null, null, 1))
+                .stream()
+                .flatMap(Collection::stream)
+                .findFirst();
+
+        if (!optApiKeys.isPresent()) return false;
+
+        ApiKey apiKey = optApiKeys.get();
+
+        String whiteList = apiKey.getDomainWhitelist();
+        if (!"".equals(whiteList) && !"*".equals(whiteList)) {
+            if(httpRequest == null) {
+                LogUtil.info(ApiKeyService.class.getName(), "No HTTP request context available for API Key validation");
+                return false;
+            }
+
+            String domain = SecurityUtil.getDomainName(httpRequest.getHeader("referer"));
+            String ip = AppUtil.getClientIp(httpRequest);
+            List<String> whitelist = new ArrayList<>();
+            whitelist.add(httpRequest.getServerName());
+            whitelist.addAll(Arrays.asList(whiteList.split(";")));
+
+            if (!(SecurityUtil.isAllowedDomain(domain, whitelist) || SecurityUtil.isAllowedDomain(ip, whitelist))) {
+                LogUtil.info(ApiKeyService.class.getName(), "Possible CSRF attack from url(" + httpRequest.getRequestURI() + ") referer(" + httpRequest.getHeader("referer") + ") IP(" + ip + ")");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public JSONObject toJson(ApiKey apiKey) throws JSONException {
