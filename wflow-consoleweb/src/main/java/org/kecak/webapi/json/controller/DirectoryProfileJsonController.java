@@ -139,7 +139,7 @@ public class DirectoryProfileJsonController implements Declutter {
                             .setRating(Rating.PARENTAL_GUIDANCE_SUGGESTED)
                             .setStandardDefaultImage(DefaultImage.IDENTICON)
                             .getUrl(email)
-                    : "//www.gravatar.com/avatar/default?d=identicon";
+                    : "https://www.gravatar.com/avatar/default?d=identicon";
 
             HttpEntity entity = getFromUrl(url);
 
