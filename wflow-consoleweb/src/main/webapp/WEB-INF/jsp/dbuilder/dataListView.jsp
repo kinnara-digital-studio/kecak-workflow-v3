@@ -80,6 +80,8 @@
                     <!-- set checkbox position if value is null -->
                     <c:set var="checkboxPosition" value="${dataList.checkboxPosition}" />
 
+                    <c:set var="rowActionPosition" value="${dataList.rowActionPosition}" />
+
                     <c:set var="selectionType" value="multiple" />
                     <c:if test="${dataList.selectionType eq 'single'}">
                         <c:set var="selectionType" value="single" />
@@ -159,6 +161,17 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>
+
+                            <c:if test="${rowActionPosition eq 'left' || rowActionPosition eq 'both'}">
+                                <c:if test="${!empty dataListRows[0] && !empty dataList.rowActions[0]}">
+                                    <c:set var="actionTitle" value="" />
+                                    <c:forEach items="${dataList.rowActions}" var="rowAction" begin="1">
+                                        <c:set var="actionTitle" value="${actionTitle}</th><th class=\"row_action\">" />
+                                    </c:forEach>
+                                    <display:column headerClass="row_action" class="row_action" property="actions" media="html" title="${actionTitle}"/>
+                                </c:if>
+                            </c:if>
+
                             <c:forEach items="${dataList.columns}" var="column">
                                 <c:set var="columnLabel"><c:out value="${column.label}"/></c:set>
                                 <c:set var="columnHiddenCss" value=""/>
@@ -186,13 +199,17 @@
                                     media="${columnMedia}"
                                     />
                             </c:forEach>
-                            <c:if test="${!empty dataListRows[0] && !empty dataList.rowActions[0]}">
-                                <c:set var="actionTitle" value="" />
-                                <c:forEach items="${dataList.rowActions}" var="rowAction" begin="1">
-                                    <c:set var="actionTitle" value="${actionTitle}</th><th class=\"row_action\">" />
-                                </c:forEach>
-                                <display:column headerClass="row_action" class="row_action" property="actions" media="html" title="${actionTitle}"/>
+
+                            <c:if test="${rowActionPosition eq '' || rowActionPosition eq 'right' || rowActionPosition eq 'both'}">
+                                <c:if test="${!empty dataListRows[0] && !empty dataList.rowActions[0]}">
+                                    <c:set var="actionTitle" value="" />
+                                    <c:forEach items="${dataList.rowActions}" var="rowAction" begin="1">
+                                        <c:set var="actionTitle" value="${actionTitle}</th><th class=\"row_action\">" />
+                                    </c:forEach>
+                                    <display:column headerClass="row_action" class="row_action" property="actions" media="html" title="${actionTitle}"/>
+                                </c:if>
                             </c:if>
+
                             <c:if test="${checkboxPosition eq 'right' || checkboxPosition eq 'both'}">
                                 <c:choose>
                                     <c:when test="${selectionType eq 'single'}">

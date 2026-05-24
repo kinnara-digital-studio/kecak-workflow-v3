@@ -29,6 +29,9 @@ public class DataList {
     public static final String ACTION_POSITION_BOTTOM_RIGHT = "bottomRight";
     public static final String ACTION_POSITION_BOTH_LEFT = "bothLeft";
     public static final String ACTION_POSITION_BOTH_RIGHT = "bothRight";
+    public static final String ROW_ACTION_POSITION_LEFT = "left";
+    public static final String ROW_ACTION_POSITION_RIGHT = "right";
+    public static final String ROW_ACTION_POSITION_BOTH = "both";
     public static final String CHECKBOX_POSITION_LEFT = "left";
     public static final String CHECKBOX_POSITION_RIGHT = "right";
     public static final String CHECKBOX_POSITION_BOTH = "both";
@@ -71,6 +74,7 @@ public class DataList {
     private String sessionKeyPrefix = "";
     private String actionPosition = ACTION_POSITION_BOTTOM_LEFT;
     private String checkboxPosition = CHECKBOX_POSITION_LEFT;
+    private String rowActionPosition = ROW_ACTION_POSITION_RIGHT;
     private String selectionType = SELECTION_TYPE_MULTIPLE;
     private Collection<DataListFilterQueryObject> dataListFilterQueryObjectList = new ArrayList<DataListFilterQueryObject>();
     private boolean filterQueryBuild = false;
@@ -443,6 +447,10 @@ public class DataList {
             int sortIndex = Integer.parseInt(sort);
 
             if (getCheckboxPosition().equals(CHECKBOX_POSITION_LEFT) || getCheckboxPosition().equals(CHECKBOX_POSITION_BOTH)) {
+                sortIndex = sortIndex - 1;
+            }
+
+            if(getRowActionPosition().equals(ROW_ACTION_POSITION_LEFT) || getRowActionPosition().equals(ROW_ACTION_POSITION_BOTH)) {
                 sortIndex = sortIndex - 1;
             }
 
@@ -993,5 +1001,13 @@ public class DataList {
 
     public void setTheme(UserviewTheme theme) {
         this.theme = theme;
+    }
+
+    public String getRowActionPosition() {
+        return rowActionPosition;
+    }
+
+    public void setRowActionPosition(String rowActionPosition) {
+        this.rowActionPosition = rowActionPosition;
     }
 }

@@ -97,6 +97,21 @@
             label : '@@userview.datalistmenu.checkboxPosition.no@@'
         }]
     },{
+        name : 'rowActionPosition',
+        label : '@@userview.datalistmenu.rowActionPosition@@',
+        type : 'selectbox',
+        value : 'right',
+        options : [{
+            value : 'left',
+            label : '@@userview.datalistmenu.rowActionPosition.left@@'
+        },{
+            value : 'right',
+            label : '@@userview.datalistmenu.rowActionPosition.right@@'
+        },{
+            value : 'both',
+            label : '@@userview.datalistmenu.rowActionPosition.both@@'
+        }]
+    },{
         name : 'customHeader',
         label : '@@userview.datalistmenu.customHeader@@',
         type : 'codeeditor',

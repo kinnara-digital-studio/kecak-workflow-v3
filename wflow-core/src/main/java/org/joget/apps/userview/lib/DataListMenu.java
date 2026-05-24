@@ -172,6 +172,7 @@ public class DataListMenu extends UserviewMenu implements PwaOfflineValidation {
                 cacheDataList.setActionPosition(getPropertyString("buttonPosition"));
                 cacheDataList.setSelectionType(getPropertyString("selectionType"));
                 cacheDataList.setCheckboxPosition(getPropertyString("checkboxPosition"));
+                cacheDataList.setRowActionPosition(getPropertyString("rowActionPosition"));
             }
         }
         return cacheDataList;

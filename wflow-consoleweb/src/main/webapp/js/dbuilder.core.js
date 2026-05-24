@@ -51,6 +51,7 @@ DatalistBuilder = {
         pageSizeSelectorOptions : '10,20,30,40,50,100',
         buttonPosition : 'bottomLeft',
         checkboxPosition : 'left',
+        rowActionPosition : 'right',
         useSession : 'false',
         considerFilterWhenGetTotal : ''
     },                          //datalist's properties
