@@ -2499,7 +2499,7 @@ public class FormUtil implements ApplicationContextAware {
         return rowSet;
     }
 
-    public static Boolean getPermissionResult(Map permissionObj, FormData formData) {
+    public static Boolean getPermissionResult(Element element, Map permissionObj, FormData formData) {
         Boolean isAuthorize = true;
         if (permissionObj != null && permissionObj.get("className") != null) {
             PluginManager pluginManager = (PluginManager) AppUtil.getApplicationContext().getBean("pluginManager");
@@ -2512,6 +2512,10 @@ public class FormUtil implements ApplicationContextAware {
                 User user = workflowUserManager.getCurrentUser();
                 permission.setCurrentUser(user);
 
+                if(permission instanceof FormPermission) {
+                    ((FormPermission) permission).setFormData(formData);
+                    ((FormPermission) permission).setElement(element);
+                }
                 isAuthorize = permission.isAuthorize();
             }
         }

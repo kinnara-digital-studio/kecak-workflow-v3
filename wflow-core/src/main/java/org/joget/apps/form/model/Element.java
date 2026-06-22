@@ -408,7 +408,7 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
             if (Permission.DEFAULT.equals(getPermissionKey(formData))) {
                 Map permission = (Map) getProperty("permission");
                 if (permission != null) {
-                    isAuthorize = FormUtil.getPermissionResult(permission, formData);
+                    isAuthorize = FormUtil.getPermissionResult(this, permission, formData);
                 } else if (getParent() != null) {
                     isAuthorize = getParent().isAuthorize(formData);
                 }
@@ -417,7 +417,7 @@ public abstract class Element extends ExtDefaultPlugin implements PropertyEditab
                     Map rules = (Map) getProperty("permission_rules");
                     if (rules != null && rules.containsKey(getPermissionKey(formData))) {
                         Map rule = (Map) rules.get(getPermissionKey(formData));
-                        isAuthorize = FormUtil.getPermissionResult((Map) rule.get("permission"), formData);
+                        isAuthorize = FormUtil.getPermissionResult(this, (Map) rule.get("permission"), formData);
                     }
                 } else if (getParent() != null) {
                     isAuthorize = getParent().isAuthorize(formData);

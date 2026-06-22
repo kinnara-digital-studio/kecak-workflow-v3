@@ -192,7 +192,7 @@ public class Form extends Element implements FormBuilderEditable, FormContainer 
             if (Permission.DEFAULT.equals(getPermissionKey(formData))) {
                 Map permissionMap = (Map) getProperty("permission");
                 if (permissionMap != null) {
-                    isAuthorize = FormUtil.getPermissionResult(permissionMap, formData);
+                    isAuthorize = FormUtil.getPermissionResult(this, permissionMap, formData);
                 } else {
                     isAuthorize = true;
                 }
@@ -214,7 +214,7 @@ public class Form extends Element implements FormBuilderEditable, FormContainer 
                 for (Object rule : rules) {
                     Map ruleMap = (Map) rule;
                     String key = ruleMap.get("permission_key").toString();
-                    boolean isAuthorize = FormUtil.getPermissionResult((Map) ruleMap.get("permission"), formData);
+                    boolean isAuthorize = FormUtil.getPermissionResult(this, (Map) ruleMap.get("permission"), formData);
                     if (isAuthorize) {
                         permissionKeys.put(formData, key);
                         break;
