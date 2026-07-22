@@ -5,6 +5,10 @@ import io.jsonwebtoken.impl.DefaultClock;
 import org.joget.commons.util.SetupManager;
 import org.joget.directory.model.User;
 import org.joget.workflow.model.service.WorkflowUserManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,28 +16,26 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 
+@Service
+@PropertySource(value = "classpath:/jwt.properties")
 public class AuthTokenService implements Serializable {
+    public final static String ISSUER = "org.kecak";
     transient
+
     private static final long serialVersionUID = -3301605591108950415L;
     private Clock clock = DefaultClock.INSTANCE;
 
-
+    @Autowired
     private SetupManager setupManager;
 
-    private final static String DEFAULT_SECRET = "It's not secure to use default key";
-    private static final String ISSUER = "org.kecak";
 
-    @Nonnull private final String secret;
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.expirationRefreshToken}")
+    private Long expirationRefreshToken;
 
     private final Long expiration = 600L;
-    private final Long expirationRefreshToken = 300L;
-
-    public AuthTokenService(SetupManager setupManager) {
-        this.setupManager = setupManager;
-
-        String masterPassword = setupManager.getSettingValue(SetupManager.MASTER_LOGIN_PASSWORD);
-        secret = Optional.ofNullable(masterPassword).filter(s -> !s.isEmpty()).orElse(DEFAULT_SECRET);
-    }
 
     public String getUsernameFromToken(String token) throws ExpiredJwtException {
         return getClaimFromToken(token, Claims::getSubject);
@@ -200,9 +202,5 @@ public class AuthTokenService implements Serializable {
     @Nonnull
     public String getSecret() {
         return secret;
-    }
-
-    public void setSetupManager(SetupManager setupManager) {
-        this.setupManager = setupManager;
     }
 }

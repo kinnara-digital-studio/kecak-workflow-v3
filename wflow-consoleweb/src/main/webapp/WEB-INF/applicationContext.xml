@@ -167,10 +167,6 @@
         <property name="directoryManager" ref="directoryManager"/>
     </bean>
 
-    <bean id="authTokenService" class="org.kecak.apps.app.service.AuthTokenService">
-        <constructor-arg ref="setupManager" />
-    </bean>
-
     <bean id="workflowApiAuthEntryPoint" class="org.kecak.webapi.security.WorkflowApiAuthenticationEntryPoint" />
                                                                                                 
     <bean id="workflowHttpAuthFilter" class="org.joget.apps.workflow.security.WorkflowHttpAuthProcessingFilter">
