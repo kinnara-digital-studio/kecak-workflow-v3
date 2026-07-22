@@ -3,7 +3,7 @@ package org.kecak.apps.form.model;
 import org.joget.apps.form.model.Element;
 import org.joget.apps.form.model.FormData;
 import org.joget.apps.form.model.FormPermission;
-import org.joget.apps.userview.model.UserviewPermission;
+import org.joget.apps.userview.model.Permission;
 
 /**
  * @author aristo
@@ -11,7 +11,7 @@ import org.joget.apps.userview.model.UserviewPermission;
  * Permission for form
  *
  */
-public abstract class FormPermissionDefault extends UserviewPermission implements FormPermission {
+public abstract class FormPermissionDefault extends Permission implements FormPermission {
     private FormData formData;
     private Element element;
 
