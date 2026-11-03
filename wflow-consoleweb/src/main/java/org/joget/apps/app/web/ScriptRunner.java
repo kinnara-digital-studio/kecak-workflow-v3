@@ -183,6 +183,13 @@ public class ScriptRunner {
                 printlnError("Error executing: " + command);
             }
             printlnError(e);
+            if (!conn.getAutoCommit()) {
+                try {
+                    conn.rollback();
+                } catch (Exception rEx) {
+                    // ignore
+                }
+            }
             throw e;
         } catch (IOException e) {
             e.fillInStackTrace();
@@ -190,9 +197,15 @@ public class ScriptRunner {
                 printlnError("Error executing: " + command);
             }
             printlnError(e);
+            if (!conn.getAutoCommit()) {
+                try {
+                    conn.rollback();
+                } catch (Exception rEx) {
+                    // ignore
+                }
+            }
             throw e;
         } finally {
-            conn.rollback();
             flush();
         }
     }

@@ -943,16 +943,30 @@ public class FormDataDaoImpl extends HibernateDaoSupport implements FormDataDao 
                     String filename = entityName + ".hbm.xml";
                     File mappingFile = new File(path, filename);
                     if (mappingFile.exists()) {
-                        // load existing mapping
-                        configuration = new Configuration().configure();
-                        configuration.addFile(mappingFile);
-                        configuration.buildMappings();
-                        pc = configuration.getClassMapping(entityName);
-                        if (LogUtil.isDebugEnabled(FormDataDaoImpl.class.getName())) {
-                            LogUtil.debug(FormDataDaoImpl.class.getName(), "  --- Form " + entityName + " loaded from mapping file " + mappingFile.getName());
+                        // check if mapping file contains legacy non-unique index name
+                        boolean hasLegacyIndex = false;
+                        try {
+                            String xmlContent = new String(java.nio.file.Files.readAllBytes(mappingFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                            if (xmlContent.contains("IDX_FormRow_")) {
+                                hasLegacyIndex = true;
+                                mappingFile.delete();
+                            }
+                        } catch (Exception ignore) {
                         }
-                        // save into cache
-                        formPersistentClassCache.put(new net.sf.ehcache.Element(getPersistentClassCacheKey(entityName), pc));
+                        if (!hasLegacyIndex) {
+                            // load existing mapping
+                            configuration = new Configuration().configure();
+                            configuration.addFile(mappingFile);
+                            configuration.buildMappings();
+                            pc = configuration.getClassMapping(entityName);
+                            if (LogUtil.isDebugEnabled(FormDataDaoImpl.class.getName())) {
+                                LogUtil.debug(FormDataDaoImpl.class.getName(), "  --- Form " + entityName + " loaded from mapping file " + mappingFile.getName());
+                            }
+                            // save into cache
+                            formPersistentClassCache.put(new net.sf.ehcache.Element(getPersistentClassCacheKey(entityName), pc));
+                        } else {
+                            mappingFileExist = false;
+                        }
                     } else {
                         mappingFileExist = false;
                     }
@@ -1123,6 +1137,32 @@ public class FormDataDaoImpl extends HibernateDaoSupport implements FormDataDao 
         tableNameNode.setNodeValue(tableName);
         attributeMap.setNamedItem(tableNameNode);
 
+        // update index names to be unique per table (required for PostgreSQL and Oracle where index names are schema-scoped)
+        NodeList columnNodes = document.getElementsByTagName("column");
+        for (int i = 0; i < columnNodes.getLength(); i++) {
+            Element columnElement = (Element) columnNodes.item(i);
+            if (columnElement.hasAttribute("index")) {
+                String colName = columnElement.getAttribute("name");
+                String idxName = "idx_" + tableName + "_" + colName;
+                if (idxName.length() > 60) {
+                    idxName = idxName.substring(0, 50) + "_" + Math.abs(idxName.hashCode() % 10000000);
+                }
+                columnElement.setAttribute("index", idxName);
+            }
+        }
+        NodeList propertyNodes = document.getElementsByTagName("property");
+        for (int i = 0; i < propertyNodes.getLength(); i++) {
+            Element propertyElement = (Element) propertyNodes.item(i);
+            if (propertyElement.hasAttribute("index")) {
+                String propName = propertyElement.getAttribute("name");
+                String idxName = "idx_" + tableName + "_" + propName;
+                if (idxName.length() > 60) {
+                    idxName = idxName.substring(0, 50) + "_" + Math.abs(idxName.hashCode() % 10000000);
+                }
+                propertyElement.setAttribute("index", idxName);
+            }
+        }
+
         // remove existing dynamic components
         NodeList componentTags = document.getElementsByTagName("dynamic-component");
         Node node = componentTags.item(0);
@@ -1258,27 +1298,35 @@ public class FormDataDaoImpl extends HibernateDaoSupport implements FormDataDao 
      * @throws HibernateException
      */
     protected void internalUpdateSchema(final SessionFactory sf, final ServiceRegistry sr, final Configuration configuration, final String entityName) throws HibernateException {
+        // determine actual table name from configuration if available
+        String targetTableName = entityName;
+        Iterator<org.hibernate.mapping.Table> tableMappings = configuration.getTableMappings();
+        if (tableMappings != null && tableMappings.hasNext()) {
+            targetTableName = tableMappings.next().getName();
+        }
+
         // check table exists
         final Set tableSet = new HashSet();
-        if (!entityName.startsWith(FormDataDaoImpl.FORM_PREFIX_TABLE_NAME)) {
-            tableSet.add(entityName);
+        if (!targetTableName.startsWith(FormDataDaoImpl.FORM_PREFIX_TABLE_NAME)) {
+            tableSet.add(targetTableName);
         }
         Session session = null;
         try {
             session = sf.openSession();
+            final String finalTableName = targetTableName;
             session.doWork(new Work() {
                 @Override
                 public void execute(Connection connection) throws SQLException {
                     DatabaseMetaData dbm = connection.getMetaData();
-                    String tableEntityName = entityName;
+                    String tableEntityName = finalTableName;
                     if (dbm.storesUpperCaseIdentifiers()) {
-                        tableEntityName = entityName.toUpperCase();
+                        tableEntityName = finalTableName.toUpperCase();
                     } else if (dbm.storesLowerCaseIdentifiers()) {
-                        tableEntityName = entityName.toLowerCase();
+                        tableEntityName = finalTableName.toLowerCase();
                     }
                     ResultSet rs = dbm.getTables(null, null, tableEntityName, null);
                     if (rs.next()) {
-                        tableSet.add(entityName);
+                        tableSet.add(finalTableName);
                     }
                 }
             });

@@ -1,0 +1,60 @@
+name: docker-compose-kecak-workflow-v3-postgre
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=${DB_ROOT_PASSWORD}
+      - POSTGRES_DB=jwdb
+      - POSTGRES_USER=postgres
+    networks:
+      - backend
+    volumes:
+      - ${DB_DATA}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    image: kecak-workflow-v3:latest
+    depends_on:
+      - "db"
+    environment:
+      - JAVA_OPTS=${WFLOW_JAVA_OPTS}
+      - TOMCAT_DEBUG=${TOMCAT_DEBUG}
+    #links:
+    #  - "db:db"
+    networks:
+      - backend
+    volumes:
+      - ${WFLOW_DIR}:/usr/local/tomcat/wflow
+      - ${WFLOW_LOGS}:/usr/local/tomcat/logs
+    ports:
+      # application port
+      #      - "8080:8080"
+
+      # debugging port
+      - "8000:${TOMCAT_DEBUG_PORT}"
+
+    command : ["wait-for-it", "db:5432", "--", "catalina.sh", "run"]
+  proxy:
+    image: kinnaradigitalstudio/kecak-proxy:${PROXY_IMAGE_TAG}
+    depends_on:
+      - "web"
+      - "db"
+    #links:
+    #  - "web:web"
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    environment:
+      - PROXY_HOST
+      - PROXY_DEFAULT_PORT
+      - PROXY_MAX_UPLOAD_SIZE
+    command : ["wait-for-it", "web:8080", "--", "/usr/local/bin/start.sh"]
+networks:
+  backend:
+volumes:
+  db_data:
+  wflow_dir:
+  wflow_logs:
+  proxy_dir:

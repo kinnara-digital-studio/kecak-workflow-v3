@@ -4245,6 +4245,13 @@ public class ConsoleWebController {
             if (!errors.isEmpty()) {
                 model.addAttribute("errors", errors);
                 invalid = true;
+            } else {
+                try {
+                    Form form = (Form) formService.createElementFromJson(defaultJson);
+                    formDataDao.updateSchema(form, null);
+                } catch (Exception e) {
+                    LogUtil.error(getClass().getName(), e, "Error creating table for form " + formDefinition.getId());
+                }
             }
         }
 
@@ -4304,6 +4311,11 @@ public class ConsoleWebController {
         // update
         formDefinitionDao.update(formDef);
         formDataDao.clearFormCache(form);
+        try {
+            formDataDao.updateSchema(form, null);
+        } catch (Exception e) {
+            LogUtil.error(getClass().getName(), e, "Error updating schema for form " + formId);
+        }
         return "console/apps/dialogClose";
     }
 

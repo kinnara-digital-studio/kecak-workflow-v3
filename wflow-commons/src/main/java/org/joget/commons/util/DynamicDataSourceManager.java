@@ -91,6 +91,27 @@ public class DynamicDataSourceManager {
         } else {
             properties = (Properties) element.getObjectValue();
         }
+
+        if (properties != null) {
+            String driver = properties.getProperty("workflowDriver");
+            if (driver != null && driver.toLowerCase().contains("postgresql")) {
+                System.setProperty("quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+                try {
+                    java.net.URL quartzSetupUrl = DynamicDataSourceManager.class.getResource("/conf/quartz-setup.properties");
+                    if (quartzSetupUrl != null && "file".equals(quartzSetupUrl.getProtocol())) {
+                        File qFile = new File(quartzSetupUrl.toURI());
+                        if (qFile.exists() && qFile.canWrite()) {
+                            String qContent = new String(java.nio.file.Files.readAllBytes(qFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                            if (qContent.contains("StdJDBCDelegate")) {
+                                qContent = qContent.replace("StdJDBCDelegate", "PostgreSQLDelegate");
+                                java.nio.file.Files.write(qFile.toPath(), qContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                            }
+                        }
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+        }
         
         return properties;
     }

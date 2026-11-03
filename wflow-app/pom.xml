@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.joget</groupId>
     <artifactId>wflow-app</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>wflow-app</name>
     <url>http://kecak.org</url>
@@ -23,5 +23,52 @@
         <module>../wflow-consoleweb</module>
 		
     </modules>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>joget-internal</id>
+            <name>Joget Internal Repository</name>
+            <url>https://dev.joget.org/archiva/repository/internal</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>joget-snapshots</id>
+            <name>Joget Snapshot Repository</name>
+            <url>https://dev.joget.org/archiva/repository/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>joget-internal</id>
+            <name>Joget Internal Plugin Repository</name>
+            <url>https://dev.joget.org/archiva/repository/internal</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
 

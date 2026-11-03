@@ -58,6 +58,13 @@ public class SharkObjectIdDao extends AbstractSpringDao {
                     return temp;
                 }
             } catch (Exception e) {
+                if (transaction != null && transaction.isActive()) {
+                    try {
+                        transaction.rollback();
+                    } catch (Exception rbEx) {
+                        LogUtil.error(SharkObjectIdDao.class.getName(), rbEx, "Failed to rollback transaction");
+                    }
+                }
                 retry = true;
                 
                 //retry when update fail for 50 times

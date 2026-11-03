@@ -103,6 +103,7 @@
                                 <span class="form-input">
                                     <select id="dbType" name="dbType">
                                         <option value="mysql">MySQL</option>
+                                        <option value="postgresql">PostgreSQL</option>
                                         <option value="oracle">Oracle</option>
                                         <option value="sqlserver">MS SQL Server</option>
                                         <option value="custom"><%= ResourceBundleUtil.getMessage("setup.datasource.label.custom")%></option>
@@ -244,9 +245,10 @@
                     }
                 },    
                 setupStatus: function() {
+                    Setup.selectType();
                     $("#setupResult").remove();
                     $("#setupButton").hide();
-                    $("#setupForm input, #setupForm select").attr("disabled", "disabled")
+                    $("#setupForm input, #setupForm select").attr("disabled", "disabled");
                     $("#setupProgress").append($("<b><%= ResourceBundleUtil.getMessage("setup.datasource.label.inProgress")%></b> <img src='${pageContext.request.contextPath}/images/v3/loading.gif'/>"));
                     $("#setupStatus").show();
                     var dbType = $("#dbType").val();
@@ -254,8 +256,8 @@
                     var jdbcDriver = $("#jdbcDriver").val();
                     var jdbcUrl = $("#jdbcUrl").val();
                     var jdbcFullUrl = (dbType !== "custom") ? $("#jdbcFullUrl").val(): "";
-                    var jdbcUser = $("#jdbcUser").val();
-                    var jdbcPassword = $("#jdbcPassword").val();
+                    var jdbcUser = (dbType !== "custom") ? $("#dbUser").val() : $("#jdbcUser").val();
+                    var jdbcPassword = (dbType !== "custom") ? $("#dbPassword").val() : $("#jdbcPassword").val();
                     var sampleApps = $("#sampleApps:checked").length > 0;
                     var sampleUsers = $("#sampleUsers:checked").length > 0;
                     var setupParams = "dbType=" + encodeURIComponent(dbType) + "&dbName=" + encodeURIComponent(dbName) + "&jdbcDriver=" + encodeURIComponent(jdbcDriver) + "&jdbcUrl=" + encodeURIComponent(jdbcUrl) + "&jdbcFullUrl=" + encodeURIComponent(jdbcFullUrl) + "&jdbcUser=" + encodeURIComponent(jdbcUser) + "&jdbcPassword=" + encodeURIComponent(jdbcPassword);
@@ -285,6 +287,24 @@
                         }
                         $("#jdbcUrl").val("jdbc:oracle:thin:@" + dbHost + ":" + dbPort + "/" + dbName);
                         $("#jdbcFullUrl").val("jdbc:oracle:thin:@" + dbHost + ":" + dbPort + "/" + dbName);
+                    } else if (dbType === "postgresql") {
+                        $("#jdbcSetup").hide();
+                        $("#dbSetup").show();
+                        $("#jdbcDriver").val("org.postgresql.Driver");
+                        if (Setup.currentDbType !== dbType) {
+                            $("#dbPort").val("5432");
+                            dbPort = 5432;
+                            if (dbUser === "root") {
+                                $("#dbUser").val("postgres");
+                                dbUser = "postgres";
+                            }
+                            if (dbName === "kecakdb") {
+                                $("#dbName").val("jwdb");
+                                dbName = "jwdb";
+                            }
+                        }
+                        $("#jdbcUrl").val("jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName);
+                        $("#jdbcFullUrl").val("jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName);
                     } else if (dbType === "sqlserver") {
                         $("#jdbcSetup").hide();
                         $("#dbSetup").show();
@@ -302,6 +322,14 @@
                         if (Setup.currentDbType !== dbType) {
                             $("#dbPort").val("3306");
                             dbPort = 3306;
+                            if (dbUser === "postgres") {
+                                $("#dbUser").val("root");
+                                dbUser = "root";
+                            }
+                            if (dbName === "jwdb") {
+                                $("#dbName").val("kecakdb");
+                                dbName = "kecakdb";
+                            }
                         }
                         $("#jdbcUrl").val("jdbc:mysql://" + dbHost + ":" + dbPort + "/?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true");
                         $("#jdbcFullUrl").val("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName + "?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true");

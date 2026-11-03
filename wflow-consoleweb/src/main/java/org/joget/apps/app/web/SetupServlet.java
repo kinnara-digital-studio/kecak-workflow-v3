@@ -110,15 +110,61 @@ public class SetupServlet extends HttpServlet {
             ds.setUrl(jdbcUrl);
             ds.setUsername(jdbcUser);
             ds.setPassword(jdbcPassword);
+            boolean isPostgres = "postgresql".equals(dbType) || "postgres".equals(dbType) || (jdbcUrl != null && jdbcUrl.contains("postgresql"));
+
+            if (isPostgres && dbName != null && !dbName.trim().isEmpty() && !"postgres".equalsIgnoreCase(dbName)) {
+                try {
+                    con = ds.getConnection();
+                } catch (SQLException ex) {
+                    LogUtil.info(getClass().getName(), "PostgreSQL connection to " + jdbcUrl + " failed (" + ex.getMessage() + "). Checking if database " + dbName + " needs to be created...");
+                    String maintenanceUrl = jdbcUrl;
+                    int lastSlash = jdbcUrl.lastIndexOf('/');
+                    if (lastSlash != -1) {
+                        int queryIndex = jdbcUrl.indexOf('?', lastSlash);
+                        if (queryIndex != -1) {
+                            maintenanceUrl = jdbcUrl.substring(0, lastSlash + 1) + "postgres" + jdbcUrl.substring(queryIndex);
+                        } else {
+                            maintenanceUrl = jdbcUrl.substring(0, lastSlash + 1) + "postgres";
+                        }
+                    }
+                    BasicDataSource maintDs = new BasicDataSource();
+                    maintDs.setDriverClassName(jdbcDriver);
+                    maintDs.setUrl(maintenanceUrl);
+                    maintDs.setUsername(jdbcUser);
+                    maintDs.setPassword(jdbcPassword);
+                    Connection maintCon = null;
+                    Statement maintStmt = null;
+                    try {
+                        maintCon = maintDs.getConnection();
+                        maintCon.setAutoCommit(true);
+                        maintStmt = maintCon.createStatement();
+                        ResultSet dbRs = maintStmt.executeQuery("SELECT 1 FROM pg_database WHERE datname = '" + dbName.replace("'", "''") + "'");
+                        if (!dbRs.next()) {
+                            LogUtil.info(getClass().getName(), "Creating PostgreSQL database " + dbName);
+                            maintStmt.executeUpdate("CREATE DATABASE \"" + dbName.replace("\"", "\"\"") + "\"");
+                        }
+                        dbRs.close();
+                    } catch (Exception mEx) {
+                        LogUtil.error(getClass().getName(), mEx, "Failed to create database via maintenance connection: " + mEx.getMessage());
+                    } finally {
+                        if (maintStmt != null) try { maintStmt.close(); } catch (Exception e) {}
+                        if (maintCon != null) try { maintCon.close(); } catch (Exception e) {}
+                        try { maintDs.close(); } catch (Exception e) {}
+                    }
+                }
+            }
+
             try {
                 // test connection
-                con = ds.getConnection();
+                if (con == null || con.isClosed()) {
+                    con = ds.getConnection();
+                }
                 con.setAutoCommit(false);
                 success = true;
                 message = ResourceBundleUtil.getMessage("setup.datasource.label.success");
 
                 // switch database
-                if (dbName != null) {
+                if (dbName != null && !isPostgres) {
                     try {
                         LogUtil.info(getClass().getName(), "Use database " + dbName);
                         con.setCatalog(dbName);
@@ -131,13 +177,23 @@ public class SetupServlet extends HttpServlet {
                 boolean exists = false;
                 try {
                     stmt = con.createStatement();
-                    rs = stmt.executeQuery("SELECT * FROM dir_role");
+                    rs = stmt.executeQuery(isPostgres ? "SELECT 1 FROM information_schema.tables WHERE table_name = 'dir_role'" : "SELECT * FROM dir_role");
                     if (rs.next()) {
                         exists = true;
                         LogUtil.info(getClass().getName(), "Database already initialized " + jdbcUrl);
                     }
                 } catch (SQLException ex) {
                     LogUtil.info(getClass().getName(), "Database not yet initialized " + jdbcUrl);
+                } finally {
+                    if (rs != null) {
+                        try { rs.close(); } catch (Exception e) {}
+                    }
+                    if (stmt != null) {
+                        try { stmt.close(); } catch (Exception e) {}
+                    }
+                    if (isPostgres && !con.getAutoCommit()) {
+                        try { con.rollback(); } catch (Exception e) {}
+                    }
                 }
                 
                 if (!exists) {
@@ -153,11 +209,15 @@ public class SetupServlet extends HttpServlet {
                     } else if ("mysql".equals(dbType) || jdbcUrl.contains("mysql")) {
                         schemaFile = "/setup/sql/jwdb-mysql.sql";
                         quartzSchemaFile = "/setup/sql/quartz-mysql.sql";
+                    } else if (isPostgres) {
+                        schemaFile = "/setup/sql/jwdb-postgres.sql";
+                        quartzSchemaFile = "/setup/sql/quartz-postgres.sql";
+                        System.setProperty("quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
                     } else {
                         throw new SQLException("Unrecognized database type, please setup the datasource manually");
                     }
 
-                    if (dbName != null && stmt != null) {
+                    if (dbName != null && stmt != null && !isPostgres) {
                         // create database
                         try {
                             LogUtil.info(getClass().getName(), "Create database " + dbName);
@@ -173,7 +233,7 @@ public class SetupServlet extends HttpServlet {
                     
                     // execute schema file
                     LogUtil.info(getClass().getName(), "Execute schema " + schemaFile);
-                    ScriptRunner runner = new ScriptRunner(con, false, true);
+                    ScriptRunner runner = new ScriptRunner(con, isPostgres, true);
                     in = getClass().getResourceAsStream(schemaFile);
                     inQuartz = getClass().getResourceAsStream(quartzSchemaFile);
                     runner.runScript(new BufferedReader(new InputStreamReader(in)));
@@ -183,12 +243,14 @@ public class SetupServlet extends HttpServlet {
                     // create users
                     String schemaFile = "/setup/sql/jwdb-users.sql";
                     LogUtil.info(getClass().getName(), "Create users using schema " + schemaFile);
-                    ScriptRunner runner = new ScriptRunner(con, false, true);
+                    ScriptRunner runner = new ScriptRunner(con, isPostgres, true);
                     in = getClass().getResourceAsStream(schemaFile);
                     runner.runScript(new BufferedReader(new InputStreamReader(in)));
                 }
                 
-                con.commit();
+                if (!con.getAutoCommit()) {
+                    con.commit();
+                }
                 LogUtil.info(getClass().getName(), "Datasource init complete: " + success);
                 
                 // save profile
@@ -201,6 +263,24 @@ public class SetupServlet extends HttpServlet {
                 DynamicDataSourceManager.writeProperty("workflowUrl", jdbcUrlToSave);
                 DynamicDataSourceManager.writeProperty("workflowUser", jdbcUser);
                 DynamicDataSourceManager.writeProperty("workflowPassword", jdbcPassword);
+                
+                if (isPostgres) {
+                    System.setProperty("quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+                    try {
+                        java.net.URL quartzSetupUrl = getClass().getResource("/conf/quartz-setup.properties");
+                        if (quartzSetupUrl != null && "file".equals(quartzSetupUrl.getProtocol())) {
+                            java.io.File qFile = new java.io.File(quartzSetupUrl.toURI());
+                            if (qFile.exists() && qFile.canWrite()) {
+                                String qContent = new String(java.nio.file.Files.readAllBytes(qFile.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                                if (qContent.contains("StdJDBCDelegate")) {
+                                    qContent = qContent.replace("StdJDBCDelegate", "PostgreSQLDelegate");
+                                    java.nio.file.Files.write(qFile.toPath(), qContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                                }
+                            }
+                        }
+                    } catch (Exception ignore) {
+                    }
+                }
                 
                 // initialize spring application context
                 ServletContext sc = request.getServletContext();
